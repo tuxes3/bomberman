@@ -28,12 +28,20 @@
 <!doctype html>
 <html>
     <head>
+        <style>
+            .block {
+                width: 30px;
+                height: 30px;
+                border: 1px solid black;
+                float: left;
+            }
+            .clear {
+                clear: both;
+            }
+        </style>
     </head>
     <body>
-        <textarea></textarea>
-        <button>Send All</button>
-
-        <div></div>
+        <div id="field"></div>
 
         <script
             src="https://code.jquery.com/jquery-3.2.1.min.js"
@@ -46,14 +54,30 @@
             };
 
             conn.onmessage = function(e) {
-                console.log(e);
-                var div = $('div');
-                div.html(div.html() + '<br>' + e.data);
+                var field = JSON.parse(e.data);
+                console.log(field);
+                var fieldDiv = $('#field');
+                fieldDiv.empty();
+                console.log(field);
+                for (var i = 0; i < field.field.length; i++) {
+                    for (var j = 0; j < field.field[i].length; j++) {
+                        var onField = $('<div class="block">');
+                        onField.css('background-color', field.field[i][j].color);
+                        fieldDiv.append(onField);
+                    }
+                    fieldDiv.append($('<div class="clear">'));
+                }
             };
-            $('button').on('click', function () {
-                var textarea = $('textarea');
-                conn.send(textarea.val());
-                textarea.val('');
+            $(document).keypress(function(e) {
+                if (e.keyCode === 119) { // w
+                    conn.send('w');
+                } else if (e.keyCode === 97) { // a
+                    conn.send('a');
+                } else if (e.keyCode === 115) { // s
+                    conn.send('s');
+                } else if (e.keyCode === 100) { // d
+                    conn.send('d');
+                }
             });
         </script>
     </body>

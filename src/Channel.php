@@ -38,7 +38,10 @@ class Channel implements MessageComponentInterface
 
     const SET_NAME = 'name=';
 
-    protected $names = [];
+    /**
+     * @var Field $field
+     */
+    protected $field;
 
     /**
      * @var \SplObjectStorage|ConnectionInterface[]
@@ -61,22 +64,14 @@ class Channel implements MessageComponentInterface
      */
     function onMessage(ConnectionInterface $from, $msg)
     {
-        if (substr($msg, 0, strlen(self::SET_NAME)) === self::SET_NAME) {
-            $this->names[$from->resourceId] = substr($msg, strlen(self::SET_NAME));
-            return;
+        /** @var Field $field */
+        foreach ($this->field->getField() as $onFieldArray) {
+            foreach ($onFieldArray as $onField) {
+                $onField->event($from, $msg);
+            }
         }
         foreach ($this->clients as $client) {
-            if ($from !== $client) {
-                if (isset($this->names[$from->resourceId])) {
-                    $name = $this->names[$from->resourceId];
-                } else {
-                    $name = $client->resourceId;
-                }
-                $sendData = '['.$name.']: '.$msg;
-            } else {
-                $sendData = '[ME]: '.$msg;
-            }
-            $client->send($sendData);
+            $client->send(json_encode($this->field));
         }
     }
 
@@ -94,8 +89,16 @@ class Channel implements MessageComponentInterface
      */
     function onOpen(ConnectionInterface $conn)
     {
-        $this->clients->attach($conn);
         echo "New connection! ({$conn->resourceId})\n";
+        $this->clients->attach($conn);
+        if (is_null($this->field)) {
+            $this->field = new Field(15, 15);
+        }
+
+        $this->field->addToEmptySpace(new Player(0, 0, $this->field, $conn->resourceId));
+        foreach ($this->clients as $client) {
+            $client->send(json_encode($this->field));
+        }
     }
 
     /**
@@ -103,6 +106,17 @@ class Channel implements MessageComponentInterface
      */
     function onClose(ConnectionInterface $conn)
     {
+        $player = $this->field->getPlayer($conn->resourceId);
+        if (!is_null($player)) {
+            $this->field->remove($player);
+            if ($this->field->countPlayer() == 0) {
+                $this->field = null;
+            } else {
+                foreach ($this->clients as $client) {
+                    $client->send(json_encode($this->field));
+                }
+            }
+        }
         $this->clients->detach($conn);
         echo "Connection {$conn->resourceId} has disconnected\n";
     }
