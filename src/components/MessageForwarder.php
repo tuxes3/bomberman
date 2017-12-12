@@ -25,20 +25,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-use system\Server\IoServer;
-use system\Http\HttpServer;
-use system\WebSocket\WsServer;
-use bomberman\Channel;
+namespace bomberman\components;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+use bomberman\io\Message;
+use React\Socket\ConnectionInterface;
 
-$server = IoServer::factory(
-    new HttpServer(
-        new WsServer(
-            new Channel()
-        )
-    ),
-    8009
-);
+interface MessageForwarder
+{
 
-$server->run();
+    /**
+     * @param Message $message
+     * @param ConnectionInterface $from
+     */
+    public function send($message, ConnectionInterface $from);
+
+}

@@ -25,7 +25,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\components;
+
+use bomberman\components\field\Block;
+use bomberman\components\field\EmptySpace;
+use bomberman\components\field\OnField;
+use bomberman\components\field\Player;
 
 class Field implements \JsonSerializable
 {

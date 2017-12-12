@@ -25,20 +25,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-use system\Server\IoServer;
-use system\Http\HttpServer;
-use system\WebSocket\WsServer;
-use bomberman\Channel;
+namespace bomberman\components\field;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+class EmptySpace extends BaseOnField
+{
 
-$server = IoServer::factory(
-    new HttpServer(
-        new WsServer(
-            new Channel()
-        )
-    ),
-    8009
-);
+    public function init()
+    {
+        $this->color = 'transparent';
+    }
 
-$server->run();
+}

@@ -25,20 +25,76 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-use system\Server\IoServer;
-use system\Http\HttpServer;
-use system\WebSocket\WsServer;
-use bomberman\Channel;
+namespace components;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+use bomberman\components\Field;
 
-$server = IoServer::factory(
-    new HttpServer(
-        new WsServer(
-            new Channel()
-        )
-    ),
-    8009
-);
+/**
+ * Class Room
+ * @package components
+ */
+class Room
+{
 
-$server->run();
+    /**
+     * @var int
+     */
+    private $maxPlayers;
+
+    /**
+     * @var string
+     */
+    private $uniqueId;
+
+    /**
+     * @var \DateTime
+     */
+    private $createdAt;
+
+    /**
+     * @var array|int[]
+     */
+    private $connectedPlayers;
+
+    /**
+     * @var Field
+     */
+    private $field;
+
+    /**
+     * Room constructor.
+     * @param int $maxPlayers
+     * @param string $uniqueId
+     */
+    public function __construct($maxPlayers, $uniqueId)
+    {
+        $this->maxPlayers = $maxPlayers;
+        $this->uniqueId = $uniqueId;
+        $this->connectedPlayers = [];
+        $this->createdAt = new \DateTime();
+        // TODO: calculate field size depending on player
+        $this->field = new Field(10, 10);
+    }
+
+    /**
+     * @param int $playerId
+     * @return bool
+     */
+    public function addPlayer($playerId)
+    {
+        if (in_array($playerId, $this->connectedPlayers) || count($this->connectedPlayers) >= $this->maxPlayers) {
+            return false;
+        }
+        $this->connectedPlayers[] = $playerId;
+        return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUniqueId()
+    {
+        return $this->uniqueId;
+    }
+
+}

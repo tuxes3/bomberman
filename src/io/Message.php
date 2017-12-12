@@ -25,14 +25,46 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\io;
 
-class EmptySpace extends BaseOnField
+/**
+ * Class Message
+ * @package bomberman\io
+ */
+class Message
 {
 
-    public function init()
+    /**
+     * @var string
+     */
+    private $logicName;
+
+    /**
+     * @var \stdClass
+     */
+    private $data;
+
+    public function __construct($message)
     {
-        $this->color = 'transparent';
+        $data = json_decode($message);
+        $this->logicName = $data->name;
+        $this->data = $data->data;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogicName()
+    {
+        return $this->logicName;
+    }
+
+    /**
+     * @return \stdClass
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 
 }

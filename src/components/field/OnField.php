@@ -25,9 +25,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\components\field;
 
-use Ratchet\ConnectionInterface;
+use system\ConnectionInterface;
 
 interface OnField
 {

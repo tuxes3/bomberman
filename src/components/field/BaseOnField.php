@@ -25,9 +25,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\components\field;
 
-use Ratchet\ConnectionInterface;
+use bomberman\components\Field;
+use system\ConnectionInterface;
 
 abstract class BaseOnField implements OnField, \JsonSerializable
 {
@@ -75,7 +76,6 @@ abstract class BaseOnField implements OnField, \JsonSerializable
             'x' => $this->getX(),
             'y' => $this->getY(),
             'color' => $this->getColor(),
-            'class' => $this->getClass(),
         ];
     }
 
@@ -92,14 +92,6 @@ abstract class BaseOnField implements OnField, \JsonSerializable
     public function switchOnField(OnField $a, OnField $b)
     {
         $this->field->switchOnField($a, $b);
-    }
-
-    /**
-     * @return string
-     */
-    public function getClass()
-    {
-        return get_class($this);
     }
 
     /**

@@ -25,57 +25,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\logic;
 
-use Ratchet\ConnectionInterface;
+use bomberman\components\MessageForwarder;
+use bomberman\io\Message;
+use system\ConnectionInterface;
 
-class Player extends BaseOnField
+abstract class BaseLogic
 {
 
     /**
-     * @var int
+     * @var string
      */
-    protected $connId;
+    public static $name = '';
 
-    public function __construct($x, $y, $field, $connId)
-    {
-        parent::__construct($x, $y, $field);
-        $this->connId = $connId;
-    }
+    /**
+     * @var MessageForwarder
+     */
+    protected $messageForwarder;
 
-    public function event(ConnectionInterface $connection, $data)
+    /**
+     * BaseLogic constructor.
+     * @param MessageForwarder $messageForwarder
+     */
+    public function __construct(MessageForwarder $messageForwarder)
     {
-        // move player
-        if ($connection->resourceId == $this->connId) {
-            $nextField = null;
-            switch ($data) {
-                case 'w':
-                    $nextField = $this->getFieldXY($this->getX() - 1, $this->getY());
-                    break;
-                case 'a';
-                    $nextField = $this->getFieldXY($this->getX(), $this->getY() - 1);
-                    break;
-                case 's':
-                    $nextField = $this->getFieldXY($this->getX() + 1, $this->getY());
-                    break;
-                case 'd':
-                    $nextField = $this->getFieldXY($this->getX(), $this->getY() + 1);
-                    break;
-            }
-            if (!is_null($nextField)) {
-                if ($nextField->getClass() === EmptySpace::class) {
-                    $this->switchOnField($this, $nextField);
-                }
-            }
-        }
+        $this->messageForwarder = $messageForwarder;
     }
 
     /**
-     * @return int
+     * @param Message $message
+     * @param ConnectionInterface $sender
      */
-    public function getConnId()
-    {
-        return $this->connId;
-    }
+    abstract public function execute($message, ConnectionInterface $sender);
 
 }
