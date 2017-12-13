@@ -25,38 +25,58 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman\logic;
+namespace bomberman\io;
 
-use bomberman\Context;
-use bomberman\io\Message;
-use Ratchet\ConnectionInterface;
+use bomberman\components\Room;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 
-abstract class BaseLogic
+/**
+ * Class DataCollection
+ * @package bomberman\io
+ */
+class DataCollection extends ArrayCollection implements \JsonSerializable
 {
 
     /**
-     * @var string
+     * @return array
      */
-    public static $name = '';
-
-    /**
-     * @var Context
-     */
-    protected $context;
-
-    /**
-     * BaseLogic constructor.
-     * @param Context $context
-     */
-    public function __construct(Context $context)
+    public function jsonSerialize()
     {
-        $this->context = $context;
+        return $this->toArray();
     }
 
     /**
-     * @param Message $message
-     * @param ConnectionInterface $sender
+     * @return string
      */
-    abstract public function execute($message, ConnectionInterface $sender);
+    public function getFreeUniqueId()
+    {
+        $mayNextId = substr(md5(openssl_random_pseudo_bytes(128)), 0, 8);
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq('uniqueId', $mayNextId));
+        $tmp = $this->matching($criteria);
+        while ($tmp->count() > 0) {
+            $mayNextId = substr(md5(openssl_random_pseudo_bytes(128)), 0, 8);
+            $criteria = Criteria::create()
+                ->where(Criteria::expr()->eq('uniqueId', $mayNextId));
+            $tmp = $this->matching($criteria);
+        }
+        return $mayNextId;
+    }
+
+    /**
+     * @param $uniqueId
+     * @return Room|null
+     */
+    public function findRoomByUniqueId($uniqueId)
+    {
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq('uniqueId', $uniqueId));
+        $match = $this->matching($criteria);
+        if ($match->count() > 0) {
+            return $match->first();
+        }
+        return null;
+    }
 
 }

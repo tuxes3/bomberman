@@ -27,16 +27,18 @@
 
 namespace bomberman;
 
+use bomberman\io\DataCollection;
 use bomberman\io\Message;
 use bomberman\logic\BaseLogic;
+use bomberman\logic\FieldLogic;
 use bomberman\logic\RoomLogic;
-use components\MessageForwarder;
-use React\Socket\ConnectionInterface;
+use Ratchet\ConnectionInterface;
+use Ratchet\MessageComponentInterface;
 
 /**
- * Class Channel
+ * Class BombermanWebsocket
  */
-class BombermanWebsocket implements MessageComponentInterface, MessageForwarder
+class BombermanWebsocket implements MessageComponentInterface, Context
 {
 
     /**
@@ -50,13 +52,20 @@ class BombermanWebsocket implements MessageComponentInterface, MessageForwarder
     protected $logics;
 
     /**
+     * @var DataCollection $data
+     */
+    protected $data;
+
+    /**
      * Channel constructor.
      */
     public function __construct()
     {
         $this->clients = new \SplObjectStorage();
+        $this->data = new DataCollection();
         $this->logics = [
-            RoomLogic::$name => new RoomLogic(),
+            RoomLogic::$name => new RoomLogic($this),
+            FieldLogic::$name => new FieldLogic($this),
         ];
     }
 
@@ -68,8 +77,10 @@ class BombermanWebsocket implements MessageComponentInterface, MessageForwarder
      */
     function onMessage(ConnectionInterface $from, $msg)
     {
-        $message = new Message($msg);
+        echo ($msg . PHP_EOL);
+        $message = Message::fromJson($msg);
         $this->send($message, $from);
+        echo ($this->data->count().' : count');
     }
 
     /**
@@ -79,6 +90,27 @@ class BombermanWebsocket implements MessageComponentInterface, MessageForwarder
     public function send($message, ConnectionInterface $from)
     {
         $this->logics[$message->getLogicName()]->execute($message, $from);
+    }
+
+    /**
+     * @return DataCollection
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param array|int[] $playerIds
+     * @param Message $message
+     */
+    public function sendToClients($playerIds, $message)
+    {
+        foreach ($this->clients as $client) {
+            if (in_array($client->resourceId, $playerIds)) {
+                $client->send(json_encode($message));
+            }
+        }
     }
 
     /**

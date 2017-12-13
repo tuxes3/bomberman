@@ -27,9 +27,11 @@
 
 namespace bomberman\components\field;
 
-use system\ConnectionInterface;
-
-class Player extends BaseOnField
+/**
+ * Class Player
+ * @package bomberman\components\field
+ */
+class Player extends BaseInCell
 {
 
     /**
@@ -37,37 +39,32 @@ class Player extends BaseOnField
      */
     protected $connId;
 
-    public function __construct($x, $y, $field, $connId)
+    /**
+     * Player constructor.
+     * @param $x
+     * @param $y
+     * @param $connId
+     */
+    public function __construct($x, $y, $connId)
     {
-        parent::__construct($x, $y, $field);
+        parent::__construct($x, $y);
         $this->connId = $connId;
     }
 
-    public function event(ConnectionInterface $connection, $data)
+    /**
+     * @return boolean
+     */
+    public function canPlayerEnter()
     {
-        // move player
-        if ($connection->resourceId == $this->connId) {
-            $nextField = null;
-            switch ($data) {
-                case 'w':
-                    $nextField = $this->getFieldXY($this->getX() - 1, $this->getY());
-                    break;
-                case 'a';
-                    $nextField = $this->getFieldXY($this->getX(), $this->getY() - 1);
-                    break;
-                case 's':
-                    $nextField = $this->getFieldXY($this->getX() + 1, $this->getY());
-                    break;
-                case 'd':
-                    $nextField = $this->getFieldXY($this->getX(), $this->getY() + 1);
-                    break;
-            }
-            if (!is_null($nextField)) {
-                if ($nextField->getClass() === EmptySpace::class) {
-                    $this->switchOnField($this, $nextField);
-                }
-            }
-        }
+        return true;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDisplayPriority()
+    {
+        return 100;
     }
 
     /**

@@ -31,7 +31,7 @@ namespace bomberman\io;
  * Class Message
  * @package bomberman\io
  */
-class Message
+class Message implements \JsonSerializable
 {
 
     /**
@@ -40,16 +40,68 @@ class Message
     private $logicName;
 
     /**
+     * @var string
+     */
+    private $event;
+
+    /**
      * @var \stdClass
      */
     private $data;
 
-    public function __construct($message)
+    private function __construct()
     {
-        $data = json_decode($message);
-        $this->logicName = $data->name;
-        $this->data = $data->data;
     }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'name' => $this->logicName,
+            'event' => $this->event,
+            'data' => $this->data,
+        ];
+    }
+
+    /**
+     * @param string $message
+     * $message :=
+     * {
+     *      name: "xxx",
+     *      event: "yyy",
+     *      data: {
+     *          ...
+     *      }
+     * }
+     * @return Message
+     */
+    public static function fromJson($message)
+    {
+        $instance = new self();
+        $data = json_decode($message);
+        $instance->logicName = $data->name;
+        $instance->event = $data->event;
+        $instance->data = $data->data;
+        return $instance;
+    }
+
+    /**
+     * @param $name
+     * @param $event
+     * @param $data
+     * @return Message
+     */
+    public static function fromCode($name, $event, $data)
+    {
+        $instance = new self();
+        $instance->logicName = $name;
+        $instance->event = $event;
+        $instance->data = $data;
+        return $instance;
+    }
+
 
     /**
      * @return string
@@ -65,6 +117,14 @@ class Message
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEvent()
+    {
+        return $this->event;
     }
 
 }

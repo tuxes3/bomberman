@@ -25,15 +25,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace components;
-
-use bomberman\components\Field;
+namespace bomberman\components;
 
 /**
  * Class Room
  * @package components
  */
-class Room
+class Room implements \JsonSerializable
 {
 
     /**
@@ -73,20 +71,43 @@ class Room
         $this->connectedPlayers = [];
         $this->createdAt = new \DateTime();
         // TODO: calculate field size depending on player
-        $this->field = new Field(10, 10);
+        $this->field = new Field($maxPlayers);
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'maxPlayers' => $this->maxPlayers,
+            'connectedPlayers' => count($this->connectedPlayers),
+            'uniqueId' => $this->uniqueId,
+        ];
     }
 
     /**
      * @param int $playerId
-     * @return bool
+     * @return bool|string
      */
     public function addPlayer($playerId)
     {
-        if (in_array($playerId, $this->connectedPlayers) || count($this->connectedPlayers) >= $this->maxPlayers) {
-            return false;
+        if (in_array($playerId, $this->connectedPlayers)) {
+            return sprintf('Player is already in room (%s).', $this->uniqueId);
+        }
+        if (count($this->connectedPlayers) >= $this->maxPlayers) {
+            return sprintf('The room (%s) is already full.', $this->uniqueId);
         }
         $this->connectedPlayers[] = $playerId;
         return true;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isStartable()
+    {
+        return count($this->connectedPlayers) == $this->maxPlayers;
     }
 
     /**
@@ -95,6 +116,22 @@ class Room
     public function getUniqueId()
     {
         return $this->uniqueId;
+    }
+
+    /**
+     * @return array|int[]
+     */
+    public function getConnectedPlayers()
+    {
+        return $this->connectedPlayers;
+    }
+
+    /**
+     * @return Field
+     */
+    public function getField()
+    {
+        return $this->field;
     }
 
 }

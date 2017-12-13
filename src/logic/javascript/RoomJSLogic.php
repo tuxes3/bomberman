@@ -25,19 +25,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman\components\field;
+namespace bomberman\logic\javascript;
 
-use system\ConnectionInterface;
-
-interface OnField
+/**
+ * Interface RoomJSLogic
+ * @package bomberman\logic\javascript
+ */
+interface RoomJSLogic
 {
 
-    public function getX();
-    public function getY();
-    public function setX($x);
-    public function setY($y);
-    public function getColor();
-    public function getClass();
-    public function event(ConnectionInterface $connection, $data);
+    const NAME = 'room_js';
+
+    const EVENT_LIST = 'list';
 
 }

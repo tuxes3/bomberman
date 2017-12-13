@@ -27,10 +27,7 @@
 
 namespace bomberman\components\field;
 
-use bomberman\components\Field;
-use system\ConnectionInterface;
-
-abstract class BaseOnField implements OnField, \JsonSerializable
+abstract class BaseInCell implements InCell, \JsonSerializable
 {
 
     /**
@@ -43,31 +40,10 @@ abstract class BaseOnField implements OnField, \JsonSerializable
      */
     protected $y;
 
-    /**
-     * @var Field
-     */
-    protected $field;
-
-    /**
-     * @var string
-     */
-    protected $color;
-
-    public function __construct($x, $y, $field)
+    public function __construct($x, $y)
     {
         $this->x = $x;
         $this->y = $y;
-        $this->field = $field;
-        $this->color = '#000';
-        $this->init();
-    }
-
-    public function event(ConnectionInterface $connection, $data)
-    {
-    }
-
-    public function init()
-    {
     }
 
     public function jsonSerialize()
@@ -75,23 +51,9 @@ abstract class BaseOnField implements OnField, \JsonSerializable
         return [
             'x' => $this->getX(),
             'y' => $this->getY(),
-            'color' => $this->getColor(),
+            'class' => $this->getClass(),
+            'displayPriority' => $this->getDisplayPriority(),
         ];
-    }
-
-    /**
-     * @param $x
-     * @param $y
-     * @return OnField|null
-     */
-    public function getFieldXY($x, $y)
-    {
-        return $this->field->getXY($x, $y);
-    }
-
-    public function switchOnField(OnField $a, OnField $b)
-    {
-        $this->field->switchOnField($a, $b);
     }
 
     /**
@@ -133,9 +95,9 @@ abstract class BaseOnField implements OnField, \JsonSerializable
     /**
      * @return string
      */
-    public function getColor()
+    public function getClass()
     {
-        return $this->color;
+        return get_class($this);
     }
 
 }

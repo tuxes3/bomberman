@@ -27,12 +27,23 @@
 
 namespace bomberman\components\field;
 
-class Block extends BaseOnField
+class Block extends BaseInCell
 {
 
-    public function init()
+    /**
+     * @return bool
+     */
+    public function canPlayerEnter()
     {
-        $this->color = '#f00';
+        return false;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDisplayPriority()
+    {
+        return 100;
     }
 
 }

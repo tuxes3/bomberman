@@ -25,38 +25,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman\logic;
+namespace bomberman;
 
-use bomberman\Context;
+use bomberman\io\DataCollection;
 use bomberman\io\Message;
 use Ratchet\ConnectionInterface;
 
-abstract class BaseLogic
+interface Context
 {
 
     /**
-     * @var string
-     */
-    public static $name = '';
-
-    /**
-     * @var Context
-     */
-    protected $context;
-
-    /**
-     * BaseLogic constructor.
-     * @param Context $context
-     */
-    public function __construct(Context $context)
-    {
-        $this->context = $context;
-    }
-
-    /**
      * @param Message $message
-     * @param ConnectionInterface $sender
+     * @param ConnectionInterface $from
      */
-    abstract public function execute($message, ConnectionInterface $sender);
+    public function send($message, ConnectionInterface $from);
+
+    /**
+     * @return DataCollection
+     */
+    public function getData();
+
+    /**
+     * @param array|int[] $playerIds
+     * @param Message $message
+     */
+    public function sendToClients($playerIds, $message);
 
 }

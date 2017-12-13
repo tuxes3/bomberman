@@ -25,18 +25,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman\components;
+namespace bomberman\components\field;
 
-use bomberman\io\Message;
-use React\Socket\ConnectionInterface;
-
-interface MessageForwarder
+interface InCell
 {
 
     /**
-     * @param Message $message
-     * @param ConnectionInterface $from
+     * @return int
      */
-    public function send($message, ConnectionInterface $from);
+    public function getX();
+
+    /**
+     * @return int
+     */
+    public function getY();
+
+    /**
+     * @param int $x
+     */
+    public function setX($x);
+
+    /**
+     * @param int $y
+     */
+    public function setY($y);
+
+    /**
+     * @return string
+     */
+    public function getClass();
+
+    /**
+     * @return boolean
+     */
+    public function canPlayerEnter();
+
+    /**
+     * @return int
+     */
+    public function getDisplayPriority();
 
 }

@@ -25,38 +25,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman\logic;
+namespace bomberman\logic\javascript;
 
-use bomberman\Context;
-use bomberman\io\Message;
-use Ratchet\ConnectionInterface;
-
-abstract class BaseLogic
+/**
+ * Interface FieldJSLogic
+ * @package bomberman\logic\javascript
+ */
+interface FieldJSLogic
 {
 
-    /**
-     * @var string
-     */
-    public static $name = '';
+    const NAME = 'field_js';
 
-    /**
-     * @var Context
-     */
-    protected $context;
-
-    /**
-     * BaseLogic constructor.
-     * @param Context $context
-     */
-    public function __construct(Context $context)
-    {
-        $this->context = $context;
-    }
-
-    /**
-     * @param Message $message
-     * @param ConnectionInterface $sender
-     */
-    abstract public function execute($message, ConnectionInterface $sender);
+    const EVENT_UPDATE = 'update';
 
 }

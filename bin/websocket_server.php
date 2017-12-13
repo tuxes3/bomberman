@@ -25,17 +25,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-use system\Server\IoServer;
-use system\Http\HttpServer;
-use system\WebSocket\WsServer;
-use bomberman\Channel;
+use Ratchet\Server\IoServer;
+use Ratchet\Http\HttpServer;
+use Ratchet\WebSocket\WsServer;
+use bomberman\BombermanWebsocket;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+require_once dirname(__DIR__).'/vendor/ratchet/rfc6455/src/Messaging/CloseFrameChecker.php';
 
 $server = IoServer::factory(
     new HttpServer(
         new WsServer(
-            new Channel()
+            new BombermanWebsocket()
         )
     ),
     8009

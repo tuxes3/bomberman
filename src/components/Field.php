@@ -27,120 +27,62 @@
 
 namespace bomberman\components;
 
-use bomberman\components\field\Block;
-use bomberman\components\field\EmptySpace;
-use bomberman\components\field\OnField;
-use bomberman\components\field\Player;
+use bomberman\components\field\InCell;
 
 class Field implements \JsonSerializable
 {
-    protected $field = [];
 
-    public function __construct($width, $height)
+    /**
+     * @var array|InCell[]
+     */
+    protected $cells = [];
+
+    /**
+     * @var int $maxPlayers
+     */
+    protected $maxPlayers;
+
+    public function __construct($maxPlayers)
     {
-        for ($i = 0; $i < $width; $i++) {
-            $this->field[] = [];
-            for ($j = 0; $j < $height; $j++) {
-                $this->field[$i][$j] = rand(0, 4) == 0
-                    ? new Block($i, $j, $this)
-                    : new EmptySpace($i, $j, $this)
-                ;
-            }
-        }
+        $this->maxPlayers = $maxPlayers;
     }
 
     /**
      * @param $x
      * @param $y
-     * @return OnField|null
+     * @return InCell|null
      */
     public function getXY($x, $y)
     {
-        if (isset($this->field[$x])) {
-            if (isset($this->field[$x][$y])) {
-                return $this->field[$x][$y];
+        if (isset($this->cells[$x])) {
+            if (isset($this->cells[$x][$y])) {
+                return $this->cells[$x][$y];
             }
         }
         return null;
-    }
-
-    /**
-     * @param OnField $a
-     * @param OnField $b
-     */
-    public function switchOnField(OnField $a, OnField $b)
-    {
-        $this->field[$a->getX()][$a->getY()] = $b;
-        $this->field[$b->getX()][$b->getY()] = $a;
-        $bxTemp = $b->getX();
-        $byTemp = $b->getY();
-        $b->setX($a->getX());
-        $b->setY($a->getY());
-        $a->setX($bxTemp);
-        $a->setY($byTemp);
     }
 
     public function jsonSerialize()
     {
         return [
-            'field' => $this->field
+            'cells' => $this->cells
         ];
     }
 
     /**
-     * @return OnField[]
+     * @return InCell[]
      */
-    public function getField()
+    public function getCells()
     {
-        return $this->field;
-    }
-
-    public function addToEmptySpace(OnField $toAdd)
-    {
-        foreach ($this->field as $i => $fieldArray) {
-            foreach ($fieldArray as $j => $onField) {
-                if ($onField->getClass() == EmptySpace::class) {
-                    $toAdd->setX($onField->getX());
-                    $toAdd->setY($onField->getY());
-                    $this->field[$i][$j] = $toAdd;
-                    break 2;
-                }
-            }
-        }
-    }
-
-    public function remove(OnField $onField)
-    {
-        $this->field[$onField->getX()][$onField->getY()] = new EmptySpace($onField->getX(), $onField->getY(), $this);
+        return $this->cells;
     }
 
     /**
-     * @param $connId
-     * @return null|Player
+     * @param $cells
      */
-    public function getPlayer($connId)
+    public function setCells($cells)
     {
-        foreach ($this->field as $i => $fieldArray) {
-            foreach ($fieldArray as $j => $onField) {
-                if ($onField instanceof Player && $onField->getConnId() == $connId) {
-                    return $onField;
-                }
-            }
-        }
-        return null;
-    }
-
-    public function countPlayer()
-    {
-        $count = 0;
-        foreach ($this->field as $i => $fieldArray) {
-            foreach ($fieldArray as $j => $onField) {
-                if ($onField instanceof Player) {
-                    $count++;
-                }
-            }
-        }
-        return $count;
+        $this->cells = $cells;
     }
 
 }
