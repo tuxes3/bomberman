@@ -25,21 +25,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-use Ratchet\Server\IoServer;
-use Ratchet\Http\HttpServer;
-use Ratchet\WebSocket\WsServer;
-use bomberman\BombermanWebsocket;
+namespace bomberman\components\field;
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
-require_once dirname(__DIR__).'/vendor/ratchet/rfc6455/src/Messaging/CloseFrameChecker.php';
+interface InCell
+{
 
-$server = IoServer::factory(
-    new HttpServer(
-        new WsServer(
-            new BombermanWebsocket()
-        )
-    ),
-    8009
-);
+    /**
+     * @return int
+     */
+    public function getX();
 
-$server->run();
+    /**
+     * @return int
+     */
+    public function getY();
+
+    /**
+     * @param int $x
+     */
+    public function setX($x);
+
+    /**
+     * @param int $y
+     */
+    public function setY($y);
+
+    /**
+     * @return string
+     */
+    public function getClass();
+
+    /**
+     * @return boolean
+     */
+    public function canPlayerEnter();
+
+    /**
+     * @return int
+     */
+    public function getDisplayPriority();
+
+}

@@ -25,14 +25,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\components\field;
 
-class EmptySpace extends BaseOnField
+/**
+ * Class Player
+ * @package bomberman\components\field
+ */
+class Player extends BaseInCell
 {
 
-    public function init()
+    /**
+     * @var int
+     */
+    protected $connId;
+
+    /**
+     * Player constructor.
+     * @param $x
+     * @param $y
+     * @param $connId
+     */
+    public function __construct($x, $y, $connId)
     {
-        $this->color = 'transparent';
+        parent::__construct($x, $y);
+        $this->connId = $connId;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function canPlayerEnter()
+    {
+        return true;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDisplayPriority()
+    {
+        return 100;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConnId()
+    {
+        return $this->connId;
     }
 
 }

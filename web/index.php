@@ -41,44 +41,16 @@
         </style>
     </head>
     <body>
-        <div id="field"></div>
+        <a id="listRooms" href="#">List Rooms</a>
+        <a id="createRoom" href="#">Create Room</a>
+        Max Player:
+        <input type="number" id="maxPlayer" value="2" />
 
         <script
             src="https://code.jquery.com/jquery-3.2.1.min.js"
             integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
             crossorigin="anonymous"></script>
-        <script type="text/javascript">
-            var conn = new WebSocket('ws://localhost:8009');
-            conn.onopen = function(e) {
-                console.log("Connection established!");
-            };
-
-            conn.onmessage = function(e) {
-                var field = JSON.parse(e.data);
-                console.log(field);
-                var fieldDiv = $('#field');
-                fieldDiv.empty();
-                console.log(field);
-                for (var i = 0; i < field.field.length; i++) {
-                    for (var j = 0; j < field.field[i].length; j++) {
-                        var onField = $('<div class="block">');
-                        onField.css('background-color', field.field[i][j].color);
-                        fieldDiv.append(onField);
-                    }
-                    fieldDiv.append($('<div class="clear">'));
-                }
-            };
-            $(document).keypress(function(e) {
-                if (e.keyCode === 119) { // w
-                    conn.send('w');
-                } else if (e.keyCode === 97) { // a
-                    conn.send('a');
-                } else if (e.keyCode === 115) { // s
-                    conn.send('s');
-                } else if (e.keyCode === 100) { // d
-                    conn.send('d');
-                }
-            });
+        <script type="text/javascript" src="js/socket.js">
         </script>
     </body>
 </html>

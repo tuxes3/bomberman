@@ -27,21 +27,19 @@
 
 namespace bomberman;
 
+use bomberman\io\DataCollection;
+use bomberman\io\Message;
+use bomberman\logic\BaseLogic;
+use bomberman\logic\FieldLogic;
+use bomberman\logic\RoomLogic;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 
 /**
- * Class Channel
+ * Class BombermanWebsocket
  */
-class Channel implements MessageComponentInterface
+class BombermanWebsocket implements MessageComponentInterface, Context
 {
-
-    const SET_NAME = 'name=';
-
-    /**
-     * @var Field $field
-     */
-    protected $field;
 
     /**
      * @var \SplObjectStorage|ConnectionInterface[]
@@ -49,11 +47,26 @@ class Channel implements MessageComponentInterface
     protected $clients;
 
     /**
+     * @var BaseLogic[]|array
+     */
+    protected $logics;
+
+    /**
+     * @var DataCollection $data
+     */
+    protected $data;
+
+    /**
      * Channel constructor.
      */
     public function __construct()
     {
         $this->clients = new \SplObjectStorage();
+        $this->data = new DataCollection();
+        $this->logics = [
+            RoomLogic::$name => new RoomLogic($this),
+            FieldLogic::$name => new FieldLogic($this),
+        ];
     }
 
     /**
@@ -64,14 +77,39 @@ class Channel implements MessageComponentInterface
      */
     function onMessage(ConnectionInterface $from, $msg)
     {
-        /** @var Field $field */
-        foreach ($this->field->getField() as $onFieldArray) {
-            foreach ($onFieldArray as $onField) {
-                $onField->event($from, $msg);
-            }
-        }
+        echo ($msg . PHP_EOL);
+        $message = Message::fromJson($msg);
+        $this->send($message, $from);
+        echo ($this->data->count().' : count');
+    }
+
+    /**
+     * @param Message $message
+     * @param ConnectionInterface $from
+     */
+    public function send($message, ConnectionInterface $from)
+    {
+        $this->logics[$message->getLogicName()]->execute($message, $from);
+    }
+
+    /**
+     * @return DataCollection
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param array|int[] $playerIds
+     * @param Message $message
+     */
+    public function sendToClients($playerIds, $message)
+    {
         foreach ($this->clients as $client) {
-            $client->send(json_encode($this->field));
+            if (in_array($client->resourceId, $playerIds)) {
+                $client->send(json_encode($message));
+            }
         }
     }
 
@@ -81,6 +119,7 @@ class Channel implements MessageComponentInterface
      */
     function onError(ConnectionInterface $conn, \Exception $e)
     {
+        // TODO:
         print_r($e);
     }
 
@@ -89,16 +128,7 @@ class Channel implements MessageComponentInterface
      */
     function onOpen(ConnectionInterface $conn)
     {
-        echo "New connection! ({$conn->resourceId})\n";
         $this->clients->attach($conn);
-        if (is_null($this->field)) {
-            $this->field = new Field(15, 15);
-        }
-
-        $this->field->addToEmptySpace(new Player(0, 0, $this->field, $conn->resourceId));
-        foreach ($this->clients as $client) {
-            $client->send(json_encode($this->field));
-        }
     }
 
     /**
@@ -106,19 +136,7 @@ class Channel implements MessageComponentInterface
      */
     function onClose(ConnectionInterface $conn)
     {
-        $player = $this->field->getPlayer($conn->resourceId);
-        if (!is_null($player)) {
-            $this->field->remove($player);
-            if ($this->field->countPlayer() == 0) {
-                $this->field = null;
-            } else {
-                foreach ($this->clients as $client) {
-                    $client->send(json_encode($this->field));
-                }
-            }
-        }
         $this->clients->detach($conn);
-        echo "Connection {$conn->resourceId} has disconnected\n";
     }
 
 }

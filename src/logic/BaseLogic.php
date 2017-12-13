@@ -25,57 +25,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\logic;
 
+use bomberman\Context;
+use bomberman\io\Message;
 use Ratchet\ConnectionInterface;
 
-class Player extends BaseOnField
+abstract class BaseLogic
 {
 
     /**
-     * @var int
+     * @var string
      */
-    protected $connId;
+    public static $name = '';
 
-    public function __construct($x, $y, $field, $connId)
-    {
-        parent::__construct($x, $y, $field);
-        $this->connId = $connId;
-    }
+    /**
+     * @var Context
+     */
+    protected $context;
 
-    public function event(ConnectionInterface $connection, $data)
+    /**
+     * BaseLogic constructor.
+     * @param Context $context
+     */
+    public function __construct(Context $context)
     {
-        // move player
-        if ($connection->resourceId == $this->connId) {
-            $nextField = null;
-            switch ($data) {
-                case 'w':
-                    $nextField = $this->getFieldXY($this->getX() - 1, $this->getY());
-                    break;
-                case 'a';
-                    $nextField = $this->getFieldXY($this->getX(), $this->getY() - 1);
-                    break;
-                case 's':
-                    $nextField = $this->getFieldXY($this->getX() + 1, $this->getY());
-                    break;
-                case 'd':
-                    $nextField = $this->getFieldXY($this->getX(), $this->getY() + 1);
-                    break;
-            }
-            if (!is_null($nextField)) {
-                if ($nextField->getClass() === EmptySpace::class) {
-                    $this->switchOnField($this, $nextField);
-                }
-            }
-        }
+        $this->context = $context;
     }
 
     /**
-     * @return int
+     * @param Message $message
+     * @param ConnectionInterface $sender
      */
-    public function getConnId()
-    {
-        return $this->connId;
-    }
+    abstract public function execute($message, ConnectionInterface $sender);
 
 }

@@ -25,21 +25,64 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-use Ratchet\Server\IoServer;
-use Ratchet\Http\HttpServer;
-use Ratchet\WebSocket\WsServer;
-use bomberman\BombermanWebsocket;
+namespace bomberman\components;
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
-require_once dirname(__DIR__).'/vendor/ratchet/rfc6455/src/Messaging/CloseFrameChecker.php';
+use bomberman\components\field\InCell;
 
-$server = IoServer::factory(
-    new HttpServer(
-        new WsServer(
-            new BombermanWebsocket()
-        )
-    ),
-    8009
-);
+class Field implements \JsonSerializable
+{
 
-$server->run();
+    /**
+     * @var array|InCell[]
+     */
+    protected $cells = [];
+
+    /**
+     * @var int $maxPlayers
+     */
+    protected $maxPlayers;
+
+    public function __construct($maxPlayers)
+    {
+        $this->maxPlayers = $maxPlayers;
+    }
+
+    /**
+     * @param $x
+     * @param $y
+     * @return InCell|null
+     */
+    public function getXY($x, $y)
+    {
+        if (isset($this->cells[$x])) {
+            if (isset($this->cells[$x][$y])) {
+                return $this->cells[$x][$y];
+            }
+        }
+        return null;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'cells' => $this->cells
+        ];
+    }
+
+    /**
+     * @return InCell[]
+     */
+    public function getCells()
+    {
+        return $this->cells;
+    }
+
+    /**
+     * @param $cells
+     */
+    public function setCells($cells)
+    {
+        $this->cells = $cells;
+    }
+
+}

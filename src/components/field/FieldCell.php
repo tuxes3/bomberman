@@ -25,19 +25,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\components\field;
 
-use Ratchet\ConnectionInterface;
-
-interface OnField
+/**
+ * Class FieldCell
+ * @package bomberman\components\field
+ */
+class FieldCell implements \JsonSerializable
 {
 
-    public function getX();
-    public function getY();
-    public function setX($x);
-    public function setY($y);
-    public function getColor();
-    public function getClass();
-    public function event(ConnectionInterface $connection, $data);
+    /**
+     * @var array|InCell[] $inCells
+     */
+    protected $inCells = [];
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'inCells' => $this->inCells,
+        ];
+    }
+
+    /**
+     * @return boolean
+     */
+    public function canPlayerEnter()
+    {
+        $canEnter = true;
+        foreach ($this->inCells as $inCell) {
+            $canEnter = $canEnter && $inCell->canPlayerEnter();
+        }
+        return $canEnter;
+    }
+
+    /**
+     * @param InCell $inCell
+     */
+    public function add(InCell $inCell)
+    {
+        $this->inCells[] = $inCell;
+    }
 
 }

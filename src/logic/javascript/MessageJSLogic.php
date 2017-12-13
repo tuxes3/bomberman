@@ -25,21 +25,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-use Ratchet\Server\IoServer;
-use Ratchet\Http\HttpServer;
-use Ratchet\WebSocket\WsServer;
-use bomberman\BombermanWebsocket;
+namespace bomberman\logic\javascript;
 
-require_once dirname(__DIR__) . '/vendor/autoload.php';
-require_once dirname(__DIR__).'/vendor/ratchet/rfc6455/src/Messaging/CloseFrameChecker.php';
+/**
+ * Interface MessageJSLogic
+ * @package bomberman\logic\javascript
+ */
+interface MessageJSLogic
+{
 
-$server = IoServer::factory(
-    new HttpServer(
-        new WsServer(
-            new BombermanWebsocket()
-        )
-    ),
-    8009
-);
+    const NAME = 'message_js';
 
-$server->run();
+    const EVENT_WARNING = 'warning';
+    const EVENT_INFO = 'info';
+
+}
