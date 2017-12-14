@@ -38,7 +38,6 @@ var bomberman_socket_request = {
 var bomberman_ui = {
 
     init: function() {
-        $('#listRooms').on('click', bomberman_ui.listRoom);
         $('#createRoom').on('click', bomberman_ui.createRoom);
         $(document).keypress(bomberman_ui.onKeyPres);
     },
@@ -48,11 +47,6 @@ var bomberman_ui = {
         bomberman_socket.send(bomberman_socket_request.createRoom(
             $('#maxPlayer').val()
         ));
-    },
-
-    listRoom: function (e) {
-        e.preventDefault();
-        bomberman_socket.send(bomberman_socket_request.listRooms());
     },
 
     joinRoom: function (e) {
@@ -74,6 +68,11 @@ var bomberman_socket = {
     init: function () {
         this.connection = new WebSocket('ws://localhost:8009');
         this.connection.onmessage = this.onMessage;
+        this.connection.onopen = this.onOpen;
+    },
+
+    onOpen: function (e) {
+        this.send(bomberman_socket_request.listRooms());
     },
 
     onMessage: function (e) {

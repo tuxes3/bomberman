@@ -31,6 +31,7 @@ use bomberman\io\DataCollection;
 use bomberman\io\Message;
 use bomberman\logic\BaseLogic;
 use bomberman\logic\FieldLogic;
+use bomberman\logic\PlayerLogic;
 use bomberman\logic\RoomLogic;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
@@ -66,6 +67,7 @@ class BombermanWebsocket implements MessageComponentInterface, Context
         $this->logics = [
             RoomLogic::$name => new RoomLogic($this),
             FieldLogic::$name => new FieldLogic($this),
+            PlayerLogic::$name => new PlayerLogic($this),
         ];
     }
 
@@ -105,9 +107,15 @@ class BombermanWebsocket implements MessageComponentInterface, Context
      */
     public function sendToClients($playerIds, $message)
     {
-        foreach ($this->clients as $client) {
-            if (in_array($client->resourceId, $playerIds)) {
+        if (is_int($playerIds) && $playerIds == Context::SEND_ALL) {
+            foreach ($this->clients as $client) {
                 $client->send(json_encode($message));
+            }
+        } else {
+            foreach ($this->clients as $client) {
+                if (in_array($client->resourceId, $playerIds)) {
+                    $client->send(json_encode($message));
+                }
             }
         }
     }

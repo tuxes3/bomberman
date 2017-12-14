@@ -34,6 +34,8 @@ use Ratchet\ConnectionInterface;
 interface Context
 {
 
+    const SEND_ALL = -1;
+
     /**
      * @param Message $message
      * @param ConnectionInterface $from
@@ -46,7 +48,7 @@ interface Context
     public function getData();
 
     /**
-     * @param array|int[] $playerIds
+     * @param array|int[]|int $playerIds
      * @param Message $message
      */
     public function sendToClients($playerIds, $message);

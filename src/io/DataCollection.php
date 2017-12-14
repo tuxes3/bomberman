@@ -87,7 +87,7 @@ class DataCollection extends ArrayCollection implements \JsonSerializable
                 foreach ($room->getField()->getCells() as $i => $row) {
                     /** @var FieldCell $fieldCell */
                     foreach ($row as $j => $fieldCell) {
-                        $fieldCell->
+                        // TODO:
                     }
                 }
             }

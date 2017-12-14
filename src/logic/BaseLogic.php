@@ -59,6 +59,7 @@ abstract class BaseLogic
      */
     public function execute($message, ConnectionInterface $sender)
     {
+        // TODO: use reflection and protect unwanted method calls !
         $event = $message->getEvent();
         $this->$event($message->getData(), $sender);
     }

@@ -41,7 +41,6 @@
         </style>
     </head>
     <body>
-        <a id="listRooms" href="#">List Rooms</a>
         <a id="createRoom" href="#">Create Room</a>
         Max Player:
         <input type="number" id="maxPlayer" value="2" />

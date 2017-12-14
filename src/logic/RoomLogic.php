@@ -68,6 +68,15 @@ class RoomLogic extends BaseLogic
         $uniqueId = $this->context->getData()->getFreeUniqueId();
         $room = new Room($data->maxPlayers, $uniqueId);
         $this->context->getData()->add($room);
+        $this->sendRoomsToAll();
+    }
+
+    /**
+     * sends room changes
+     */
+    protected function sendRoomsToAll()
+    {
+        $this->context->sendToClients(Context::SEND_ALL, Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $this->context->getData()));
     }
 
     /**
@@ -86,8 +95,10 @@ class RoomLogic extends BaseLogic
                 $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, $result);
             } elseif ($room->isStartable()) {
                 $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_START, $data), $sender);
+                $this->sendRoomsToAll();
             } else {
                 $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'Waiting for players.');
+                $this->sendRoomsToAll();
             }
         }
         if (!is_null($return)) {
