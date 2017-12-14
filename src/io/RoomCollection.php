@@ -28,6 +28,7 @@
 namespace bomberman\io;
 
 use bomberman\components\field\FieldCell;
+use bomberman\components\field\Player;
 use bomberman\components\Room;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
@@ -36,7 +37,7 @@ use Doctrine\Common\Collections\Criteria;
  * Class DataCollection
  * @package bomberman\io
  */
-class DataCollection extends ArrayCollection implements \JsonSerializable
+class RoomCollection extends ArrayCollection implements \JsonSerializable
 {
 
     /**
@@ -80,18 +81,34 @@ class DataCollection extends ArrayCollection implements \JsonSerializable
         return null;
     }
 
+    /**
+     * @param int $resourceId
+     * @return Player
+     */
     public function findPlayerBySender($resourceId)
     {
-        $this->filter(function (Room $room) use ($resourceId) {
-            if (in_array($resourceId, $room->getConnectedPlayers())) {
-                foreach ($room->getField()->getCells() as $i => $row) {
-                    /** @var FieldCell $fieldCell */
-                    foreach ($row as $j => $fieldCell) {
-                        // TODO:
-                    }
-                }
-            }
+        $room = $this->findRoomBySender($resourceId);
+        if ($room) {
+            return $room->getField()->getFieldCollection()->findPlayerBySender($resourceId);
+        }
+        return null;
+    }
+
+    /**
+     * @param int $resourceId
+     * @return Room|null
+     */
+    public function findRoomBySender($resourceId)
+    {
+        $room = $this->filter(function (Room $room) use ($resourceId) {
+            return in_array($resourceId, $room->getConnectedPlayers());
         });
+        /** @var Room|bool $room */
+        $room = $room->first();
+        if ($room) {
+            return $room;
+        }
+        return null;
     }
 
 }

@@ -27,7 +27,9 @@
 
 namespace bomberman\components;
 
+use bomberman\components\field\FieldCell;
 use bomberman\components\field\InCell;
+use bomberman\io\FieldCollection;
 
 class Field implements \JsonSerializable
 {
@@ -50,7 +52,7 @@ class Field implements \JsonSerializable
     /**
      * @param $x
      * @param $y
-     * @return InCell|null
+     * @return FieldCell|null
      */
     public function getXY($x, $y)
     {
@@ -75,6 +77,42 @@ class Field implements \JsonSerializable
     public function getCells()
     {
         return $this->cells;
+    }
+
+    /**
+     * @param InCell $a
+     * @param int $x
+     * @param int $y
+     */
+    public function moveTo(InCell $a, $x, $y)
+    {
+        $this->cells[$a->getX()][$a->getY()]->removeById($a->getId());
+        $a->setX($x);
+        $a->setY($y);
+        $this->cells[$a->getX()][$a->getY()]->add($a);
+    }
+
+    /**
+     * @return FieldCollection
+     */
+    public function getFieldCollection()
+    {
+        $inCells = [];
+        foreach ($this->cells as $row) {
+            /** @var InCell $inCell */
+            foreach ($row as $inCell) {
+                $inCells[] = $inCell;
+            }
+        }
+        return new FieldCollection($inCells);
+    }
+
+    /**
+     * @param InCell $inCell
+     */
+    public function addTo(InCell $inCell)
+    {
+        $this->getXY($inCell->getX(), $inCell->getY())->add($inCell);
     }
 
     /**

@@ -29,17 +29,24 @@ use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use bomberman\BombermanWebsocket;
+use bomberman\io\Config;
+use bomberman\io\Message;
+use bomberman\logic\BombLogic;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
-require_once dirname(__DIR__).'/vendor/ratchet/rfc6455/src/Messaging/CloseFrameChecker.php';
 
+$bombermanWebsocket = new BombermanWebsocket();
 $server = IoServer::factory(
     new HttpServer(
         new WsServer(
-            new BombermanWebsocket()
+            $bombermanWebsocket
         )
     ),
     8009
 );
+
+//$server->loop->addPeriodicTimer(Config::get(Config::BOMB_INTERVAL), function ($timer) use ($bombermanWebsocket) {
+//    $bombermanWebsocket->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_CHECK, null), null);
+//});
 
 $server->run();

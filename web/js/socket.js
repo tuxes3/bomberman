@@ -32,6 +32,13 @@ var bomberman_socket_request = {
                 direction: direction
             }
         });
+    },
+    plantBomb: function () {
+        return JSON.stringify({
+            name: 'player',
+            event: 'plant',
+            data: null
+        });
     }
 };
 
@@ -58,7 +65,11 @@ var bomberman_ui = {
 
     onKeyPres: function (e) {
         var char = String.fromCharCode(e.which);
-        bomberman_socket.send(bomberman_socket_request.movePlayer(char));
+        if (['w', 'a', 's', 'd'].indexOf(char) >= 0) {
+            bomberman_socket.send(bomberman_socket_request.movePlayer(char));
+        } else if ([' '].indexOf(char) >= 0) {
+            bomberman_socket.send(bomberman_socket_request.plantBomb());
+        }
     }
 };
 
@@ -109,7 +120,7 @@ var bomberman_socket = {
 
         field_js: {
             update: function (field) {
-                // TODO: better
+                console.log(field);
                 var fieldDiv = $('#field');
                 fieldDiv.empty();
                 for (var i = 0; i < field.cells.length; i++) {
@@ -118,7 +129,7 @@ var bomberman_socket = {
                         var onField = $('<div class="block"></div>');
                         for (var r = 0; r < inCells.length; r++) {
                             // TODO: priority
-                            onField.css('background-color', inCells[r].class === 'player' ? 'red' : 'black');
+                            onField.css('background-color', inCells[r].class === 'player' ? 'blue' : inCells[r].class === 'bomb' ? 'black' : 'brown');
                         }
                         fieldDiv.append(onField);
                     }

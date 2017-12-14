@@ -26,6 +26,7 @@
  */
 
 namespace bomberman\components\field;
+use bomberman\io\Config;
 
 /**
  * Class Player
@@ -40,6 +41,21 @@ class Player extends BaseInCell
     protected $connId;
 
     /**
+     * @var float
+     */
+    protected $lastMoved;
+
+    /**
+     * @var int
+     */
+    protected $movementSpeed;
+
+    /**
+     * @var int
+     */
+    protected $bombCount;
+
+    /**
      * Player constructor.
      * @param $x
      * @param $y
@@ -49,6 +65,9 @@ class Player extends BaseInCell
     {
         parent::__construct($x, $y);
         $this->connId = $connId;
+        $this->lastMoved = microtime(true);
+        $this->movementSpeed = Config::get(Config::MOVEMENT_SPEED);
+        $this->bombCount = Config::get(Config::BOMB_COUNT);
     }
 
     /**
@@ -60,11 +79,19 @@ class Player extends BaseInCell
     }
 
     /**
+     * @return boolean
+     */
+    public function canPlayerMove()
+    {
+        return (microtime(true) - $this->lastMoved) > $this->movementSpeed;
+    }
+
+    /**
      * @return int
      */
     public function getDisplayPriority()
     {
-        return 100;
+        return BaseInCell::BASE_PRIORITY;
     }
 
     /**
@@ -73,6 +100,15 @@ class Player extends BaseInCell
     public function getConnId()
     {
         return $this->connId;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setLastMoved()
+    {
+        $this->lastMoved = microtime(true);
+        return $this;
     }
 
 }

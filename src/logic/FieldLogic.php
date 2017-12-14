@@ -77,8 +77,8 @@ class FieldLogic extends BaseLogic
                     if ($cell->canPlayerEnter()) {
                         $player = new Player($i, $j, $playerId);
                         $cell->add($player);
+                        break(2);
                     }
-                    break(2);
                 }
             }
         }

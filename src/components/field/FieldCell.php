@@ -62,6 +62,30 @@ class FieldCell implements \JsonSerializable
     }
 
     /**
+     * @param int $connId
+     * @return Player|null
+     */
+    public function getPlayer($connId)
+    {
+        foreach ($this->inCells as $inCell) {
+            if ($inCell instanceof Player && $inCell->getConnId() == $connId) {
+                return $inCell;
+            }
+        }
+        return null;
+    }
+
+    public function removeById($id)
+    {
+        foreach ($this->inCells as $key => $inCell) {
+            if ($inCell->getId() == $id) {
+                unset ($this->inCells[$key]);
+            }
+        }
+        $this->inCells = array_values($this->inCells);
+    }
+
+    /**
      * @param InCell $inCell
      */
     public function add(InCell $inCell)

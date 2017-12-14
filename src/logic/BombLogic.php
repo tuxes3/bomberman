@@ -25,32 +25,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
-
-use bomberman\io\RoomCollection;
-use bomberman\io\Message;
+namespace bomberman\logic;
 use Ratchet\ConnectionInterface;
 
-interface Context
+/**
+ * Class BombLogic
+ * @package bomberman\logic
+ */
+class BombLogic extends BaseLogic
 {
 
-    const SEND_ALL = -1;
+    public static $name = 'bomb';
+
+    const EVENT_CHECK = 'boom';
 
     /**
-     * @param Message $message
-     * @param ConnectionInterface $from
+     * @param $data
+     * @param ConnectionInterface $sender
      */
-    public function send($message, ConnectionInterface $from);
+    public function boom($data, ConnectionInterface $sender)
+    {
 
-    /**
-     * @return RoomCollection
-     */
-    public function getData();
-
-    /**
-     * @param array|int[]|int $playerIds
-     * @param Message $message
-     */
-    public function sendToClients($playerIds, $message);
+    }
 
 }

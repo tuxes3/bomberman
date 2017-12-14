@@ -27,7 +27,7 @@
 
 namespace bomberman;
 
-use bomberman\io\DataCollection;
+use bomberman\io\RoomCollection;
 use bomberman\io\Message;
 use bomberman\logic\BaseLogic;
 use bomberman\logic\FieldLogic;
@@ -53,9 +53,10 @@ class BombermanWebsocket implements MessageComponentInterface, Context
     protected $logics;
 
     /**
-     * @var DataCollection $data
+     * @var RoomCollection $data
      */
     protected $data;
+
 
     /**
      * Channel constructor.
@@ -63,7 +64,7 @@ class BombermanWebsocket implements MessageComponentInterface, Context
     public function __construct()
     {
         $this->clients = new \SplObjectStorage();
-        $this->data = new DataCollection();
+        $this->data = new RoomCollection();
         $this->logics = [
             RoomLogic::$name => new RoomLogic($this),
             FieldLogic::$name => new FieldLogic($this),
@@ -94,7 +95,7 @@ class BombermanWebsocket implements MessageComponentInterface, Context
     }
 
     /**
-     * @return DataCollection
+     * @return RoomCollection
      */
     public function getData()
     {

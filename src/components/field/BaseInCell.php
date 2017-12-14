@@ -30,6 +30,8 @@ namespace bomberman\components\field;
 abstract class BaseInCell implements InCell, \JsonSerializable
 {
 
+    const BASE_PRIORITY = 100;
+
     /**
      * @var int $x
      */
@@ -40,10 +42,16 @@ abstract class BaseInCell implements InCell, \JsonSerializable
      */
     protected $y;
 
+    /**
+     * @var string $id
+     */
+    protected $id;
+
     public function __construct($x, $y)
     {
         $this->x = $x;
         $this->y = $y;
+        $this->id = md5(openssl_random_pseudo_bytes(128));
     }
 
     public function jsonSerialize()
@@ -99,6 +107,14 @@ abstract class BaseInCell implements InCell, \JsonSerializable
     {
         $reflectionClass = new \ReflectionClass(get_class($this));
         return $reflectionClass->getShortName();
+    }
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
 }

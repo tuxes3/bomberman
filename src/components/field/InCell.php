@@ -53,6 +53,11 @@ interface InCell
     /**
      * @return string
      */
+    public function getId();
+
+    /**
+     * @return string
+     */
     public function getClass();
 
     /**

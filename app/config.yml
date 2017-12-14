@@ -1,0 +1,4 @@
+movement_speed: 0.3
+bomb_count: 1
+bomb_timeout: 2
+bomb_interval: 0.1

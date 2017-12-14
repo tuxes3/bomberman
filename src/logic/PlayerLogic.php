@@ -27,6 +27,11 @@
 
 namespace bomberman\logic;
 
+use bomberman\components\field\Bomb;
+use bomberman\components\field\Player;
+use bomberman\components\Room;
+use bomberman\io\Message;
+use bomberman\logic\javascript\FieldJSLogic;
 use Ratchet\ConnectionInterface;
 
 class PlayerLogic extends BaseLogic
@@ -35,14 +40,59 @@ class PlayerLogic extends BaseLogic
     public static $name = 'player';
 
     const EVENT_MOVE = 'move';
+    const EVENT_PLAN = 'plant';
 
     protected function move($data, ConnectionInterface $sender)
     {
-        // TODO:
-        //  - finish move
-        //  - impl FieldCollection
-        //    ala:
-        //    $room->getFieldCollection()->findPlayerBySender()
+        $player = $this->context->getData()->findPlayerBySender($sender->resourceId);
+        if ($player instanceof Player && $player->canPlayerMove()) {
+            $room = $this->context->getData()->findRoomBySender($sender->resourceId);
+            $x = -1;
+            $y = -1;
+            switch ($data->direction) {
+                case 'w':
+                    $x = $player->getX() - 1;
+                    $y = $player->getY();
+                    break;
+                case 'a';
+                    $x = $player->getx();
+                    $y = $player->getY() - 1;
+                    break;
+                case 's':
+                    $x = $player->getX() + 1;
+                    $y = $player->getY();
+                    break;
+                case 'd':
+                    $x = $player->getX();
+                    $y = $player->getY() + 1;
+                    break;
+            }
+            $nextField = $room->getField()->getXY($x, $y);
+            if (!is_null($nextField) && $nextField->canPlayerEnter()) {
+                $room->getField()->moveTo($player, $x, $y);
+                $player->setLastMoved();
+                $this->context->sendToClients($room->getConnectedPlayers(),
+                    Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
+                );
+            }
+        }
+    }
+
+    /**
+     * @param $data
+     * @param ConnectionInterface $sender
+     */
+    protected function plant($data, ConnectionInterface $sender)
+    {
+        /** @var Room $room */
+        $room = $this->context->getData()->findRoomBySender($sender->resourceId);
+        if (!is_null($room)) {
+            $player = $room->getField()->getFieldCollection()->findPlayerBySender($sender->resourceId);
+            $room->getField()->addTo(new Bomb($player->getX(), $player->getY(), $player));
+            $this->context->sendToClients($room->getConnectedPlayers(),
+                Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
+            );
+        }
     }
 
 }

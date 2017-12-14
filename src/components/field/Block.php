@@ -43,7 +43,7 @@ class Block extends BaseInCell
      */
     public function getDisplayPriority()
     {
-        return 100;
+        return self::BASE_PRIORITY;
     }
 
 }

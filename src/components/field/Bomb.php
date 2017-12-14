@@ -25,32 +25,46 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\components\field;
 
-use bomberman\io\RoomCollection;
-use bomberman\io\Message;
-use Ratchet\ConnectionInterface;
-
-interface Context
+/**
+ * Class Bomb
+ * @package bomberman\components\field
+ */
+class Bomb extends BaseInCell
 {
 
-    const SEND_ALL = -1;
+    /**
+     * @var Player $from
+     */
+    protected $from;
 
     /**
-     * @param Message $message
-     * @param ConnectionInterface $from
+     * @var float
      */
-    public function send($message, ConnectionInterface $from);
+    protected $planted;
 
     /**
-     * @return RoomCollection
+     * Bomb constructor.
+     * @param int $x
+     * @param int $y
+     * @param Player $player
      */
-    public function getData();
+    public function __construct($x, $y, Player $player)
+    {
+        parent::__construct($x, $y);
+        $this->from = $player;
+        $this->planted = microtime(true);
+    }
 
-    /**
-     * @param array|int[]|int $playerIds
-     * @param Message $message
-     */
-    public function sendToClients($playerIds, $message);
+    public function canPlayerEnter()
+    {
+        return true;
+    }
+
+    public function getDisplayPriority()
+    {
+        return BaseInCell::BASE_PRIORITY - 1;
+    }
 
 }

@@ -43,7 +43,7 @@
     <body>
         <a id="createRoom" href="#">Create Room</a>
         Max Player:
-        <input type="number" id="maxPlayer" value="2" />
+        <input type="number" id="maxPlayer" value="1" />
 
         <div id="roomList">
 

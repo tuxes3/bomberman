@@ -25,32 +25,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\io;
 
-use bomberman\io\RoomCollection;
-use bomberman\io\Message;
-use Ratchet\ConnectionInterface;
+use bomberman\components\field\FieldCell;
+use bomberman\components\field\Player;
+use Doctrine\Common\Collections\ArrayCollection;
 
-interface Context
+/**
+ * Class FieldCollection
+ * @package bomberman\io
+ */
+class FieldCollection extends ArrayCollection
 {
 
-    const SEND_ALL = -1;
-
     /**
-     * @param Message $message
-     * @param ConnectionInterface $from
+     * @param int $resourceId
+     * @return null|Player
      */
-    public function send($message, ConnectionInterface $from);
-
-    /**
-     * @return RoomCollection
-     */
-    public function getData();
-
-    /**
-     * @param array|int[]|int $playerIds
-     * @param Message $message
-     */
-    public function sendToClients($playerIds, $message);
+    public function findPlayerBySender($resourceId)
+    {
+        $fieldCells = $this->filter(function (FieldCell $fieldCell) use ($resourceId) {
+            return null !== $fieldCell->getPlayer($resourceId);
+        });
+        if ($fieldCells->count() > 0) {
+            return $fieldCells->first()->getPlayer($resourceId);
+        }
+        return null;
+    }
 
 }

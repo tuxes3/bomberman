@@ -25,32 +25,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
 
-use bomberman\io\RoomCollection;
-use bomberman\io\Message;
-use Ratchet\ConnectionInterface;
+namespace bomberman\io;
 
-interface Context
+
+use Symfony\Component\Yaml\Yaml;
+
+class Config
 {
 
-    const SEND_ALL = -1;
+    const MOVEMENT_SPEED = 'movement_speed';
+    const BOMB_COUNT = 'bomb_count';
+    const BOMB_INTERVAL = 'bomb_interval';
+    const BOMB_TIMEOUT = 'bomb_timeout';
+
+    private static $configFile = null;
 
     /**
-     * @param Message $message
-     * @param ConnectionInterface $from
+     * @param string $key
+     * @return string
      */
-    public function send($message, ConnectionInterface $from);
-
-    /**
-     * @return RoomCollection
-     */
-    public function getData();
-
-    /**
-     * @param array|int[]|int $playerIds
-     * @param Message $message
-     */
-    public function sendToClients($playerIds, $message);
+    public static function get($key)
+    {
+        if (is_null(Config::$configFile)) {
+            Config::$configFile = Yaml::parseFile(__DIR__.'/../../app/config.yml');
+        }
+        return Config::$configFile[$key];
+    }
 
 }
