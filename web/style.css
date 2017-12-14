@@ -1,0 +1,108 @@
+/* =======================================================
+*
+* 	Created by Lukas Müller, 14.12.2017
+*
+* ======================================================= */
+
+
+html{
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100%;
+    position: relative;
+    font-family: "Roboto", Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #05144f;
+    font-family: "Roboto", Arial, sans-serif;
+    font-weight: 400;
+    margin: 0 0 15px 0;
+}
+
+#header{
+    padding: 20px 0 0 0;
+    text-align: center;
+}
+
+#main{
+    margin: 0 auto;
+    min-width: 800px;
+    max-width:1200px;
+    background:#fff;
+    text-align: center;
+    line-height: 1.5;
+    padding-bottom: 3em; /* footer height */
+}
+
+#footer{
+    position: absolute;
+    bottom:0;
+    color:#fff;
+    background-color:#05144f;
+    height: 3em;
+    min-width: 100%;
+    width: 100%;
+    text-align: center;
+    line-height: 1.5;
+}
+
+#footer a{
+    color: #ffffff;
+}
+
+.block {
+    width: 20px;
+    height: 20px;
+    border: 1px solid black;
+    float: left;
+}
+
+.clear {
+    clear: both;
+}
+
+#roomcontrols{
+}
+
+#createRoom{
+    display: inline-block;
+    margin: 10px;
+    text-decoration: none;
+    background-color: #05144f;
+    color: #fff;
+    padding: 2px 6px 2px 6px;
+    border: 1px outset white;
+}
+
+#roomList{
+    padding-bottom: 10px;
+}
+
+#field{
+    margin: 10px auto;
+    display: inline-block;
+}
+
+/*============ J S - E R R O R ============*/
+.js_error{
+    width:800px;
+    height:25px;
+    margin:0;
+    padding:4px 0;
+    margin:0 auto;
+    text-align:center;
+    background:#ff0000;
+    border-radius:0.4em 0.4em 0.4em 0.4em;
+}
+
+.js_error p{
+    font-size:16px;
+    font-weight:bold;
+    color:#fff;
+    margin:0;
+    padding:0;
+}
