@@ -80,7 +80,6 @@ class BombermanWebsocket implements MessageComponentInterface, Context
         echo ($msg . PHP_EOL);
         $message = Message::fromJson($msg);
         $this->send($message, $from);
-        echo ($this->data->count().' : count');
     }
 
     /**

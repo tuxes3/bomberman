@@ -46,6 +46,14 @@
         Max Player:
         <input type="number" id="maxPlayer" value="2" />
 
+        <div id="roomList">
+
+        </div>
+
+        <div id="field">
+
+        </div>
+
         <script
             src="https://code.jquery.com/jquery-3.2.1.min.js"
             integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="

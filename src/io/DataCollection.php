@@ -27,6 +27,7 @@
 
 namespace bomberman\io;
 
+use bomberman\components\field\FieldCell;
 use bomberman\components\Room;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
@@ -77,6 +78,20 @@ class DataCollection extends ArrayCollection implements \JsonSerializable
             return $match->first();
         }
         return null;
+    }
+
+    public function findPlayerBySender($resourceId)
+    {
+        $this->filter(function (Room $room) use ($resourceId) {
+            if (in_array($resourceId, $room->getConnectedPlayers())) {
+                foreach ($room->getField()->getCells() as $i => $row) {
+                    /** @var FieldCell $fieldCell */
+                    foreach ($row as $j => $fieldCell) {
+                        $fieldCell->
+                    }
+                }
+            }
+        });
     }
 
 }

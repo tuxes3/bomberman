@@ -25,80 +25,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman\components\field;
+namespace bomberman\logic;
 
-abstract class BaseInCell implements InCell, \JsonSerializable
+use Ratchet\ConnectionInterface;
+
+class PlayerLogic extends BaseLogic
 {
 
-    /**
-     * @var int $x
-     */
-    protected $x;
+    public static $name = 'player';
 
-    /**
-     * @var int $y
-     */
-    protected $y;
+    const EVENT_MOVE = 'move';
 
-    public function __construct($x, $y)
+    protected function move($data, ConnectionInterface $sender)
     {
-        $this->x = $x;
-        $this->y = $y;
-    }
-
-    public function jsonSerialize()
-    {
-        return [
-            'x' => $this->getX(),
-            'y' => $this->getY(),
-            'class' => strtolower($this->getClass()),
-            'displayPriority' => $this->getDisplayPriority(),
-        ];
-    }
-
-    /**
-     * @return int
-     */
-    public function getX()
-    {
-        return $this->x;
-    }
-
-    /**
-     * @param int $x
-     * @return $this
-     */
-    public function setX($x)
-    {
-        $this->x = $x;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getY()
-    {
-        return $this->y;
-    }
-
-    /**
-     * @param int $y
-     * @return $this
-     */
-    public function setY($y)
-    {
-        $this->y = $y;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getClass()
-    {
-        $reflectionClass = new \ReflectionClass(get_class($this));
-        return $reflectionClass->getShortName();
+        // TODO:
+        //  - finish move
+        //  - impl FieldCollection
+        //    ala:
+        //    $room->getFieldCollection()->findPlayerBySender()
     }
 
 }

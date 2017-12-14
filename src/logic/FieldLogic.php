@@ -27,6 +27,7 @@
 
 namespace bomberman\logic;
 
+use bomberman\components\field\Block;
 use bomberman\components\field\FieldCell;
 use bomberman\components\field\Player;
 use bomberman\components\Room;
@@ -42,7 +43,7 @@ class FieldLogic extends BaseLogic
 {
 
     const EVENT_START = 'start';
-    const EVENT_UPDATE_CLIENTS = 'update_clients';
+    const EVENT_UPDATE_CLIENTS = 'updateClients';
 
     /**
      * @var string
@@ -50,27 +51,11 @@ class FieldLogic extends BaseLogic
     public static $name = 'field';
 
     /**
-     * @param Message $message
+     * @param \stdClass $data
      * @param ConnectionInterface $sender
      */
-    public function execute($message, ConnectionInterface $sender)
+    protected function start($data, ConnectionInterface $sender)
     {
-        switch ($message->getEvent()) {
-            case self::EVENT_START:
-                $this->start($message);
-                break;
-            case self::EVENT_UPDATE_CLIENTS:
-                $this->updateClients($message);
-                break;
-        }
-    }
-
-    /**
-     * @param Message $message
-     */
-    protected function start($message)
-    {
-        $data = $message->getData();
         /** @var Room $room */
         $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);
         $cells = [];
@@ -80,6 +65,9 @@ class FieldLogic extends BaseLogic
             $cells[] = [];
             for ($j = 0; $j < 10; $j++) {
                 $cells[$i][$j] = new FieldCell();
+                if (1 == rand(1, 4)) {
+                    $cells[$i][$j]->add(new Block($i, $j));
+                }
             }
         }
         foreach ($room->getConnectedPlayers() as $playerId) {
@@ -90,19 +78,20 @@ class FieldLogic extends BaseLogic
                         $player = new Player($i, $j, $playerId);
                         $cell->add($player);
                     }
+                    break(2);
                 }
             }
         }
         $room->getField()->setCells($cells);
-        $this->updateClients($message);
+        $this->updateClients($data, $sender);
     }
 
     /**
-     * @param Message $message
+     * @param \stdClass $data
+     * @param ConnectionInterface $sender
      */
-    public function updateClients($message)
+    public function updateClients($data, ConnectionInterface $sender)
     {
-        $data = $message->getData();
         /** @var Room $room */
         $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);
         $this->context->sendToClients(

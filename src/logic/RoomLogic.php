@@ -43,7 +43,7 @@ class RoomLogic extends BaseLogic
 
     const EVENT_CREATE = 'create';
     const EVENT_JOIN = 'join';
-    const EVENT_LIST = 'list';
+    const EVENT_LIST = 'getAll';
 
     /**
      * @var string
@@ -60,41 +60,22 @@ class RoomLogic extends BaseLogic
     }
 
     /**
-     * @param Message $message
+     * @param \stdClass $data
      * @param ConnectionInterface $sender
      */
-    public function execute($message, ConnectionInterface $sender)
-    {
-        switch ($message->getEvent()) {
-            case self::EVENT_CREATE:
-                $this->createRoom($message);
-                break;
-            case self::EVENT_JOIN:
-                $this->joinRoom($message, $sender);
-                break;
-            case self::EVENT_LIST:
-                $this->listRooms($sender);
-                break;
-        }
-    }
-
-    /**
-     * @param Message $message
-     */
-    protected function createRoom($message)
+    protected function create($data, ConnectionInterface $sender)
     {
         $uniqueId = $this->context->getData()->getFreeUniqueId();
-        $room = new Room($message->getData()->maxPlayers, $uniqueId);
+        $room = new Room($data->maxPlayers, $uniqueId);
         $this->context->getData()->add($room);
     }
 
     /**
-     * @param Message $message
+     * @param \stdClass $data
      * @param ConnectionInterface $sender
      */
-    protected function joinRoom($message, ConnectionInterface $sender)
+    protected function join($data, ConnectionInterface $sender)
     {
-        $data = $message->getData();
         $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);
         $return = null;
         if (is_null($room)) {
@@ -117,7 +98,7 @@ class RoomLogic extends BaseLogic
     /**
      * @param ConnectionInterface $sender
      */
-    protected function listRooms(ConnectionInterface $sender)
+    protected function getAll($data, ConnectionInterface $sender)
     {
         $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $this->context->getData())));
     }

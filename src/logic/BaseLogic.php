@@ -57,6 +57,10 @@ abstract class BaseLogic
      * @param Message $message
      * @param ConnectionInterface $sender
      */
-    abstract public function execute($message, ConnectionInterface $sender);
+    public function execute($message, ConnectionInterface $sender)
+    {
+        $event = $message->getEvent();
+        $this->$event($message->getData(), $sender);
+    }
 
 }
