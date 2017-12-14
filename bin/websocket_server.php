@@ -36,6 +36,12 @@ use bomberman\logic\ExplosionLogic;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
+// needs to be run 64 bit machine
+function milliseconds() {
+    $mt = explode(' ', microtime());
+    return ((int)$mt[1]) * 1000 + ((int)round($mt[0] * 1000));
+}
+
 $bombermanWebsocket = new BombermanWebsocket();
 $server = IoServer::factory(
     new HttpServer(

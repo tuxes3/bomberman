@@ -41,12 +41,12 @@ class Player extends BaseInCell
     protected $connId;
 
     /**
-     * @var float
+     * @var int
      */
     protected $lastMoved;
 
     /**
-     * @var int
+     * @var float
      */
     protected $movementSpeed;
 
@@ -75,7 +75,7 @@ class Player extends BaseInCell
     {
         parent::__construct($x, $y);
         $this->connId = $connId;
-        $this->lastMoved = microtime(true);
+        $this->lastMoved = milliseconds();
         $this->movementSpeed = Config::get(Config::MOVEMENT_SPEED);
         $this->bombCount = Config::get(Config::BOMB_COUNT);
         $this->explosionSpread = Config::get(Config::EXPLOSION_SPREAD);
@@ -112,7 +112,7 @@ class Player extends BaseInCell
      */
     public function canPlayerMove()
     {
-        return (microtime(true) - $this->lastMoved) > $this->movementSpeed && $this->alive;
+        return (milliseconds() - $this->lastMoved) > $this->movementSpeed && $this->alive;
     }
 
     /**
@@ -136,8 +136,16 @@ class Player extends BaseInCell
      */
     public function setLastMoved()
     {
-        $this->lastMoved = microtime(true);
+        $this->lastMoved = milliseconds();
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getNextMovement()
+    {
+        return $this->lastMoved + $this->movementSpeed;
     }
 
     /**

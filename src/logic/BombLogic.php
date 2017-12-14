@@ -50,7 +50,7 @@ class BombLogic extends BaseLogic
      */
     public function check($data, $sender)
     {
-        $current = microtime(true);
+        $current = milliseconds();
         /** @var Room $room */
         foreach ($this->context->getData() as $room) {
             $updateRoom = false;

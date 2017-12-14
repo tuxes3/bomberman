@@ -35,14 +35,14 @@ class Explosion extends BaseInCell
 {
 
     /**
-     * @var float
+     * @var int
      */
     private $exploaded;
 
     public function __construct($x, $y)
     {
         parent::__construct($x, $y);
-        $this->exploaded = microtime(true);
+        $this->exploaded = milliseconds();
     }
 
     /**

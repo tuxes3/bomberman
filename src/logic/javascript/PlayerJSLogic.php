@@ -25,81 +25,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman\components\field;
+namespace bomberman\logic\javascript;
 
 /**
- * Class Bomb
- * @package bomberman\components\field
+ * Interface PlayerJSLogic
+ * @package bomberman\logic\javascript
  */
-class Bomb extends BaseInCell
+interface PlayerJSLogic
 {
 
-    /**
-     * @var int $explosionSpread
-     */
-    protected $explosionSpread;
+    const NAME = 'player_js';
 
-    /**
-     * @var int
-     */
-    protected $planted;
-
-    /**
-     * Bomb constructor.
-     * @param int $x
-     * @param int $y
-     * @param int $explosionSpread
-     */
-    public function __construct($x, $y, $explosionSpread)
-    {
-        parent::__construct($x, $y);
-        $this->explosionSpread = $explosionSpread;
-        $this->planted = milliseconds();
-    }
-
-    /**
-     * @return boolean
-     */
-    public function canPlayerEnter()
-    {
-        return true;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function blocksExplosion()
-    {
-        return false;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDisplayPriority()
-    {
-        return BaseInCell::BASE_PRIORITY - 1;
-    }
-
-    /**
-     * @return float
-     */
-    public function getPlanted()
-    {
-        return $this->planted;
-    }
-
-    public function explodeNow()
-    {
-        $this->planted = 0;
-    }
-
-    /**
-     * @return int
-     */
-    public function getExplosionSpread()
-    {
-        return $this->explosionSpread;
-    }
+    const EVENT_NEXT_MOVEMENT = 'nextMovement';
 
 }
