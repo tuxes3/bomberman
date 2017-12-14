@@ -88,7 +88,7 @@ class PlayerLogic extends BaseLogic
         $room = $this->context->getData()->findRoomBySender($sender->resourceId);
         if (!is_null($room)) {
             $player = $room->getField()->getFieldCollection()->findPlayerBySender($sender->resourceId);
-            $room->getField()->addTo(new Bomb($player->getX(), $player->getY(), $player));
+            $room->getField()->addTo(new Bomb($player->getX(), $player->getY(), $player->getExplosionSpread()));
             $this->context->sendToClients($room->getConnectedPlayers(),
                 Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
             );

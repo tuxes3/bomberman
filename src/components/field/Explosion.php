@@ -28,37 +28,25 @@
 namespace bomberman\components\field;
 
 /**
- * Class Bomb
+ * Class Explosion
  * @package bomberman\components\field
  */
-class Bomb extends BaseInCell
+class Explosion extends BaseInCell
 {
-
-    /**
-     * @var int $explosionSpread
-     */
-    protected $explosionSpread;
 
     /**
      * @var float
      */
-    protected $planted;
+    private $exploaded;
 
-    /**
-     * Bomb constructor.
-     * @param int $x
-     * @param int $y
-     * @param int $explosionSpread
-     */
-    public function __construct($x, $y, $explosionSpread)
+    public function __construct($x, $y)
     {
         parent::__construct($x, $y);
-        $this->explosionSpread = $explosionSpread;
-        $this->planted = microtime(true);
+        $this->exploaded = microtime(true);
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function canPlayerEnter()
     {
@@ -78,28 +66,15 @@ class Bomb extends BaseInCell
      */
     public function getDisplayPriority()
     {
-        return BaseInCell::BASE_PRIORITY - 1;
+        return BaseInCell::BASE_PRIORITY + 1;
     }
 
     /**
      * @return float
      */
-    public function getPlanted()
+    public function getExploaded()
     {
-        return $this->planted;
-    }
-
-    public function explodeNow()
-    {
-        $this->planted = 0;
-    }
-
-    /**
-     * @return int
-     */
-    public function getExplosionSpread()
-    {
-        return $this->explosionSpread;
+        return $this->exploaded;
     }
 
 }

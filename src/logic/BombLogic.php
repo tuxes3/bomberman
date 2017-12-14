@@ -26,6 +26,11 @@
  */
 
 namespace bomberman\logic;
+use bomberman\components\field\Bomb;
+use bomberman\components\Room;
+use bomberman\io\Config;
+use bomberman\io\Message;
+use bomberman\logic\javascript\FieldJSLogic;
 use Ratchet\ConnectionInterface;
 
 /**
@@ -37,15 +42,34 @@ class BombLogic extends BaseLogic
 
     public static $name = 'bomb';
 
-    const EVENT_CHECK = 'boom';
+    const EVENT_CHECK = 'check';
 
     /**
      * @param $data
      * @param ConnectionInterface $sender
      */
-    public function boom($data, ConnectionInterface $sender)
+    public function check($data, $sender)
     {
-
+        $current = microtime(true);
+        /** @var Room $room */
+        foreach ($this->context->getData() as $room) {
+            $updateRoom = false;
+            /** @var Bomb $bomb */
+            foreach ($room->getField()->getFieldCollection()->findBombs() as $bomb) {
+                if (($current - $bomb->getPlanted()) >= Config::get(Config::BOMB_TIMEOUT)) {
+                    $fieldCell = $room->getField()->getXY($bomb->getX(), $bomb->getY());
+                    $fieldCell->removeById($bomb->getId());
+                    $std = new \stdClass();
+                    $std->bomb = $bomb;
+                    $std->room = $room;
+                    $this->context->send(Message::fromCode(ExplosionLogic::$name, ExplosionLogic::EVENT_CREATE, $std), $sender);
+                    $updateRoom = true;
+                }
+            }
+            if ($updateRoom) {
+                $this->context->sendToClients($room->getConnectedPlayers(), Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField()));
+            }
+        }
     }
 
 }

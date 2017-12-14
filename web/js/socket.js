@@ -129,7 +129,7 @@ var bomberman_socket = {
                         var onField = $('<div class="block"></div>');
                         for (var r = 0; r < inCells.length; r++) {
                             // TODO: priority
-                            onField.css('background-color', inCells[r].class === 'player' ? 'blue' : inCells[r].class === 'bomb' ? 'black' : 'brown');
+                            onField.css('background-color', inCells[r].class === 'player' ? 'blue' : inCells[r].class === 'bomb' ? 'black' : inCells[r].class === 'explosion' ? 'yellow' : 'brown');
                         }
                         fieldDiv.append(onField);
                     }

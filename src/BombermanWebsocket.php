@@ -30,6 +30,8 @@ namespace bomberman;
 use bomberman\io\RoomCollection;
 use bomberman\io\Message;
 use bomberman\logic\BaseLogic;
+use bomberman\logic\BombLogic;
+use bomberman\logic\ExplosionLogic;
 use bomberman\logic\FieldLogic;
 use bomberman\logic\PlayerLogic;
 use bomberman\logic\RoomLogic;
@@ -69,6 +71,8 @@ class BombermanWebsocket implements MessageComponentInterface, Context
             RoomLogic::$name => new RoomLogic($this),
             FieldLogic::$name => new FieldLogic($this),
             PlayerLogic::$name => new PlayerLogic($this),
+            BombLogic::$name => new BombLogic($this),
+            ExplosionLogic::$name => new ExplosionLogic($this),
         ];
     }
 
@@ -89,7 +93,7 @@ class BombermanWebsocket implements MessageComponentInterface, Context
      * @param Message $message
      * @param ConnectionInterface $from
      */
-    public function send($message, ConnectionInterface $from)
+    public function send($message, $from)
     {
         $this->logics[$message->getLogicName()]->execute($message, $from);
     }

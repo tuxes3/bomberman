@@ -66,6 +66,11 @@ interface InCell
     public function canPlayerEnter();
 
     /**
+     * @return boolean
+     */
+    public function blocksExplosion();
+
+    /**
      * @return int
      */
     public function getDisplayPriority();

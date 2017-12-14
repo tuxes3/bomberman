@@ -29,6 +29,7 @@ namespace bomberman\io;
 
 use bomberman\components\field\FieldCell;
 use bomberman\components\field\Player;
+use bomberman\components\Room;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
@@ -51,6 +52,29 @@ class FieldCollection extends ArrayCollection
             return $fieldCells->first()->getPlayer($resourceId);
         }
         return null;
+    }
+
+    /**
+     * @return array
+     */
+    public function findBombs()
+    {
+        $bombs = [];
+        /** @var FieldCell $fieldCell */
+        foreach ($this as $fieldCell) {
+            $bombs = array_merge($bombs, $fieldCell->getAllBombs());
+        }
+        return $bombs;
+    }
+
+    public function findExplosions()
+    {
+        $explosions = [];
+        /** @var FieldCell $fieldCell */
+        foreach ($this as $fieldCell) {
+            $explosions = array_merge($explosions, $fieldCell->getAllExplosions());
+        }
+        return $explosions;
     }
 
 }

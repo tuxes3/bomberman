@@ -39,6 +39,14 @@ class Block extends BaseInCell
     }
 
     /**
+     * @return bool
+     */
+    public function blocksExplosion()
+    {
+        return true;
+    }
+
+    /**
      * @return int
      */
     public function getDisplayPriority()

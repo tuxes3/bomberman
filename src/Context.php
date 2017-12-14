@@ -40,7 +40,7 @@ interface Context
      * @param Message $message
      * @param ConnectionInterface $from
      */
-    public function send($message, ConnectionInterface $from);
+    public function send($message, $from);
 
     /**
      * @return RoomCollection

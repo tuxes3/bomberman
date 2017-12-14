@@ -32,6 +32,7 @@ use bomberman\BombermanWebsocket;
 use bomberman\io\Config;
 use bomberman\io\Message;
 use bomberman\logic\BombLogic;
+use bomberman\logic\ExplosionLogic;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -45,8 +46,12 @@ $server = IoServer::factory(
     8009
 );
 
-//$server->loop->addPeriodicTimer(Config::get(Config::BOMB_INTERVAL), function ($timer) use ($bombermanWebsocket) {
-//    $bombermanWebsocket->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_CHECK, null), null);
-//});
+$server->loop->addPeriodicTimer(Config::get(Config::BOMB_INTERVAL), function ($timer) use ($bombermanWebsocket) {
+    $bombermanWebsocket->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_CHECK, null), null);
+});
+
+$server->loop->addPeriodicTimer(Config::get(Config::EXPLOSION_INTERVAL), function ($timer) use ($bombermanWebsocket) {
+    $bombermanWebsocket->send(Message::fromCode(ExplosionLogic::$name, ExplosionLogic::EVENT_CHECK, null), null);
+});
 
 $server->run();

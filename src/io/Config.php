@@ -25,9 +25,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 namespace bomberman\io;
-
 
 use Symfony\Component\Yaml\Yaml;
 
@@ -38,6 +36,9 @@ class Config
     const BOMB_COUNT = 'bomb_count';
     const BOMB_INTERVAL = 'bomb_interval';
     const BOMB_TIMEOUT = 'bomb_timeout';
+    const EXPLOSION_DURATION = 'explosion_duration';
+    const EXPLOSION_SPREAD = 'explosion_spread';
+    const EXPLOSION_INTERVAL = 'explosion_interval';
 
     private static $configFile = null;
 

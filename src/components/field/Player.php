@@ -56,6 +56,16 @@ class Player extends BaseInCell
     protected $bombCount;
 
     /**
+     * @var int
+     */
+    protected $explosionSpread;
+
+    /**
+     * @var boolean
+     */
+    protected $alive = true;
+
+    /**
      * Player constructor.
      * @param $x
      * @param $y
@@ -68,6 +78,17 @@ class Player extends BaseInCell
         $this->lastMoved = microtime(true);
         $this->movementSpeed = Config::get(Config::MOVEMENT_SPEED);
         $this->bombCount = Config::get(Config::BOMB_COUNT);
+        $this->explosionSpread = Config::get(Config::EXPLOSION_SPREAD);
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return array_merge(parent::jsonSerialize(), [
+            'alive' => $this->alive,
+        ]);
     }
 
     /**
@@ -81,9 +102,17 @@ class Player extends BaseInCell
     /**
      * @return boolean
      */
+    public function blocksExplosion()
+    {
+        return false;
+    }
+
+    /**
+     * @return boolean
+     */
     public function canPlayerMove()
     {
-        return (microtime(true) - $this->lastMoved) > $this->movementSpeed;
+        return (microtime(true) - $this->lastMoved) > $this->movementSpeed && $this->alive;
     }
 
     /**
@@ -109,6 +138,22 @@ class Player extends BaseInCell
     {
         $this->lastMoved = microtime(true);
         return $this;
+    }
+
+    /**
+     *
+     */
+    public function setDead()
+    {
+        $this->alive = false;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExplosionSpread()
+    {
+        return $this->explosionSpread;
     }
 
 }
