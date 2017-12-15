@@ -44,6 +44,7 @@ class RoomLogic extends BaseLogic
     const EVENT_CREATE = 'create';
     const EVENT_JOIN = 'join';
     const EVENT_LIST = 'getAll';
+    const EVENT_CLOSE = 'close';
 
     /**
      * @var string
@@ -61,9 +62,9 @@ class RoomLogic extends BaseLogic
 
     /**
      * @param \stdClass $data
-     * @param ConnectionInterface $sender
+     * @param ClientConnection $sender
      */
-    protected function create($data, ConnectionInterface $sender)
+    protected function create($data, ClientConnection $sender)
     {
         $uniqueId = $this->context->getData()->getFreeUniqueId();
         $room = new Room($data->maxPlayers, $uniqueId);
@@ -72,25 +73,36 @@ class RoomLogic extends BaseLogic
     }
 
     /**
+     * @param Room $data
+     * @param ClientConnection $sender
+     */
+    protected function close($data, $sender)
+    {
+        $this->context->getData()->removeUniqueId($data->getUniqueId());
+        echo ('count: '.$this->context->getData()->count());
+        $this->sendRoomsToAll();
+    }
+
+    /**
      * sends room changes
      */
     protected function sendRoomsToAll()
     {
-        $this->context->sendToClients(Context::SEND_ALL, Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $this->context->getData()));
+        $this->context->sendToClients(Context::SEND_ALL, Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $this->context->getData()->getValues()));
     }
 
     /**
      * @param \stdClass $data
-     * @param ConnectionInterface $sender
+     * @param ClientConnection $sender
      */
-    protected function join($data, ConnectionInterface $sender)
+    protected function join($data, ClientConnection $sender)
     {
         $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);
         $return = null;
         if (is_null($room)) {
             $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, sprintf('Room (%s) not existing.', $data->uniqueId));
         } else {
-            $result = $room->addPlayer($sender->resourceId);
+            $result = $room->addPlayer($sender->getUuid());
             if (is_string($result)) {
                 $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, $result);
             } elseif ($room->isStartable()) {
@@ -107,11 +119,11 @@ class RoomLogic extends BaseLogic
     }
 
     /**
-     * @param ConnectionInterface $sender
+     * @param ClientConnection $sender
      */
-    protected function getAll($data, ConnectionInterface $sender)
+    protected function getAll($data, ClientConnection $sender)
     {
-        $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $this->context->getData())));
+        $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $this->context->getData()->getValues())));
     }
 
 }

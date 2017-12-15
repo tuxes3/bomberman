@@ -77,6 +77,16 @@
         </div>
 
 
+        <script type="text/javascript">
+            const BOMBERMAN_WEBSOCKET_URL = '<?php 
+            $webSocketPath = isset($_SERVER['WEBSOCKET_PATH']) ? $_SERVER['WEBSOCKET_PATH'] : ':8009';
+            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+                echo 'wss://' . $_SERVER['HTTP_HOST'] . $webSocketPath;
+            } else {
+                echo 'ws://' . $_SERVER['HTTP_HOST'] . $webSocketPath;
+            }
+            ?>';
+        </script>
 
         <script
                 src="https://code.jquery.com/jquery-3.2.1.min.js"

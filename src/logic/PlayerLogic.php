@@ -32,6 +32,9 @@ use bomberman\components\field\Player;
 use bomberman\components\Room;
 use bomberman\io\Message;
 use bomberman\logic\javascript\FieldJSLogic;
+use bomberman\logic\javascript\GameJSLogic;
+use bomberman\logic\javascript\PlayerJSLogic;
+use bomberman\logic\javascript\RoomJSLogic;
 use Ratchet\ConnectionInterface;
 
 class PlayerLogic extends BaseLogic
@@ -41,12 +44,35 @@ class PlayerLogic extends BaseLogic
 
     const EVENT_MOVE = 'move';
     const EVENT_PLAN = 'plant';
+    const EVENT_INIT = 'init';
 
-    protected function move($data, ConnectionInterface $sender)
+    /**
+     * @param \stdClass $data
+     * @param ClientConnection $sender
+     */
+    protected function init($data, ClientConnection $sender)
     {
-        $player = $this->context->getData()->findPlayerBySender($sender->resourceId);
+        $rooms = $this->context->getData();
+        /** @var Room $room */
+        $room = $rooms->findRoomBySender($sender->getUuid());
+        if (!is_null($room) && $room->isStartable()) {
+            $sender->send(json_encode(Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_STARTED, null)));
+            echo ('init');
+            $sender->send(json_encode(Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())));
+        } else {
+            $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $rooms->getValues())));
+        }
+    }
+
+    /**
+     * @param \stdClass $data
+     * @param ClientConnection $sender
+     */
+    protected function move($data, ClientConnection $sender)
+    {
+        $player = $this->context->getData()->findPlayerBySender($sender->getUuid());
         if ($player instanceof Player && $player->canPlayerMove()) {
-            $room = $this->context->getData()->findRoomBySender($sender->resourceId);
+            $room = $this->context->getData()->findRoomBySender($sender->getUuid());
             $x = -1;
             $y = -1;
             switch ($data->direction) {
@@ -74,21 +100,22 @@ class PlayerLogic extends BaseLogic
                 $this->context->sendToClients($room->getConnectedPlayers(),
                     Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
                 );
+                $sender->send(json_encode(Message::fromCode(PlayerJSLogic::NAME, PlayerJSLogic::EVENT_NEXT_MOVEMENT, $player->getNextMovement())));
             }
         }
     }
 
     /**
-     * @param $data
-     * @param ConnectionInterface $sender
+     * @param \stdClass $data
+     * @param ClientConnection $sender
      */
-    protected function plant($data, ConnectionInterface $sender)
+    protected function plant($data, ClientConnection $sender)
     {
         /** @var Room $room */
-        $room = $this->context->getData()->findRoomBySender($sender->resourceId);
+        $room = $this->context->getData()->findRoomBySender($sender->getUuid());
         if (!is_null($room)) {
-            $player = $room->getField()->getFieldCollection()->findPlayerBySender($sender->resourceId);
-            $room->getField()->addTo(new Bomb($player->getX(), $player->getY(), $player));
+            $player = $room->getField()->getFieldCollection()->findPlayerBySender($sender->getUuid());
+            $room->getField()->addTo(new Bomb($player->getX(), $player->getY(), $player->getExplosionSpread()));
             $this->context->sendToClients($room->getConnectedPlayers(),
                 Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
             );

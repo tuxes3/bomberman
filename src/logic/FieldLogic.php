@@ -33,6 +33,7 @@ use bomberman\components\field\Player;
 use bomberman\components\Room;
 use bomberman\io\Message;
 use bomberman\logic\javascript\FieldJSLogic;
+use bomberman\logic\javascript\GameJSLogic;
 use Ratchet\ConnectionInterface;
 
 /**
@@ -52,9 +53,9 @@ class FieldLogic extends BaseLogic
 
     /**
      * @param \stdClass $data
-     * @param ConnectionInterface $sender
+     * @param ClientConnection $sender
      */
-    protected function start($data, ConnectionInterface $sender)
+    protected function start($data, ClientConnection $sender)
     {
         /** @var Room $room */
         $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);
@@ -83,14 +84,18 @@ class FieldLogic extends BaseLogic
             }
         }
         $room->getField()->setCells($cells);
+        $this->context->sendToClients(
+            $room->getConnectedPlayers(),
+            Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_STARTED, null)
+        );
         $this->updateClients($data, $sender);
     }
 
     /**
      * @param \stdClass $data
-     * @param ConnectionInterface $sender
+     * @param ClientConnection $sender
      */
-    public function updateClients($data, ConnectionInterface $sender)
+    public function updateClients($data, ClientConnection $sender)
     {
         /** @var Room $room */
         $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);

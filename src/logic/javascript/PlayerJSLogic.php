@@ -25,44 +25,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman\logic;
+namespace bomberman\logic\javascript;
 
-use bomberman\Context;
-use bomberman\io\Message;
-use Ratchet\ConnectionInterface;
-
-abstract class BaseLogic
+/**
+ * Interface PlayerJSLogic
+ * @package bomberman\logic\javascript
+ */
+interface PlayerJSLogic
 {
 
-    /**
-     * @var string
-     */
-    public static $name = '';
+    const NAME = 'player_js';
 
-    /**
-     * @var Context
-     */
-    protected $context;
-
-    /**
-     * BaseLogic constructor.
-     * @param Context $context
-     */
-    public function __construct(Context $context)
-    {
-        $this->context = $context;
-    }
-
-    /**
-     * @param Message $message
-     * @param ClientConnection $sender
-     */
-    public function execute($message, $sender)
-    {
-        // TODO: use reflection and protect unwanted method calls !
-        //      !! message.save
-        $event = $message->getEvent();
-        $this->$event($message->getData(), $sender);
-    }
+    const EVENT_NEXT_MOVEMENT = 'nextMovement';
 
 }

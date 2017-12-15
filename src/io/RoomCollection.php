@@ -49,6 +49,20 @@ class RoomCollection extends ArrayCollection implements \JsonSerializable
     }
 
     /**
+     * @param string $uniqueId
+     */
+    public function removeUniqueId($uniqueId)
+    {
+        /** @var Room $room */
+        foreach ($this as $key => $room) {
+            if ($room->getUniqueId() == $uniqueId) {
+                $this->remove($key);
+                break;
+            }
+        }
+    }
+
+    /**
      * @return string
      */
     public function getFreeUniqueId()
@@ -82,26 +96,26 @@ class RoomCollection extends ArrayCollection implements \JsonSerializable
     }
 
     /**
-     * @param int $resourceId
+     * @param string $uuid
      * @return Player
      */
-    public function findPlayerBySender($resourceId)
+    public function findPlayerBySender($uuid)
     {
-        $room = $this->findRoomBySender($resourceId);
+        $room = $this->findRoomBySender($uuid);
         if ($room) {
-            return $room->getField()->getFieldCollection()->findPlayerBySender($resourceId);
+            return $room->getField()->getFieldCollection()->findPlayerBySender($uuid);
         }
         return null;
     }
 
     /**
-     * @param int $resourceId
+     * @param string $uuid
      * @return Room|null
      */
-    public function findRoomBySender($resourceId)
+    public function findRoomBySender($uuid)
     {
-        $room = $this->filter(function (Room $room) use ($resourceId) {
-            return in_array($resourceId, $room->getConnectedPlayers());
+        $room = $this->filter(function (Room $room) use ($uuid) {
+            return in_array($uuid, $room->getConnectedPlayers());
         });
         /** @var Room|bool $room */
         $room = $room->first();

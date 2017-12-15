@@ -27,6 +27,8 @@
 
 namespace bomberman\io;
 
+use bomberman\components\field\Bomb;
+use bomberman\components\field\Explosion;
 use bomberman\components\field\FieldCell;
 use bomberman\components\field\Player;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -39,18 +41,57 @@ class FieldCollection extends ArrayCollection
 {
 
     /**
-     * @param int $resourceId
+     * @param string $uuid
      * @return null|Player
      */
-    public function findPlayerBySender($resourceId)
+    public function findPlayerBySender($uuid)
     {
-        $fieldCells = $this->filter(function (FieldCell $fieldCell) use ($resourceId) {
-            return null !== $fieldCell->getPlayer($resourceId);
+        $fieldCells = $this->filter(function (FieldCell $fieldCell) use ($uuid) {
+            return null !== $fieldCell->getPlayer($uuid);
         });
         if ($fieldCells->count() > 0) {
-            return $fieldCells->first()->getPlayer($resourceId);
+            return $fieldCells->first()->getPlayer($uuid);
         }
         return null;
+    }
+
+    /**
+     * @return array|Bomb[]
+     */
+    public function findBombs()
+    {
+        $bombs = [];
+        /** @var FieldCell $fieldCell */
+        foreach ($this as $fieldCell) {
+            $bombs = array_merge($bombs, $fieldCell->getAllBombs());
+        }
+        return $bombs;
+    }
+
+    /**
+     * @return array|Explosion[]
+     */
+    public function findExplosions()
+    {
+        $explosions = [];
+        /** @var FieldCell $fieldCell */
+        foreach ($this as $fieldCell) {
+            $explosions = array_merge($explosions, $fieldCell->getAllExplosions());
+        }
+        return $explosions;
+    }
+
+    /**
+     * @return array|Player[]
+     */
+    public function findPlayers()
+    {
+        $players = [];
+        /** @var FieldCell $fieldCell */
+        foreach ($this as $fieldCell) {
+            $players = array_merge($players, $fieldCell->getAllPlayers());
+        }
+        return $players;
     }
 
 }

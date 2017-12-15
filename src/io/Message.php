@@ -49,6 +49,16 @@ class Message implements \JsonSerializable
      */
     private $data;
 
+    /**
+     * @var string
+     */
+    private $uuid;
+
+    /**
+     * @var boolean
+     */
+    private $save = false;
+
     private function __construct()
     {
     }
@@ -71,6 +81,7 @@ class Message implements \JsonSerializable
      * {
      *      name: "xxx",
      *      event: "yyy",
+     *      uuid: "zzz",
      *      data: {
      *          ...
      *      }
@@ -84,6 +95,7 @@ class Message implements \JsonSerializable
         $instance->logicName = $data->name;
         $instance->event = $data->event;
         $instance->data = $data->data;
+        $instance->uuid = $data->uuid;
         return $instance;
     }
 
@@ -99,6 +111,7 @@ class Message implements \JsonSerializable
         $instance->logicName = $name;
         $instance->event = $event;
         $instance->data = $data;
+        $instance->save = true;
         return $instance;
     }
 
@@ -125,6 +138,14 @@ class Message implements \JsonSerializable
     public function getEvent()
     {
         return $this->event;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUuid()
+    {
+        return $this->uuid;
     }
 
 }

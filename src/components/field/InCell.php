@@ -66,8 +66,24 @@ interface InCell
     public function canPlayerEnter();
 
     /**
+     * @return boolean
+     */
+    public function blocksExplosion();
+
+    /**
      * @return int
      */
     public function getDisplayPriority();
+
+    /**
+     * @return array
+     */
+    public function backup();
+
+    /**
+     * @param array $data
+     * @return self
+     */
+    public static function restore($data);
 
 }

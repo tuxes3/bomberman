@@ -36,17 +36,17 @@ class Player extends BaseInCell
 {
 
     /**
-     * @var int
+     * @var string
      */
-    protected $connId;
+    protected $uuid;
 
     /**
-     * @var float
+     * @var int
      */
     protected $lastMoved;
 
     /**
-     * @var int
+     * @var float
      */
     protected $movementSpeed;
 
@@ -56,18 +56,67 @@ class Player extends BaseInCell
     protected $bombCount;
 
     /**
+     * @var int
+     */
+    protected $explosionSpread;
+
+    /**
+     * @var boolean
+     */
+    protected $alive = true;
+
+    /**
      * Player constructor.
      * @param $x
      * @param $y
-     * @param $connId
+     * @param $uuid
      */
-    public function __construct($x, $y, $connId)
+    public function __construct($x, $y, $uuid)
     {
         parent::__construct($x, $y);
-        $this->connId = $connId;
-        $this->lastMoved = microtime(true);
+        $this->uuid = $uuid;
+        $this->lastMoved = milliseconds();
         $this->movementSpeed = Config::get(Config::MOVEMENT_SPEED);
         $this->bombCount = Config::get(Config::BOMB_COUNT);
+        $this->explosionSpread = Config::get(Config::EXPLOSION_SPREAD);
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return array_merge(parent::jsonSerialize(), [
+            'alive' => $this->alive,
+        ]);
+    }
+
+    /**
+     * @return array
+     */
+    public function backup()
+    {
+        return array_merge(parent::backup(), [
+            'lastMoved' => $this->lastMoved,
+            'movementSpeed' => $this->movementSpeed,
+            'bombCount' => $this->bombCount,
+            'explosionSpread' => $this->explosionSpread,
+            'uuid' => $this->uuid,
+        ]);
+    }
+
+    /**
+     * @param array $data
+     * @return Player
+     */
+    public static function restore($data)
+    {
+        $player = new Player($data['x'], $data['y'], $data['uuid']);
+        $player->lastMoved = $data['lastMoved'];
+        $player->movementSpeed = $data['movementSpeed'];
+        $player->bombCount = $data['bombCount'];
+        $player->explosionSpread = $data['explosionSpread'];
+        return $player;
     }
 
     /**
@@ -81,9 +130,17 @@ class Player extends BaseInCell
     /**
      * @return boolean
      */
+    public function blocksExplosion()
+    {
+        return false;
+    }
+
+    /**
+     * @return boolean
+     */
     public function canPlayerMove()
     {
-        return (microtime(true) - $this->lastMoved) > $this->movementSpeed;
+        return (milliseconds() - $this->lastMoved) > $this->movementSpeed && $this->alive;
     }
 
     /**
@@ -97,9 +154,9 @@ class Player extends BaseInCell
     /**
      * @return int
      */
-    public function getConnId()
+    public function getUuid()
     {
-        return $this->connId;
+        return $this->uuid;
     }
 
     /**
@@ -107,8 +164,40 @@ class Player extends BaseInCell
      */
     public function setLastMoved()
     {
-        $this->lastMoved = microtime(true);
+        $this->lastMoved = milliseconds();
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getNextMovement()
+    {
+        return $this->lastMoved + $this->movementSpeed;
+    }
+
+    /**
+     *
+     */
+    public function setDead()
+    {
+        $this->alive = false;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExplosionSpread()
+    {
+        return $this->explosionSpread;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAlive()
+    {
+        return $this->alive;
     }
 
 }

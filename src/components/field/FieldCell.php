@@ -62,19 +62,46 @@ class FieldCell implements \JsonSerializable
     }
 
     /**
+     * @return boolean
+     */
+    public function blocksExplosion()
+    {
+        $blocks = false;
+        foreach ($this->inCells as $inCell) {
+            $blocks = $blocks || $inCell->blocksExplosion();
+        }
+        return $blocks;
+    }
+
+    /**
      * @param int $connId
      * @return Player|null
      */
     public function getPlayer($connId)
     {
         foreach ($this->inCells as $inCell) {
-            if ($inCell instanceof Player && $inCell->getConnId() == $connId) {
+            if ($inCell instanceof Player && $inCell->getUuid() == $connId) {
                 return $inCell;
             }
         }
         return null;
     }
 
+    /**
+     * @return array
+     */
+    public function backup()
+    {
+        $backup = [];
+        foreach ($this->inCells as $inCell) {
+            $backup[] = $inCell->backup();
+        }
+        return $backup;
+    }
+
+    /**
+     * @param $id
+     */
     public function removeById($id)
     {
         foreach ($this->inCells as $key => $inCell) {
@@ -83,6 +110,70 @@ class FieldCell implements \JsonSerializable
             }
         }
         $this->inCells = array_values($this->inCells);
+    }
+
+    /**
+     * @return boolean if something changed
+     */
+    public function explode()
+    {
+        $changes = false;
+        foreach ($this->inCells as $key => $inCell) {
+            if ($inCell instanceof Player) {
+                $inCell->setDead();
+                $changes = true;
+            } elseif ($inCell instanceof Explosion) {
+            } elseif ($inCell instanceof Bomb) {
+                $inCell->explodeNow();
+            } else {
+                unset($this->inCells[$key]);
+                $changes = true;
+            }
+        }
+        $this->inCells = array_values($this->inCells);
+        return $changes;
+    }
+
+    /**
+     * @return array|Bomb[]
+     */
+    public function getAllBombs()
+    {
+        $bombs = [];
+        foreach ($this->inCells as $inCell) {
+            if ($inCell instanceof Bomb) {
+                $bombs[] = $inCell;
+            }
+        }
+        return $bombs;
+    }
+
+    /**
+     * @return array|Explosion[]
+     */
+    public function getAllExplosions()
+    {
+        $explosions = [];
+        foreach ($this->inCells as $inCell) {
+            if ($inCell instanceof Explosion) {
+                $explosions[] = $inCell;
+            }
+        }
+        return $explosions;
+    }
+
+    /**
+     * return array|Player[]
+     */
+    public function getAllPlayers()
+    {
+        $players = [];
+        foreach ($this->inCells as $inCell) {
+            if ($inCell instanceof Player) {
+                $players[] = $inCell;
+            }
+        }
+        return $players;
     }
 
     /**

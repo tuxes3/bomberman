@@ -31,11 +31,28 @@ class Block extends BaseInCell
 {
 
     /**
+     * @param array $data
+     * @return Block
+     */
+    public static function restore($data)
+    {
+        return new self($data['x'], $data['y']);
+    }
+
+    /**
      * @return bool
      */
     public function canPlayerEnter()
     {
         return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function blocksExplosion()
+    {
+        return true;
     }
 
     /**

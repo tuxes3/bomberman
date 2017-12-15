@@ -64,6 +64,14 @@ abstract class BaseInCell implements InCell, \JsonSerializable
         ];
     }
 
+    public function backup()
+    {
+        return array_merge($this->jsonSerialize(), [
+            'id' => $this->id,
+            'class' => get_class($this),
+        ]);
+    }
+
     /**
      * @return int
      */

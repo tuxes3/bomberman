@@ -30,6 +30,9 @@ namespace bomberman;
 use bomberman\io\RoomCollection;
 use bomberman\io\Message;
 use bomberman\logic\BaseLogic;
+use bomberman\logic\BombLogic;
+use bomberman\logic\ClientConnection;
+use bomberman\logic\ExplosionLogic;
 use bomberman\logic\FieldLogic;
 use bomberman\logic\PlayerLogic;
 use bomberman\logic\RoomLogic;
@@ -57,18 +60,23 @@ class BombermanWebsocket implements MessageComponentInterface, Context
      */
     protected $data;
 
+    protected $clientConnectionUuidMap;
 
     /**
      * Channel constructor.
+     * @param RoomCollection $roomCollection
      */
-    public function __construct()
+    public function __construct($roomCollection)
     {
         $this->clients = new \SplObjectStorage();
-        $this->data = new RoomCollection();
+        $this->data = $roomCollection;
+        $this->clientConnectionUuidMap = [];
         $this->logics = [
             RoomLogic::$name => new RoomLogic($this),
             FieldLogic::$name => new FieldLogic($this),
             PlayerLogic::$name => new PlayerLogic($this),
+            BombLogic::$name => new BombLogic($this),
+            ExplosionLogic::$name => new ExplosionLogic($this),
         ];
     }
 
@@ -82,14 +90,16 @@ class BombermanWebsocket implements MessageComponentInterface, Context
     {
         echo ($msg . PHP_EOL);
         $message = Message::fromJson($msg);
-        $this->send($message, $from);
+        $clientConnection = new ClientConnection($from, $message->getUuid());
+        $this->clientConnectionUuidMap[$from->resourceId] = $message->getUuid();
+        $this->send($message, $clientConnection);
     }
 
     /**
      * @param Message $message
-     * @param ConnectionInterface $from
+     * @param ClientConnection $from
      */
-    public function send($message, ConnectionInterface $from)
+    public function send($message, $from)
     {
         $this->logics[$message->getLogicName()]->execute($message, $from);
     }
@@ -103,7 +113,7 @@ class BombermanWebsocket implements MessageComponentInterface, Context
     }
 
     /**
-     * @param array|int[] $playerIds
+     * @param array|string[] $playerIds
      * @param Message $message
      */
     public function sendToClients($playerIds, $message)
@@ -114,7 +124,7 @@ class BombermanWebsocket implements MessageComponentInterface, Context
             }
         } else {
             foreach ($this->clients as $client) {
-                if (in_array($client->resourceId, $playerIds)) {
+                if (array_key_exists($client->resourceId, $this->clientConnectionUuidMap) && in_array($this->clientConnectionUuidMap[$client->resourceId], $playerIds)) {
                     $client->send(json_encode($message));
                 }
             }
