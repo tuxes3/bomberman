@@ -37,12 +37,33 @@ class Explosion extends BaseInCell
     /**
      * @var int
      */
-    private $exploaded;
+    private $exploded;
 
     public function __construct($x, $y)
     {
         parent::__construct($x, $y);
-        $this->exploaded = milliseconds();
+        $this->exploded = milliseconds();
+    }
+
+    /**
+     * @return array
+     */
+    public function backup()
+    {
+        return array_merge(parent::backup(), [
+            'exploded' => $this->exploded,
+        ]);
+    }
+
+    /**
+     * @param array $data
+     * @return Explosion
+     */
+    public static function restore($data)
+    {
+        $explosion = new self($data['x'], $data['y']);
+        $explosion->exploded = $data['exploded'];
+        return $explosion;
     }
 
     /**
@@ -72,9 +93,9 @@ class Explosion extends BaseInCell
     /**
      * @return float
      */
-    public function getExploaded()
+    public function getExploded()
     {
-        return $this->exploaded;
+        return $this->exploded;
     }
 
 }

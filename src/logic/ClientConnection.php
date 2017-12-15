@@ -27,42 +27,62 @@
 
 namespace bomberman\logic;
 
-use bomberman\Context;
-use bomberman\io\Message;
 use Ratchet\ConnectionInterface;
 
-abstract class BaseLogic
+/**
+ * Class ClientConnection
+ * @package bomberman\logic
+ */
+class ClientConnection implements ConnectionInterface
 {
 
     /**
-     * @var string
+     * @var ConnectionInterface|null $connection
      */
-    public static $name = '';
+    protected $connection;
 
     /**
-     * @var Context
+     * @var string|null $uuid
      */
-    protected $context;
+    protected $uuid;
 
     /**
-     * BaseLogic constructor.
-     * @param Context $context
+     * ClientConnection constructor.
+     * @param ConnectionInterface $connection
+     * @param string $uuid
      */
-    public function __construct(Context $context)
+    public function __construct($connection, $uuid)
     {
-        $this->context = $context;
+        $this->connection = $connection;
+        $this->uuid = $uuid;
     }
 
     /**
-     * @param Message $message
-     * @param ClientConnection $sender
+     * @return null|string
      */
-    public function execute($message, $sender)
+    public function getUuid()
     {
-        // TODO: use reflection and protect unwanted method calls !
-        //      !! message.save
-        $event = $message->getEvent();
-        $this->$event($message->getData(), $sender);
+        return $this->uuid;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function send($data)
+    {
+        if (!is_null($this->connection)) {
+            $this->connection->send($data);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function close()
+    {
+        if (!is_null($this->connection)) {
+            $this->connection->close();
+        }
     }
 
 }

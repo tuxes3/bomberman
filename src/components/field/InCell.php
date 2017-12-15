@@ -75,4 +75,15 @@ interface InCell
      */
     public function getDisplayPriority();
 
+    /**
+     * @return array
+     */
+    public function backup();
+
+    /**
+     * @param array $data
+     * @return self
+     */
+    public static function restore($data);
+
 }

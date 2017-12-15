@@ -39,6 +39,7 @@ class Config
     const EXPLOSION_DURATION = 'explosion_duration';
     const EXPLOSION_SPREAD = 'explosion_spread';
     const EXPLOSION_INTERVAL = 'explosion_interval';
+    const BACK_UP_INTERVAL = 'back_up_interval';
 
     private static $configFile = null;
 

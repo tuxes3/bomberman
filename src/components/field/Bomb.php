@@ -57,6 +57,25 @@ class Bomb extends BaseInCell
         $this->planted = milliseconds();
     }
 
+    public function backup()
+    {
+        return array_merge(parent::backup(), [
+            'explosionSpread' => $this->explosionSpread,
+            'planted' => $this->planted,
+        ]);
+    }
+
+    /**
+     * @param array $data
+     * @return Bomb
+     */
+    public static function restore($data)
+    {
+        $bomb = new self($data['x'], $data['y'], $data['explosionSpread']);
+        $bomb->planted = $data['planted'];
+        return $bomb;
+    }
+
     /**
      * @return boolean
      */

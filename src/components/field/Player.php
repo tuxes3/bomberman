@@ -36,9 +36,9 @@ class Player extends BaseInCell
 {
 
     /**
-     * @var int
+     * @var string
      */
-    protected $connId;
+    protected $uuid;
 
     /**
      * @var int
@@ -69,12 +69,12 @@ class Player extends BaseInCell
      * Player constructor.
      * @param $x
      * @param $y
-     * @param $connId
+     * @param $uuid
      */
-    public function __construct($x, $y, $connId)
+    public function __construct($x, $y, $uuid)
     {
         parent::__construct($x, $y);
-        $this->connId = $connId;
+        $this->uuid = $uuid;
         $this->lastMoved = milliseconds();
         $this->movementSpeed = Config::get(Config::MOVEMENT_SPEED);
         $this->bombCount = Config::get(Config::BOMB_COUNT);
@@ -89,6 +89,34 @@ class Player extends BaseInCell
         return array_merge(parent::jsonSerialize(), [
             'alive' => $this->alive,
         ]);
+    }
+
+    /**
+     * @return array
+     */
+    public function backup()
+    {
+        return array_merge(parent::backup(), [
+            'lastMoved' => $this->lastMoved,
+            'movementSpeed' => $this->movementSpeed,
+            'bombCount' => $this->bombCount,
+            'explosionSpread' => $this->explosionSpread,
+            'uuid' => $this->uuid,
+        ]);
+    }
+
+    /**
+     * @param array $data
+     * @return Player
+     */
+    public static function restore($data)
+    {
+        $player = new Player($data['x'], $data['y'], $data['uuid']);
+        $player->lastMoved = $data['lastMoved'];
+        $player->movementSpeed = $data['movementSpeed'];
+        $player->bombCount = $data['bombCount'];
+        $player->explosionSpread = $data['explosionSpread'];
+        return $player;
     }
 
     /**
@@ -126,9 +154,9 @@ class Player extends BaseInCell
     /**
      * @return int
      */
-    public function getConnId()
+    public function getUuid()
     {
-        return $this->connId;
+        return $this->uuid;
     }
 
     /**
@@ -162,6 +190,14 @@ class Player extends BaseInCell
     public function getExplosionSpread()
     {
         return $this->explosionSpread;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAlive()
+    {
+        return $this->alive;
     }
 
 }

@@ -50,7 +50,7 @@ class Room implements \JsonSerializable
     private $createdAt;
 
     /**
-     * @var array|int[]
+     * @var array|string[]
      */
     private $connectedPlayers;
 
@@ -119,7 +119,7 @@ class Room implements \JsonSerializable
     }
 
     /**
-     * @return array|int[]
+     * @return array|string[]
      */
     public function getConnectedPlayers()
     {
@@ -132,6 +132,72 @@ class Room implements \JsonSerializable
     public function getField()
     {
         return $this->field;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxPlayers()
+    {
+        return $this->maxPlayers;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param int $maxPlayers
+     * @return $this
+     */
+    public function setMaxPlayers($maxPlayers)
+    {
+        $this->maxPlayers = $maxPlayers;
+        return $this;
+    }
+
+    /**
+     * @param string $uniqueId
+     * @return $this
+     */
+    public function setUniqueId($uniqueId)
+    {
+        $this->uniqueId = $uniqueId;
+        return $this;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     * @return $this
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    /**
+     * @param array|string[] $connectedPlayers
+     * @return $this
+     */
+    public function setConnectedPlayers($connectedPlayers)
+    {
+        $this->connectedPlayers = $connectedPlayers;
+        return $this;
+    }
+
+    /**
+     * @param Field $field
+     * @return $this
+     */
+    public function setField($field)
+    {
+        $this->field = $field;
+        return $this;
     }
 
 }

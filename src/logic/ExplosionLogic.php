@@ -35,6 +35,7 @@ use bomberman\components\Room;
 use bomberman\io\Config;
 use bomberman\io\Message;
 use bomberman\logic\javascript\FieldJSLogic;
+use bomberman\logic\javascript\GameJSLogic;
 use Ratchet\ConnectionInterface;
 
 /**
@@ -51,7 +52,7 @@ class ExplosionLogic extends BaseLogic
 
     /**
      * @param \stdClass $data
-     * @param ConnectionInterface $sender
+     * @param ClientConnection $sender
      */
     public function check($data, $sender)
     {
@@ -62,25 +63,38 @@ class ExplosionLogic extends BaseLogic
             /** @var Explosion $explosion */
             foreach ($room->getField()->getFieldCollection()->findExplosions() as $explosion) {
                 $fieldCell = $room->getField()->getXY($explosion->getX(), $explosion->getY());
-                if (($current - $explosion->getExploaded()) >= Config::get(Config::EXPLOSION_DURATION)) {
+                if (($current - $explosion->getExploded()) >= Config::get(Config::EXPLOSION_DURATION)) {
                     $fieldCell->removeById($explosion->getId());
                     $updateRoom = true;
                 } else {
                     $updateRoom = $fieldCell->explode();
                 }
             }
-            if ($updateRoom) {
+            if ($updateRoom || $room->getField()->isFinished()) {
                 $this->context->sendToClients(
                     $room->getConnectedPlayers(),
                     Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
                 );
+                if ($room->getField()->isFinished()) {
+                    $this->context->send(Message::fromCode(RoomLogic::$name, RoomLogic::EVENT_CLOSE, $room), $sender);
+                    // send finish
+                    foreach ($room->getConnectedPlayers() as $uuid) {
+                        $player = $room->getField()->getFieldCollection()->findPlayerBySender($uuid);
+                        $data = new \stdClass();
+                        $data->won = $player->isAlive();
+                        $this->context->sendToClients(
+                            [$uuid],
+                            Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_FINISHED, $data)
+                        );
+                    }
+                }
             }
         }
     }
 
     /**
      * @param \stdClass $data
-     * @param ConnectionInterface $sender
+     * @param ClientConnection $sender
      */
     public function create($data, $sender)
     {

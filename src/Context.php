@@ -29,6 +29,7 @@ namespace bomberman;
 
 use bomberman\io\RoomCollection;
 use bomberman\io\Message;
+use bomberman\logic\ClientConnection;
 use Ratchet\ConnectionInterface;
 
 interface Context
@@ -38,7 +39,7 @@ interface Context
 
     /**
      * @param Message $message
-     * @param ConnectionInterface $from
+     * @param ClientConnection $from
      */
     public function send($message, $from);
 

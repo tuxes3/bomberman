@@ -41,14 +41,15 @@
         </style>
     </head>
     <body>
-        <a id="createRoom" href="#">Create Room</a>
-        Max Player:
-        <input type="number" id="maxPlayer" value="1" />
+        <div id="lobby">
+            <a id="createRoom" href="#">Create Room</a>
+            Max Player:
+            <input type="number" id="maxPlayer" value="1" />
 
-        <div id="roomList">
+            <div id="roomList">
 
+            </div>
         </div>
-
         <div id="field">
 
         </div>

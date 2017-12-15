@@ -1,15 +1,21 @@
 (function($) {
 
     var bomberman_socket_request = {
-        listRooms: function () {
-            return JSON.stringify({
-                name: 'room',
-                event: 'getAll',
+        prepare: function (request) {
+            request.uuid = bomberman_storage.getUuid();
+            return JSON.stringify(request);
+        },
+
+        init: function () {
+            return this.prepare({
+                name: 'player',
+                event: 'init',
                 data: null
             });
         },
+
         createRoom: function (maxPlayers) {
-            return JSON.stringify({
+            return this.prepare({
                 name: 'room',
                 event: 'create',
                 data: {
@@ -17,8 +23,9 @@
                 }
             });
         },
+
         joinRoom: function (uniqueId) {
-            return JSON.stringify({
+            return this.prepare({
                 name: 'room',
                 event: 'join',
                 data: {
@@ -26,8 +33,9 @@
                 }
             });
         },
+
         movePlayer: function (direction) {
-            return JSON.stringify({
+            return this.prepare({
                 name: 'player',
                 event: 'move',
                 data: {
@@ -35,12 +43,22 @@
                 }
             });
         },
+
         plantBomb: function () {
-            return JSON.stringify({
+            return this.prepare({
                 name: 'player',
                 event: 'plant',
                 data: null
             });
+        }
+    };
+
+    var bomberman_storage = {
+        getUuid: function () {
+            if (localStorage.userId == null) {
+                localStorage.userId = Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36); // uuid
+            }
+            return localStorage.userId;
         }
     };
 
@@ -50,7 +68,7 @@
         lastWantedMovement: null,
         waitingForNextMove: null,
 
-        init: function() {
+        init: function () {
             $('#createRoom').on('click', bomberman_ui.createRoom);
             $(document).keypress(bomberman_ui.onKeyPres);
         },
@@ -105,7 +123,7 @@
         },
 
         onOpen: function (e) {
-            this.send(bomberman_socket_request.listRooms());
+            this.send(bomberman_socket_request.init());
         },
 
         onMessage: function (e) {
@@ -118,10 +136,26 @@
         },
 
         handler: {
+            game_js: {
+                started: function (data) {
+                    console.log('started');
+                    $('#lobby').hide();
+                },
+
+                finished: function (data) {
+                    console.log('finished');
+                    $('#lobby').show();
+                    $('#field').empty();
+                    var text = 'You ' + (data.won ? 'won' : 'lose') + '!';
+                    alert(text);
+                }
+            },
+
             room_js: {
                 list: function (roomList) {
                     var roomListDiv = $('#roomList');
                     roomListDiv.empty();
+                    console.log(roomList);
                     for (var i = 0; i < roomList.length; i++) {
                         roomListDiv.append($(
                            '<a href="#" data-unique-id="'+roomList[i].uniqueId+'">#'+i+' Room ('+roomList[i].connectedPlayers+'/'+roomList[i].maxPlayers+')</a>'
@@ -142,7 +176,7 @@
 
             field_js: {
                 update: function (field) {
-                    console.log(field);
+                    console.log({event: 'field_js.update', field: field});
                     var fieldDiv = $('#field');
                     fieldDiv.empty();
                     for (var i = 0; i < field.cells.length; i++) {
@@ -152,6 +186,9 @@
                             for (var r = 0; r < inCells.length; r++) {
                                 // TODO: priority
                                 onField.css('background-color', inCells[r].class === 'player' ? 'blue' : inCells[r].class === 'bomb' ? 'black' : inCells[r].class === 'explosion' ? 'yellow' : 'brown');
+                                if (inCells[r].class === 'player' && !inCells[r].alive) {
+                                    onField.text('RIP');
+                                }
                             }
                             fieldDiv.append(onField);
                         }

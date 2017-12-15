@@ -46,7 +46,7 @@ class BombLogic extends BaseLogic
 
     /**
      * @param $data
-     * @param ConnectionInterface $sender
+     * @param ClientConnection $sender
      */
     public function check($data, $sender)
     {

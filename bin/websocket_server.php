@@ -33,6 +33,8 @@ use bomberman\io\Config;
 use bomberman\io\Message;
 use bomberman\logic\BombLogic;
 use bomberman\logic\ExplosionLogic;
+use bomberman\io\BackupManager;
+use \bomberman\io\RoomCollection;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -42,7 +44,12 @@ function milliseconds() {
     return ((int)$mt[1]) * 1000 + ((int)round($mt[0] * 1000));
 }
 
-$bombermanWebsocket = new BombermanWebsocket();
+$backupManager = new BackupManager();
+$roomCollection = $roomCollection = $backupManager->restore();
+if (!$roomCollection instanceof RoomCollection) {
+    $roomCollection = new RoomCollection();
+}
+$bombermanWebsocket = new BombermanWebsocket($roomCollection);
 $server = IoServer::factory(
     new HttpServer(
         new WsServer(
@@ -58,6 +65,10 @@ $server->loop->addPeriodicTimer(Config::get(Config::BOMB_INTERVAL), function ($t
 
 $server->loop->addPeriodicTimer(Config::get(Config::EXPLOSION_INTERVAL), function ($timer) use ($bombermanWebsocket) {
     $bombermanWebsocket->send(Message::fromCode(ExplosionLogic::$name, ExplosionLogic::EVENT_CHECK, null), null);
+});
+
+$server->loop->addPeriodicTimer(Config::get(Config::BACK_UP_INTERVAL), function ($timer) use ($bombermanWebsocket, $backupManager) {
+    $backupManager->backup($bombermanWebsocket->getData());
 });
 
 $server->run();

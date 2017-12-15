@@ -35,7 +35,7 @@ class Field implements \JsonSerializable
 {
 
     /**
-     * @var array|InCell[]
+     * @var array|InCell[][]
      */
     protected $cells = [];
 
@@ -72,7 +72,7 @@ class Field implements \JsonSerializable
     }
 
     /**
-     * @return InCell[]
+     * @return InCell[][]
      */
     public function getCells()
     {
@@ -108,6 +108,22 @@ class Field implements \JsonSerializable
     }
 
     /**
+     * @return boolean
+     */
+    public function isFinished()
+    {
+        $players = $this->getFieldCollection()->findPlayers();
+        if ($this->maxPlayers != count($players)) {
+            return false;
+        }
+        $aliveCount = 0;
+        foreach ($players as $player) {
+            $aliveCount += $player->isAlive() ? 1 : 0;
+        }
+        return count($players) == 1 ? $aliveCount == 0 : $aliveCount <= 1;
+    }
+
+    /**
      * @param InCell $inCell
      */
     public function addTo(InCell $inCell)
@@ -121,6 +137,14 @@ class Field implements \JsonSerializable
     public function setCells($cells)
     {
         $this->cells = $cells;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxPlayers()
+    {
+        return $this->maxPlayers;
     }
 
 }

@@ -80,11 +80,23 @@ class FieldCell implements \JsonSerializable
     public function getPlayer($connId)
     {
         foreach ($this->inCells as $inCell) {
-            if ($inCell instanceof Player && $inCell->getConnId() == $connId) {
+            if ($inCell instanceof Player && $inCell->getUuid() == $connId) {
                 return $inCell;
             }
         }
         return null;
+    }
+
+    /**
+     * @return array
+     */
+    public function backup()
+    {
+        $backup = [];
+        foreach ($this->inCells as $inCell) {
+            $backup[] = $inCell->backup();
+        }
+        return $backup;
     }
 
     /**
@@ -148,6 +160,20 @@ class FieldCell implements \JsonSerializable
             }
         }
         return $explosions;
+    }
+
+    /**
+     * return array|Player[]
+     */
+    public function getAllPlayers()
+    {
+        $players = [];
+        foreach ($this->inCells as $inCell) {
+            if ($inCell instanceof Player) {
+                $players[] = $inCell;
+            }
+        }
+        return $players;
     }
 
     /**
