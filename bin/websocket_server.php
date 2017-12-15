@@ -28,17 +28,47 @@
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
-use bomberman\Channel;
+use bomberman\BombermanWebsocket;
+use bomberman\io\Config;
+use bomberman\io\Message;
+use bomberman\logic\BombLogic;
+use bomberman\logic\ExplosionLogic;
+use bomberman\io\BackupManager;
+use \bomberman\io\RoomCollection;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
+// needs to be run 64 bit machine
+function milliseconds() {
+    $mt = explode(' ', microtime());
+    return ((int)$mt[1]) * 1000 + ((int)round($mt[0] * 1000));
+}
+
+$backupManager = new BackupManager();
+$roomCollection = $roomCollection = $backupManager->restore();
+if (!$roomCollection instanceof RoomCollection) {
+    $roomCollection = new RoomCollection();
+}
+$bombermanWebsocket = new BombermanWebsocket($roomCollection);
 $server = IoServer::factory(
     new HttpServer(
         new WsServer(
-            new Channel()
+            $bombermanWebsocket
         )
     ),
     8009
 );
+
+$server->loop->addPeriodicTimer(Config::get(Config::BOMB_INTERVAL), function ($timer) use ($bombermanWebsocket) {
+    $bombermanWebsocket->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_CHECK, null), null);
+});
+
+$server->loop->addPeriodicTimer(Config::get(Config::EXPLOSION_INTERVAL), function ($timer) use ($bombermanWebsocket) {
+    $bombermanWebsocket->send(Message::fromCode(ExplosionLogic::$name, ExplosionLogic::EVENT_CHECK, null), null);
+});
+
+$server->loop->addPeriodicTimer(Config::get(Config::BACK_UP_INTERVAL), function ($timer) use ($bombermanWebsocket, $backupManager) {
+    $backupManager->backup($bombermanWebsocket->getData());
+});
 
 $server->run();

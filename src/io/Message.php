@@ -25,125 +25,127 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\io;
 
-use Ratchet\ConnectionInterface;
-
-abstract class BaseOnField implements OnField, \JsonSerializable
+/**
+ * Class Message
+ * @package bomberman\io
+ */
+class Message implements \JsonSerializable
 {
-
-    /**
-     * @var int $x
-     */
-    protected $x;
-
-    /**
-     * @var int $y
-     */
-    protected $y;
-
-    /**
-     * @var Field
-     */
-    protected $field;
 
     /**
      * @var string
      */
-    protected $color;
+    private $logicName;
 
-    public function __construct($x, $y, $field)
+    /**
+     * @var string
+     */
+    private $event;
+
+    /**
+     * @var \stdClass
+     */
+    private $data;
+
+    /**
+     * @var string
+     */
+    private $uuid;
+
+    /**
+     * @var boolean
+     */
+    private $save = false;
+
+    private function __construct()
     {
-        $this->x = $x;
-        $this->y = $y;
-        $this->field = $field;
-        $this->color = '#000';
-        $this->init();
     }
 
-    public function event(ConnectionInterface $connection, $data)
-    {
-    }
-
-    public function init()
-    {
-    }
-
+    /**
+     * @return array
+     */
     public function jsonSerialize()
     {
         return [
-            'x' => $this->getX(),
-            'y' => $this->getY(),
-            'color' => $this->getColor(),
-            'class' => $this->getClass(),
+            'name' => $this->logicName,
+            'event' => $this->event,
+            'data' => $this->data,
         ];
     }
 
     /**
-     * @param $x
-     * @param $y
-     * @return OnField|null
+     * @param string $message
+     * $message :=
+     * {
+     *      name: "xxx",
+     *      event: "yyy",
+     *      uuid: "zzz",
+     *      data: {
+     *          ...
+     *      }
+     * }
+     * @return Message
      */
-    public function getFieldXY($x, $y)
+    public static function fromJson($message)
     {
-        return $this->field->getXY($x, $y);
+        $instance = new self();
+        $data = json_decode($message);
+        $instance->logicName = $data->name;
+        $instance->event = $data->event;
+        $instance->data = $data->data;
+        $instance->uuid = $data->uuid;
+        return $instance;
     }
 
-    public function switchOnField(OnField $a, OnField $b)
+    /**
+     * @param $name
+     * @param $event
+     * @param $data
+     * @return Message
+     */
+    public static function fromCode($name, $event, $data)
     {
-        $this->field->switchOnField($a, $b);
+        $instance = new self();
+        $instance->logicName = $name;
+        $instance->event = $event;
+        $instance->data = $data;
+        $instance->save = true;
+        return $instance;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getLogicName()
+    {
+        return $this->logicName;
+    }
+
+    /**
+     * @return \stdClass
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 
     /**
      * @return string
      */
-    public function getClass()
+    public function getEvent()
     {
-        return get_class($this);
-    }
-
-    /**
-     * @return int
-     */
-    public function getX()
-    {
-        return $this->x;
-    }
-
-    /**
-     * @param int $x
-     * @return $this
-     */
-    public function setX($x)
-    {
-        $this->x = $x;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getY()
-    {
-        return $this->y;
-    }
-
-    /**
-     * @param int $y
-     * @return $this
-     */
-    public function setY($y)
-    {
-        $this->y = $y;
-        return $this;
+        return $this->event;
     }
 
     /**
      * @return string
      */
-    public function getColor()
+    public function getUuid()
     {
-        return $this->color;
+        return $this->uuid;
     }
 
 }

@@ -25,14 +25,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\logic\javascript;
 
-class Block extends BaseOnField
+/**
+ * Interface RoomJSLogic
+ * @package bomberman\logic\javascript
+ */
+interface RoomJSLogic
 {
 
-    public function init()
-    {
-        $this->color = '#f00';
-    }
+    const NAME = 'room_js';
+
+    const EVENT_LIST = 'list';
 
 }

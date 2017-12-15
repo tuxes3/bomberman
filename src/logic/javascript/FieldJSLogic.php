@@ -24,51 +24,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-?>
-<!doctype html>
-<html>
-    <head>
-        <style>
-            .block {
-                width: 30px;
-                height: 30px;
-                border: 1px solid black;
-                float: left;
-            }
-            .clear {
-                clear: both;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="lobby">
-            <a id="createRoom" href="#">Create Room</a>
-            Max Player:
-            <input type="number" id="maxPlayer" value="1" />
 
-            <div id="roomList">
+namespace bomberman\logic\javascript;
 
-            </div>
-        </div>
-        <div id="field">
+/**
+ * Interface FieldJSLogic
+ * @package bomberman\logic\javascript
+ */
+interface FieldJSLogic
+{
 
-        </div>
+    const NAME = 'field_js';
 
-        <script type="text/javascript">
-            const BOMBERMAN_WEBSOCKET_URL = '<?php 
-            $webSocketPath = isset($_SERVER['WEBSOCKET_PATH']) ? $_SERVER['WEBSOCKET_PATH'] : ':8009';
-            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
-                echo 'wss://' . $_SERVER['HTTP_HOST'] . $webSocketPath;
-            } else {
-                echo 'ws://' . $_SERVER['HTTP_HOST'] . $webSocketPath;
-            }
-            ?>';
-        </script>
-        <script
-            src="https://code.jquery.com/jquery-3.2.1.min.js"
-            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-            crossorigin="anonymous"></script>
-        <script type="text/javascript" src="js/socket.js">
-        </script>
-    </body>
-</html>
+    const EVENT_UPDATE = 'update';
+
+}

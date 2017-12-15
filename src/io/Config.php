@@ -24,51 +24,35 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-?>
-<!doctype html>
-<html>
-    <head>
-        <style>
-            .block {
-                width: 30px;
-                height: 30px;
-                border: 1px solid black;
-                float: left;
-            }
-            .clear {
-                clear: both;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="lobby">
-            <a id="createRoom" href="#">Create Room</a>
-            Max Player:
-            <input type="number" id="maxPlayer" value="1" />
 
-            <div id="roomList">
+namespace bomberman\io;
 
-            </div>
-        </div>
-        <div id="field">
+use Symfony\Component\Yaml\Yaml;
 
-        </div>
+class Config
+{
 
-        <script type="text/javascript">
-            const BOMBERMAN_WEBSOCKET_URL = '<?php 
-            $webSocketPath = isset($_SERVER['WEBSOCKET_PATH']) ? $_SERVER['WEBSOCKET_PATH'] : ':8009';
-            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
-                echo 'wss://' . $_SERVER['HTTP_HOST'] . $webSocketPath;
-            } else {
-                echo 'ws://' . $_SERVER['HTTP_HOST'] . $webSocketPath;
-            }
-            ?>';
-        </script>
-        <script
-            src="https://code.jquery.com/jquery-3.2.1.min.js"
-            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-            crossorigin="anonymous"></script>
-        <script type="text/javascript" src="js/socket.js">
-        </script>
-    </body>
-</html>
+    const MOVEMENT_SPEED = 'movement_speed';
+    const BOMB_COUNT = 'bomb_count';
+    const BOMB_INTERVAL = 'bomb_interval';
+    const BOMB_TIMEOUT = 'bomb_timeout';
+    const EXPLOSION_DURATION = 'explosion_duration';
+    const EXPLOSION_SPREAD = 'explosion_spread';
+    const EXPLOSION_INTERVAL = 'explosion_interval';
+    const BACK_UP_INTERVAL = 'back_up_interval';
+
+    private static $configFile = null;
+
+    /**
+     * @param string $key
+     * @return string
+     */
+    public static function get($key)
+    {
+        if (is_null(Config::$configFile)) {
+            Config::$configFile = Yaml::parseFile(__DIR__.'/../../app/config.yml');
+        }
+        return Config::$configFile[$key];
+    }
+
+}

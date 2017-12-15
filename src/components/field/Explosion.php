@@ -24,51 +24,78 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-?>
-<!doctype html>
-<html>
-    <head>
-        <style>
-            .block {
-                width: 30px;
-                height: 30px;
-                border: 1px solid black;
-                float: left;
-            }
-            .clear {
-                clear: both;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="lobby">
-            <a id="createRoom" href="#">Create Room</a>
-            Max Player:
-            <input type="number" id="maxPlayer" value="1" />
 
-            <div id="roomList">
+namespace bomberman\components\field;
 
-            </div>
-        </div>
-        <div id="field">
+/**
+ * Class Explosion
+ * @package bomberman\components\field
+ */
+class Explosion extends BaseInCell
+{
 
-        </div>
+    /**
+     * @var int
+     */
+    private $exploded;
 
-        <script type="text/javascript">
-            const BOMBERMAN_WEBSOCKET_URL = '<?php 
-            $webSocketPath = isset($_SERVER['WEBSOCKET_PATH']) ? $_SERVER['WEBSOCKET_PATH'] : ':8009';
-            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
-                echo 'wss://' . $_SERVER['HTTP_HOST'] . $webSocketPath;
-            } else {
-                echo 'ws://' . $_SERVER['HTTP_HOST'] . $webSocketPath;
-            }
-            ?>';
-        </script>
-        <script
-            src="https://code.jquery.com/jquery-3.2.1.min.js"
-            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-            crossorigin="anonymous"></script>
-        <script type="text/javascript" src="js/socket.js">
-        </script>
-    </body>
-</html>
+    public function __construct($x, $y)
+    {
+        parent::__construct($x, $y);
+        $this->exploded = milliseconds();
+    }
+
+    /**
+     * @return array
+     */
+    public function backup()
+    {
+        return array_merge(parent::backup(), [
+            'exploded' => $this->exploded,
+        ]);
+    }
+
+    /**
+     * @param array $data
+     * @return Explosion
+     */
+    public static function restore($data)
+    {
+        $explosion = new self($data['x'], $data['y']);
+        $explosion->exploded = $data['exploded'];
+        return $explosion;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canPlayerEnter()
+    {
+        return true;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function blocksExplosion()
+    {
+        return false;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDisplayPriority()
+    {
+        return BaseInCell::BASE_PRIORITY + 1;
+    }
+
+    /**
+     * @return float
+     */
+    public function getExploded()
+    {
+        return $this->exploded;
+    }
+
+}

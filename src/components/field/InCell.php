@@ -25,14 +25,65 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\components\field;
 
-class EmptySpace extends BaseOnField
+interface InCell
 {
 
-    public function init()
-    {
-        $this->color = 'transparent';
-    }
+    /**
+     * @return int
+     */
+    public function getX();
+
+    /**
+     * @return int
+     */
+    public function getY();
+
+    /**
+     * @param int $x
+     */
+    public function setX($x);
+
+    /**
+     * @param int $y
+     */
+    public function setY($y);
+
+    /**
+     * @return string
+     */
+    public function getId();
+
+    /**
+     * @return string
+     */
+    public function getClass();
+
+    /**
+     * @return boolean
+     */
+    public function canPlayerEnter();
+
+    /**
+     * @return boolean
+     */
+    public function blocksExplosion();
+
+    /**
+     * @return int
+     */
+    public function getDisplayPriority();
+
+    /**
+     * @return array
+     */
+    public function backup();
+
+    /**
+     * @param array $data
+     * @return self
+     */
+    public static function restore($data);
 
 }

@@ -1,0 +1,8 @@
+movement_speed: 100
+bomb_count: 1
+bomb_timeout: 2000
+bomb_interval: 0.1
+explosion_interval: 0.1
+explosion_duration: 1000
+explosion_spread: 2
+back_up_interval: 3

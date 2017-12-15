@@ -25,19 +25,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace bomberman;
+namespace bomberman\logic\javascript;
 
-use Ratchet\ConnectionInterface;
-
-interface OnField
+/**
+ * Interface PlayerJSLogic
+ * @package bomberman\logic\javascript
+ */
+interface PlayerJSLogic
 {
 
-    public function getX();
-    public function getY();
-    public function setX($x);
-    public function setY($y);
-    public function getColor();
-    public function getClass();
-    public function event(ConnectionInterface $connection, $data);
+    const NAME = 'player_js';
+
+    const EVENT_NEXT_MOVEMENT = 'nextMovement';
 
 }
