@@ -117,7 +117,7 @@
         connection: null,
 
         init: function () {
-            this.connection = new WebSocket('ws://localhost:8009');
+            this.connection = new WebSocket(BOMBERMAN_WEBSOCKET_URL);
             this.connection.onmessage = this.onMessage;
             this.connection.onopen = this.onOpen;
         },
