@@ -29,6 +29,7 @@ class RoomLogic extends BaseLogic
     const EVENT_JOIN = 'join';
     const EVENT_LIST = 'getAll';
     const EVENT_CLOSE = 'close';
+    const EVENT_LEAVE = 'leave';
 
     /**
      * @var string
@@ -51,7 +52,7 @@ class RoomLogic extends BaseLogic
     protected function create($data, ClientConnection $sender)
     {
         $uniqueId = $this->context->getData()->getFreeUniqueId();
-        $room = new Room($data->maxPlayers, $uniqueId);
+        $room = new Room($data->maxPlayers, $uniqueId, $data->name);
         $this->context->getData()->add($room);
         $this->sendRoomsToAll();
     }
@@ -80,24 +81,43 @@ class RoomLogic extends BaseLogic
      */
     protected function join($data, ClientConnection $sender)
     {
-        $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);
-        $return = null;
-        if (is_null($room)) {
-            $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, sprintf('Room (%s) not existing.', $data->uniqueId));
+        $isInRoom = !is_null($this->context->getData()->findRoomBySender($sender->getUuid()));
+        if ($isInRoom) {
+            $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'You can only be in one room');
         } else {
-            $result = $room->addPlayer($sender->getUuid());
-            if (is_string($result)) {
-                $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, $result);
-            } elseif ($room->isStartable()) {
-                $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_START, $data), $sender);
-                $this->sendRoomsToAll();
+            $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);
+            $return = null;
+            if (is_null($room)) {
+                $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, sprintf('Room (%s) not existing.', $data->uniqueId));
             } else {
-                $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'Waiting for players.');
-                $this->sendRoomsToAll();
+                $result = $room->addPlayer($sender->getUuid());
+                if (is_string($result)) {
+                    $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, $result);
+                } elseif ($room->isStartable()) {
+                    $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_START, $data), $sender);
+                    $this->sendRoomsToAll();
+                } else {
+                    $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'Waiting for players.');
+                    $this->sendRoomsToAll();
+                }
             }
         }
+
         if (!is_null($return)) {
             $sender->send(json_encode($return));
+        }
+    }
+
+    /**
+     * @param \stdClass $data
+     * @param ClientConnection $sender
+     */
+    protected function leave($data, ClientConnection $sender)
+    {
+        $room = $this->context->getData()->findRoomBySender($sender->getUuid());
+        if (!is_null($room)) {
+            $room->removePlayer($sender->getUuid());
+            $this->sendRoomsToAll();
         }
     }
 

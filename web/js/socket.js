@@ -14,12 +14,13 @@
             });
         },
 
-        createRoom: function (maxPlayers) {
+        createRoom: function (maxPlayers, name) {
             return this.prepare({
                 name: 'room',
                 event: 'create',
                 data: {
-                    maxPlayers: maxPlayers
+                    maxPlayers: maxPlayers,
+                    name: name
                 }
             });
         },
@@ -28,6 +29,16 @@
             return this.prepare({
                 name: 'room',
                 event: 'join',
+                data: {
+                    uniqueId: uniqueId
+                }
+            });
+        },
+
+        leaveRoom: function (uniqueId) {
+            return this.prepare({
+                name: 'room',
+                event: 'leave',
                 data: {
                     uniqueId: uniqueId
                 }
@@ -76,13 +87,20 @@
         createRoom: function (e) {
             e.preventDefault();
             bomberman_socket.send(bomberman_socket_request.createRoom(
-                $('#maxPlayer').val()
+                $('#maxPlayer').val(), $('#roomName').val()
             ));
         },
 
         joinRoom: function (e) {
             e.preventDefault();
             bomberman_socket.send(bomberman_socket_request.joinRoom(
+                $(this).data('unique-id')
+            ));
+        },
+
+        leaveRoom: function (e) {
+            e.preventDefault();
+            bomberman_socket.send(bomberman_socket_request.leaveRoom(
                 $(this).data('unique-id')
             ));
         },
@@ -183,8 +201,12 @@
                     console.log(roomList);
                     for (var i = 0; i < roomList.length; i++) {
                         roomListDiv.append($(
-                           '<a href="#" data-unique-id="'+roomList[i].uniqueId+'">#'+i+' Room ('+roomList[i].connectedPlayers+'/'+roomList[i].maxPlayers+')</a>'
+                           '<a href="#" data-unique-id="'+roomList[i].uniqueId+'">Room #'+i+': '+roomList[i].name+' ('+roomList[i].connectedPlayers+'/'+roomList[i].maxPlayers+')</a>'
                         ).on('click', bomberman_ui.joinRoom));
+                        roomListDiv.append($('<span> - </span>'));
+                        roomListDiv.append($(
+                            '<a href="#" data-unique-id="'+roomList[i].uniqueId+'">Leave</a>'
+                        ).on('click', bomberman_ui.leaveRoom));
                         roomListDiv.append('<br />');
                     }
                 }

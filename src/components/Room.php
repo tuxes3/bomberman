@@ -44,11 +44,17 @@ class Room implements \JsonSerializable
     private $field;
 
     /**
+     * @var string
+     */
+    private $name;
+
+    /**
      * Room constructor.
      * @param int $maxPlayers
      * @param string $uniqueId
+     * @param $name
      */
-    public function __construct($maxPlayers, $uniqueId)
+    public function __construct($maxPlayers, $uniqueId, $name)
     {
         //max 12 players
         if($maxPlayers >= self::PLAYER_LIMIT){
@@ -61,6 +67,7 @@ class Room implements \JsonSerializable
         $this->createdAt = new \DateTime();
         // TODO: calculate field size depending on player
         $this->field = new Field($maxPlayers);
+        $this->name = $name;
     }
 
     /**
@@ -72,6 +79,7 @@ class Room implements \JsonSerializable
             'maxPlayers' => $this->maxPlayers,
             'connectedPlayers' => count($this->connectedPlayers),
             'uniqueId' => $this->uniqueId,
+            'name' => $this->name,
         ];
     }
 
@@ -89,6 +97,17 @@ class Room implements \JsonSerializable
         }
         $this->connectedPlayers[] = $playerId;
         return true;
+    }
+
+    /**
+     * @param $playerId
+     * @return bool|string
+     */
+    public function removePlayer($playerId)
+    {
+        if (($key = array_search($playerId, $this->connectedPlayers)) !== false) {
+            unset($this->connectedPlayers[$key]);
+        }
     }
 
     /**
@@ -187,6 +206,14 @@ class Room implements \JsonSerializable
     {
         $this->field = $field;
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
 }
