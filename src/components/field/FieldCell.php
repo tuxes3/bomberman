@@ -97,11 +97,33 @@ class FieldCell implements \JsonSerializable
     }
 
     /**
+     * @return boolean
+     */
+    public function consumeItem()
+    {
+        $consumed = false;
+        foreach ($this->getAllItems() as $key => $item) {
+            foreach ($this->getAllPlayers() as $player) {
+                $item->consume($player);
+                $consumed = true;
+                unset($this->inCells[$key]);
+                break;
+            }
+        }
+        if ($consumed) {
+            $this->inCells = array_values($this->inCells);
+        }
+        return $consumed;
+    }
+
+    /**
+     * @param Explosion $explosion
      * @return boolean if something changed
      */
-    public function explode()
+    public function explode($explosion)
     {
         $changes = false;
+        $createItem = null;
         foreach ($this->inCells as $key => $inCell) {
             if ($inCell instanceof Player) {
                 $inCell->setDead();
@@ -109,10 +131,23 @@ class FieldCell implements \JsonSerializable
             } elseif ($inCell instanceof Explosion) {
             } elseif ($inCell instanceof Bomb) {
                 $inCell->explodeNow();
+            } elseif ($inCell instanceof Block) {
+                $createItem = $inCell;
+                unset($this->inCells[$key]);
+                $changes = true;
+            } elseif ($inCell instanceof BaseItem) {
+                if ($inCell->getExplosionId() !== $explosion->getId()) {
+                    unset($this->inCells[$key]);
+                    $changes = true;
+                }
             } else {
                 unset($this->inCells[$key]);
                 $changes = true;
             }
+        }
+        if ($createItem && rand(1, 3) == 1) {
+            $itemClass = BaseItem::ALL_IMPL[rand(0, count(BaseItem::ALL_IMPL) - 1)];
+            $this->inCells[] = new $itemClass($createItem->getX(), $createItem->getY(), $explosion->getId());
         }
         $this->inCells = array_values($this->inCells);
         return $changes;
@@ -133,6 +168,21 @@ class FieldCell implements \JsonSerializable
     }
 
     /**
+     * @param string $uuid
+     * @return array
+     */
+    public function getAllBombsByPlanter($uuid)
+    {
+        $bombs = [];
+        foreach ($this->getAllBombs() as $bomb) {
+            if ($bomb->getPlantedByUuid() == $uuid) {
+                $bombs[] = $bomb;
+            }
+        }
+        return $bombs;
+    }
+
+    /**
      * @return array|Explosion[]
      */
     public function getAllExplosions()
@@ -147,7 +197,7 @@ class FieldCell implements \JsonSerializable
     }
 
     /**
-     * return array|Player[]
+     * @return array|Player[]
      */
     public function getAllPlayers()
     {
@@ -158,6 +208,20 @@ class FieldCell implements \JsonSerializable
             }
         }
         return $players;
+    }
+
+    /**
+     * @return array|BaseItem[]
+     */
+    public function getAllItems()
+    {
+        $items = [];
+        foreach ($this->inCells as $key => $inCell) {
+            if ($inCell instanceof BaseItem) {
+                $items[$key] = $inCell;
+            }
+        }
+        return $items;
     }
 
     /**

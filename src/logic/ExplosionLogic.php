@@ -50,7 +50,7 @@ class ExplosionLogic extends BaseLogic
                     $fieldCell->removeById($explosion->getId());
                     $updateRoom = true;
                 } else {
-                    $updateRoom = $fieldCell->explode();
+                    $updateRoom = $fieldCell->explode($explosion);
                 }
             }
             if ($updateRoom || $room->getField()->isFinished()) {

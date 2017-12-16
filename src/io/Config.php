@@ -24,6 +24,9 @@ class Config
     const EXPLOSION_SPREAD = 'explosion_spread';
     const EXPLOSION_INTERVAL = 'explosion_interval';
     const BACK_UP_INTERVAL = 'back_up_interval';
+    const ITEM_INTERVAL = 'item_interval';
+    const MAX_MOVEMENT_SPEED = 'max_movement_speed';
+    const ITEM_MOVEMENT_SPEED_DECREASE = 'item_movement_speed_decrease';
 
     private static $configFile = null;
 

@@ -29,23 +29,34 @@ class Bomb extends BaseInCell
     protected $planted;
 
     /**
+     * @var string
+     */
+    protected $plantedByUuid;
+
+    /**
      * Bomb constructor.
      * @param int $x
      * @param int $y
      * @param int $explosionSpread
+     * @param string $plantedByUuid
      */
-    public function __construct($x, $y, $explosionSpread)
+    public function __construct($x, $y, $explosionSpread, $plantedByUuid)
     {
         parent::__construct($x, $y);
         $this->explosionSpread = $explosionSpread;
         $this->planted = milliseconds();
+        $this->plantedByUuid = $plantedByUuid;
     }
 
+    /**
+     * @return array
+     */
     public function backup()
     {
         return array_merge(parent::backup(), [
             'explosionSpread' => $this->explosionSpread,
             'planted' => $this->planted,
+            'plantedByUuid' => $this->plantedByUuid,
         ]);
     }
 
@@ -55,7 +66,7 @@ class Bomb extends BaseInCell
      */
     public static function restore($data)
     {
-        $bomb = new self($data['x'], $data['y'], $data['explosionSpread']);
+        $bomb = new self($data['x'], $data['y'], $data['explosionSpread'], $data['plantedByUuid']);
         $bomb->planted = $data['planted'];
         return $bomb;
     }
@@ -65,7 +76,7 @@ class Bomb extends BaseInCell
      */
     public function canPlayerEnter()
     {
-        return true;
+        return false;
     }
 
     /**
@@ -103,6 +114,14 @@ class Bomb extends BaseInCell
     public function getExplosionSpread()
     {
         return $this->explosionSpread;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlantedByUuid()
+    {
+        return $this->plantedByUuid;
     }
 
 }

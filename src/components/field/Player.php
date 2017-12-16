@@ -185,4 +185,38 @@ class Player extends BaseInCell
         return $this->alive;
     }
 
+    /**
+     * @return int
+     */
+    public function getBombCount()
+    {
+        return $this->bombCount;
+    }
+
+    /**
+     *
+     */
+    public function incrementBombCount()
+    {
+        $this->bombCount++;
+    }
+
+    /**
+     *
+     */
+    public function incrementExplosionSpread()
+    {
+        $this->explosionSpread++;
+    }
+
+    /**
+     *
+     */
+    public function decreaseMovementSpeed()
+    {
+        if ($this->movementSpeed > Config::get(Config::MAX_MOVEMENT_SPEED)) {
+            $this->movementSpeed = $this->movementSpeed - Config::get(Config::ITEM_MOVEMENT_SPEED_DECREASE);
+        }
+    }
+
 }

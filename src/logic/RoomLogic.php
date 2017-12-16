@@ -63,7 +63,6 @@ class RoomLogic extends BaseLogic
     protected function close($data, $sender)
     {
         $this->context->getData()->removeUniqueId($data->getUniqueId());
-        echo ('count: '.$this->context->getData()->count());
         $this->sendRoomsToAll();
     }
 

@@ -78,4 +78,28 @@ class FieldCollection extends ArrayCollection
         return $players;
     }
 
+    /**
+     * @param string $uuid
+     * @return array|Bomb[]
+     */
+    public function findBombsByPlanter($uuid)
+    {
+        $bombs = [];
+        /** @var FieldCell $fieldCell */
+        foreach ($this as $fieldCell) {
+            $bombs = array_merge($bombs, $fieldCell->getAllBombsByPlanter($uuid));
+        }
+        return $bombs;
+    }
+
+    /**
+     * @return ArrayCollection|\Doctrine\Common\Collections\Collection
+     */
+    public function filterContainsItem()
+    {
+        return $this->filter(function(FieldCell $fieldCell){
+            return count($fieldCell->getAllItems()) > 0;
+        });
+    }
+
 }

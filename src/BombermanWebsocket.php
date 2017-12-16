@@ -18,6 +18,7 @@ use bomberman\logic\BombLogic;
 use bomberman\logic\ClientConnection;
 use bomberman\logic\ExplosionLogic;
 use bomberman\logic\FieldLogic;
+use bomberman\logic\ItemLogic;
 use bomberman\logic\PlayerLogic;
 use bomberman\logic\RoomLogic;
 use Ratchet\ConnectionInterface;
@@ -61,6 +62,7 @@ class BombermanWebsocket implements MessageComponentInterface, Context
             PlayerLogic::$name => new PlayerLogic($this),
             BombLogic::$name => new BombLogic($this),
             ExplosionLogic::$name => new ExplosionLogic($this),
+            ItemLogic::$name => new ItemLogic($this),
         ];
     }
 

@@ -41,7 +41,6 @@ class PlayerLogic extends BaseLogic
         $room = $rooms->findRoomBySender($sender->getUuid());
         if (!is_null($room) && $room->isStartable()) {
             $sender->send(json_encode(Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_STARTED, null)));
-            echo ('init');
             $sender->send(json_encode(Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())));
         } else {
             $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $rooms->getValues())));
@@ -99,10 +98,13 @@ class PlayerLogic extends BaseLogic
         $room = $this->context->getData()->findRoomBySender($sender->getUuid());
         if (!is_null($room)) {
             $player = $room->getField()->getFieldCollection()->findPlayerBySender($sender->getUuid());
-            $room->getField()->addTo(new Bomb($player->getX(), $player->getY(), $player->getExplosionSpread()));
-            $this->context->sendToClients($room->getConnectedPlayers(),
-                Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
-            );
+            $playerBombs = $room->getField()->getFieldCollection()->findBombsByPlanter($player->getUuid());
+            if (count($playerBombs) < $player->getBombCount()) {
+                $room->getField()->addTo(new Bomb($player->getX(), $player->getY(), $player->getExplosionSpread(), $player->getUuid()));
+                $this->context->sendToClients($room->getConnectedPlayers(),
+                    Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
+                );
+            }
         }
     }
 
