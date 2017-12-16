@@ -257,16 +257,19 @@
                                     onField.css('background-image','url(\"./img/twobomb.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
                                     onField.css('background-size', '22px');
+                                    onField.css('background-color', '#c5ffbc');
                                 }
                                 if(inCells[r].class === 'shoeitem'){
                                     onField.css('background-image','url(\"./img/shoe.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
                                     onField.css('background-size', '22px');
+                                    onField.css('background-color', '#c5ffbc');
                                 }
                                 if(inCells[r].class === 'explosionradiusitem'){
                                     onField.css('background-image','url(\"./img/bombsize_lvlup.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
                                     onField.css('background-size', '22px');
+                                    onField.css('background-color', '#c5ffbc');
                                 }
                                 if (inCells[r].class === 'player' && !inCells[r].alive) {
                                     onField.css('background-image','url(\"./img/rip.gif\")');
