@@ -70,7 +70,7 @@
 
         init: function () {
             $('#createRoom').on('click', bomberman_ui.createRoom);
-            $(document).keypress(bomberman_ui.onKeyPres);
+            $(document).keydown(bomberman_ui.onKeyDown);
         },
 
         createRoom: function (e) {
@@ -87,19 +87,44 @@
             ));
         },
 
-        onKeyPres: function (e) {
-            var char = String.fromCharCode(e.which);
+        onKeyDown: function (e) {
+            var dir = '\u2191';
+            var keycode = e.which || e.keyCode;
             var _ = bomberman_ui;
-            if (['w', 'a', 's', 'd'].indexOf(char) >= 0) {
+            //console.log("keycode:" + keycode);
+
+            // See
+            // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/which
+            // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_event_key_keycode
+            // https://www.key-shortcut.com/schriftsysteme/35-symbole/pfeile/
+            if ([87,65,83,68,40,38,37,39].indexOf(keycode) >= 0) {
+                if(keycode == 87 || keycode ==38){
+                    // UP
+                    dir = '\u2191';
+                }
+                if(keycode == 65 || keycode ==37){
+                    // LEFT
+                    dir = '\u2190';
+                }
+                if(keycode == 83 || keycode ==40){
+                    // DOWN
+                    dir = '\u2193';
+                }
+                if(keycode == 68 || keycode ==39){
+                    // RIGHT
+                    dir = '\u2192';
+                }
+                //console.log("dir:" + dir);
+
                 var now = Date.now();
                 if (_.nextMovement === null || _.nextMovement <= now) {
                     if (_.waitingForNextMove !== null) {
                         clearTimeout(_.waitingForNextMove);
                         _.waitingForNextMove = null;
                     }
-                    bomberman_socket.send(bomberman_socket_request.movePlayer(char));
+                    bomberman_socket.send(bomberman_socket_request.movePlayer(dir));
                 } else {
-                    _.lastWantedMovement = char;
+                    _.lastWantedMovement = dir;
                     if (_.waitingForNextMove == null) {
                         _.waitingForNextMove = setTimeout(function() {
                             bomberman_socket.send(bomberman_socket_request.movePlayer(bomberman_ui.lastWantedMovement));
@@ -107,7 +132,7 @@
                         }, _.nextMovement - now)
                     }
                 }
-            } else if ([' '].indexOf(char) >= 0) {
+            } else if (keycode == 32) {
                 bomberman_socket.send(bomberman_socket_request.plantBomb());
             }
         }
@@ -185,6 +210,7 @@
                             var onField = $('<div class="block"></div>');
                             for (var r = 0; r < inCells.length; r++) {
                                 // TODO: priority
+                                // TODO LUKAS
                                 onField.css('background-color', inCells[r].class === 'player' ? 'blue' : inCells[r].class === 'bomb' ? 'black' : inCells[r].class === 'fixblock' ? 'violet' : inCells[r].class === 'explosion' ? 'yellow' : inCells[r].class === 'bombitem' ? 'pink' : inCells[r].class === 'shoeitem' ? 'lightblue' : inCells[r].class === 'explosionradiusitem' ? 'orange' : 'brown');
 
                                 if (inCells[r].class === 'player' && !inCells[r].alive) {

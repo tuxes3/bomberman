@@ -59,19 +59,19 @@ class PlayerLogic extends BaseLogic
             $x = -1;
             $y = -1;
             switch ($data->direction) {
-                case 'w':
+                case '↑':
                     $x = $player->getX() - 1;
                     $y = $player->getY();
                     break;
-                case 'a';
+                case '←';
                     $x = $player->getx();
                     $y = $player->getY() - 1;
                     break;
-                case 's':
+                case '↓':
                     $x = $player->getX() + 1;
                     $y = $player->getY();
                     break;
-                case 'd':
+                case '→':
                     $x = $player->getX();
                     $y = $player->getY() + 1;
                     break;
