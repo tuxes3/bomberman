@@ -20,6 +20,6 @@ interface PlayerJSLogic
 
     const NAME = 'player_js';
 
-    const EVENT_NEXT_MOVEMENT = 'nextMovement';
+    const EVENT_MOVEMENT_SPEED = 'movementSpeed';
 
 }

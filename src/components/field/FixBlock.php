@@ -27,12 +27,16 @@
 
 namespace bomberman\components\field;
 
+/**
+ * Class FixBlock
+ * @package bomberman\components\field
+ */
 class FixBlock extends BaseInCell
 {
 
     /**
      * @param array $data
-     * @return Block
+     * @return FixBlock
      */
     public static function restore($data)
     {

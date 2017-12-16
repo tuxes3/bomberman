@@ -156,9 +156,9 @@ class Player extends BaseInCell
     /**
      * @return int
      */
-    public function getNextMovement()
+    public function getMovementSpeed()
     {
-        return $this->lastMoved + $this->movementSpeed;
+        return $this->movementSpeed;
     }
 
     /**

@@ -83,7 +83,7 @@ class PlayerLogic extends BaseLogic
                 $this->context->sendToClients($room->getConnectedPlayers(),
                     Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
                 );
-                $sender->send(json_encode(Message::fromCode(PlayerJSLogic::NAME, PlayerJSLogic::EVENT_NEXT_MOVEMENT, $player->getNextMovement())));
+                $sender->send(json_encode(Message::fromCode(PlayerJSLogic::NAME, PlayerJSLogic::EVENT_MOVEMENT_SPEED, $player->getMovementSpeed())));
             }
         }
     }

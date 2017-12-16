@@ -38,6 +38,9 @@ abstract class BaseInCell implements InCell, \JsonSerializable
         $this->id = md5(openssl_random_pseudo_bytes(128));
     }
 
+    /**
+     * @return array
+     */
     public function jsonSerialize()
     {
         return [
@@ -45,9 +48,13 @@ abstract class BaseInCell implements InCell, \JsonSerializable
             'y' => $this->getY(),
             'class' => strtolower($this->getClass()),
             'displayPriority' => $this->getDisplayPriority(),
+            'id' => $this->id,
         ];
     }
 
+    /**
+     * @return array
+     */
     public function backup()
     {
         return array_merge($this->jsonSerialize(), [

@@ -75,7 +75,8 @@
 
     var bomberman_ui = {
 
-        nextMovement: null,
+        lastMoved: null,
+        movementSpeed: null,
         lastWantedMovement: null,
         waitingForNextMove: null,
 
@@ -132,22 +133,22 @@
                     // RIGHT
                     dir = '\u2192';
                 }
-                //console.log("dir:" + dir);
 
                 var now = Date.now();
-                if (_.nextMovement === null || _.nextMovement <= now) {
+                if (_.lastMoved === null || _.lastMoved + _.movementSpeed <= now) {
                     if (_.waitingForNextMove !== null) {
                         clearTimeout(_.waitingForNextMove);
                         _.waitingForNextMove = null;
                     }
                     bomberman_socket.send(bomberman_socket_request.movePlayer(dir));
+                    _.lastMoved = now;
                 } else {
                     _.lastWantedMovement = dir;
                     if (_.waitingForNextMove == null) {
                         _.waitingForNextMove = setTimeout(function() {
                             bomberman_socket.send(bomberman_socket_request.movePlayer(bomberman_ui.lastWantedMovement));
                             bomberman_ui.waitingForNextMove = null;
-                        }, _.nextMovement - now)
+                        }, _.lastMoved + _.movementSpeed - now)
                     }
                 }
             } else if (keycode == 32) {
@@ -225,71 +226,75 @@
                 update: function (field) {
                     console.log({event: 'field_js.update', field: field});
                     var fieldDiv = $('#field');
-                    fieldDiv.empty();
-                    for (var i = 0; i < field.cells.length; i++) {
-                        for (var j = 0; j < field.cells[i].length; j++) {
-                            var inCells = field.cells[i][j].inCells;
-                            var onField = $('<div class="block"></div>');
-                            for (var r = 0; r < inCells.length; r++) {
-                                // TODO: priority // inCells[r].priority
-
-                                if(inCells[r].class === 'player'){
-                                    onField.css('background-image','url(\"./img/man.gif\")');
-                                    onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
-                                }
-                                if( inCells[r].class === 'bomb'){
-                                    onField.css('background-image','url(\"./img/bomb.gif\")');
-                                    onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
-                                }
-                                if(inCells[r].class === 'fixblock'){
-                                    onField.css('background-image','url(\"./img/fixBlock.gif\")');
-                                    onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
-                                }
-                                if(inCells[r].class === 'explosion'){
-                                    onField.css('background-image','url(\"./img/explosion.gif\")');
-                                    onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
-                                }
-                                if(inCells[r].class === 'bombitem'){
-                                    onField.css('background-image','url(\"./img/twobomb.gif\")');
-                                    onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
-                                }
-                                if(inCells[r].class === 'shoeitem'){
-                                    onField.css('background-image','url(\"./img/shoe.gif\")');
-                                    onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
-                                }
-                                if(inCells[r].class === 'explosionradiusitem'){
-                                    onField.css('background-image','url(\"./img/bombsize_lvlup.gif\")');
-                                    onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
-                                }
-                                if (inCells[r].class === 'player' && !inCells[r].alive) {
-                                    onField.css('background-image','url(\"./img/rip.gif\")');
-                                    onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
-                                }
-                                if (inCells[r].class === 'block' && !inCells[r].alive) {
-                                    onField.css('background-image','url(\"./img/block.gif\")');
-                                    onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
-                                }
+                    if (fieldDiv.find('div').length === 0) {
+                        // init map creation
+                        for (var i = 0; i < field.cells.length; i++) {
+                            for (var j = 0; j < field.cells[i].length; j++) {
+                                fieldDiv.append($('<div data-x-y="' + i + '|' + j + '" class="fieldCell"></div>'));
                             }
-
-                            fieldDiv.append(onField);
+                            fieldDiv.append($('<div class="clear">'));
                         }
-                        fieldDiv.append($('<div class="clear">'));
                     }
+                    $('.block').addClass('delete');
+                    for (i = 0; i < field.cells.length; i++) {
+                        for (j = 0; j < field.cells[i].length; j++) {
+                            var inCells = field.cells[i][j].inCells;
+                            for (var r = 0; r < inCells.length; r++) {
+                                var inCell = inCells[r];
+                                var inCellDom = $('div[data-id="'+inCell.id+'"]');
+                                // first creation of inCell
+                                if (inCellDom.length === 0) {
+                                    var image = null;
+                                    if(inCell.class === 'player' && inCell.alive){
+                                        image = 'url("./img/man.gif")';
+                                    } else
+                                    if( inCell.class === 'bomb'){
+                                        image = 'url("./img/bomb.gif")';
+                                    } else
+                                    if(inCell.class === 'fixblock'){
+                                        image = 'url("./img/fixBlock.gif")';
+                                    } else
+                                    if(inCell.class === 'explosion'){
+                                        image = 'url("./img/explosion.gif")';
+                                    } else
+                                    if(inCell.class === 'bombitem'){
+                                        image = 'url("./img/twobomb.gif")';
+                                    } else
+                                    if(inCell.class === 'shoeitem'){
+                                        image = 'url("./img/shoe.gif")';
+                                    } else
+                                    if(inCell.class === 'explosionradiusitem'){
+                                        image = 'url("./img/bombsize_lvlup.gif")';
+                                    } else
+                                    if (inCell.class === 'player' && !inCell.alive) {
+                                        image = 'url("./img/rip.gif")';
+                                    } else
+                                    if (inCell.class === 'block') {
+                                        image = 'url("./img/block.gif")';
+                                    }
+                                    inCellDom = $('<div class="block" data-id="'+inCell.id+'"></div>');
+                                    inCellDom.css('background-image', image);
+                                    inCellDom.css('z-index', inCell.displayPriority);
+                                    inCellDom.appendTo('div.fieldCell[data-x-y="'+i+'|'+j+'"]');
+                                }
+                                if (inCell.class === 'player' && !inCell.alive) {
+                                    inCellDom.css('background-image', 'url("./img/rip.gif")');
+                                }
+                                if (!inCellDom.parent().is('div[data-x-y="'+i+'|'+j+'"]')) {
+                                    inCellDom.detach();
+                                    inCellDom.appendTo('div.fieldCell[data-x-y="'+i+'|'+j+'"]');
+                                }
+                                inCellDom.removeClass('delete');
+                            }
+                        }
+                    }
+                    $('.delete').remove();
                 }
             },
 
             player_js: {
-                nextMovement: function (timestamp) {
-                    bomberman_ui.nextMovement = timestamp;
+                movementSpeed: function (movementSpeed) {
+                    bomberman_ui.movementSpeed = movementSpeed;
                 }
             }
         }

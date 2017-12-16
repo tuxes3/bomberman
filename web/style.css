@@ -54,11 +54,19 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffffff;
 }
 
-.block {
+.fieldCell {
     width: 20px;
     height: 20px;
     border: 1px solid black;
     float: left;
+}
+
+.block {
+    width: 20px;
+    height: 20px;
+    background-repeat: no-repeat;
+    background-size: 22px;
+    position: absolute;
 }
 
 .clear {
