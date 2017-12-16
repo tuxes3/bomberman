@@ -1,4 +1,6 @@
-movement_speed: 100
+movement_speed: 300
+max_movement_speed: 100
+item_movement_speed_decrease: 50
 bomb_count: 1
 bomb_timeout: 2000
 bomb_interval: 0.1
@@ -6,3 +8,4 @@ explosion_interval: 0.1
 explosion_duration: 1000
 explosion_spread: 2
 back_up_interval: 3
+item_interval: 0.1

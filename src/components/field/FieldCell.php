@@ -1,28 +1,12 @@
 <?php
 /*
- * Copyright (c) 2017, whatwedo GmbH
- * All rights reserved
+ * This file is part of the bomberman project.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * @author Nicolo Singer tuxes3@outlook.com
+ * @author Lukas Müller computer_bastler@hotmail.com
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace bomberman\components\field;
@@ -113,11 +97,33 @@ class FieldCell implements \JsonSerializable
     }
 
     /**
+     * @return boolean
+     */
+    public function consumeItem()
+    {
+        $consumed = false;
+        foreach ($this->getAllItems() as $key => $item) {
+            foreach ($this->getAllPlayers() as $player) {
+                $item->consume($player);
+                $consumed = true;
+                unset($this->inCells[$key]);
+                break;
+            }
+        }
+        if ($consumed) {
+            $this->inCells = array_values($this->inCells);
+        }
+        return $consumed;
+    }
+
+    /**
+     * @param Explosion $explosion
      * @return boolean if something changed
      */
-    public function explode()
+    public function explode($explosion)
     {
         $changes = false;
+        $createItem = null;
         foreach ($this->inCells as $key => $inCell) {
             if ($inCell instanceof Player) {
                 $inCell->setDead();
@@ -126,10 +132,23 @@ class FieldCell implements \JsonSerializable
             } elseif ($inCell instanceof FixBlock) {
             } elseif ($inCell instanceof Bomb) {
                 $inCell->explodeNow();
+            } elseif ($inCell instanceof Block) {
+                $createItem = $inCell;
+                unset($this->inCells[$key]);
+                $changes = true;
+            } elseif ($inCell instanceof BaseItem) {
+                if ($inCell->getExplosionId() !== $explosion->getId()) {
+                    unset($this->inCells[$key]);
+                    $changes = true;
+                }
             } else {
                 unset($this->inCells[$key]);
                 $changes = true;
             }
+        }
+        if ($createItem && rand(1, 3) == 1) {
+            $itemClass = BaseItem::ALL_IMPL[rand(0, count(BaseItem::ALL_IMPL) - 1)];
+            $this->inCells[] = new $itemClass($createItem->getX(), $createItem->getY(), $explosion->getId());
         }
         $this->inCells = array_values($this->inCells);
         return $changes;
@@ -150,6 +169,21 @@ class FieldCell implements \JsonSerializable
     }
 
     /**
+     * @param string $uuid
+     * @return array
+     */
+    public function getAllBombsByPlanter($uuid)
+    {
+        $bombs = [];
+        foreach ($this->getAllBombs() as $bomb) {
+            if ($bomb->getPlantedByUuid() == $uuid) {
+                $bombs[] = $bomb;
+            }
+        }
+        return $bombs;
+    }
+
+    /**
      * @return array|Explosion[]
      */
     public function getAllExplosions()
@@ -164,7 +198,7 @@ class FieldCell implements \JsonSerializable
     }
 
     /**
-     * return array|Player[]
+     * @return array|Player[]
      */
     public function getAllPlayers()
     {
@@ -175,6 +209,20 @@ class FieldCell implements \JsonSerializable
             }
         }
         return $players;
+    }
+
+    /**
+     * @return array|BaseItem[]
+     */
+    public function getAllItems()
+    {
+        $items = [];
+        foreach ($this->inCells as $key => $inCell) {
+            if ($inCell instanceof BaseItem) {
+                $items[$key] = $inCell;
+            }
+        }
+        return $items;
     }
 
     /**

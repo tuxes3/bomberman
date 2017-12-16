@@ -9,18 +9,21 @@
  * file that was distributed with this source code.
  */
 
-namespace bomberman\logic\javascript;
+namespace bomberman\components\field;
 
 /**
- * Interface MessageJSLogic
- * @package bomberman\logic\javascript
+ * Class BombItem
+ * @package bomberman\components\field
  */
-interface MessageJSLogic
+class BombItem extends BaseItem
 {
 
-    const NAME = 'message_js';
-
-    const EVENT_WARNING = 'warning';
-    const EVENT_INFO = 'info';
+    /**
+     * @param Player $player
+     */
+    public function consume(Player $player)
+    {
+        $player->incrementBombCount();
+    }
 
 }
