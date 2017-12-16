@@ -48,27 +48,34 @@ class FieldLogic extends BaseLogic
         $playercount = count($room->getConnectedPlayers());
 
         // add two more rows per additional player
-        $fieldsize= 11 + (($playercount-2)*2);
+        $height= 11 + (($playercount-2)*2);
+        $width= 11 + (($playercount-2)*2);
+
+
+        // if more than 8 players no more square field. instead a wider one :)
+        if($playercount > 8){
+            $height = 11 + ((8-2)*2);
+        }
 
         // initialize fieldCells
-        for ($i = 0; $i < $fieldsize; $i++) {
+        for ($i = 0; $i < $height; $i++) {
             $cells[] = [];
-            for ($j = 0; $j < $fieldsize; $j++) {
+            for ($j = 0; $j < $width; $j++) {
                 $cells[$i][$j] = new FieldCell();
             }
         }
 
         // STEP 1: Generate fix (not bombable) blocks 
         // (every second row and every second column)
-        for ($i = 1; $i < $fieldsize-1; $i = $i+2) {
-            for ($j = 1; $j < $fieldsize-1; $j = $j+2) {
+        for ($i = 1; $i < $height-1; $i = $i+2) {
+            for ($j = 1; $j < $width-1; $j = $j+2) {
                 $cells[$i][$j]->add(new FixBlock($i, $j));
             }
         }
 
         // step 2: generate random blocks
-        for ($i = 0; $i < $fieldsize; $i++) {
-            for ($j = 0; $j < $fieldsize; $j++) {
+        for ($i = 0; $i < $height; $i++) {
+            for ($j = 0; $j < $width; $j++) {
                 if($cells[$i][$j]->isEmpty()){
                     if (1 == rand(1, 2)) {
                         $cells[$i][$j]->add(new Block($i, $j));
@@ -76,21 +83,111 @@ class FieldLogic extends BaseLogic
                 }
             }
         }
-        
-        
-        // Spawn players
-        // TODO! @LUKAS
-        foreach ($room->getConnectedPlayers() as $playerId) {
-            foreach ($cells as $i => $row) {
-                /** @var FieldCell $cell */
-                foreach ($row as $j => $cell) {
-                    if ($cell->canPlayerEnter()) {
-                        $player = new Player($i, $j, $playerId);
-                        $cell->add($player);
-                        break(2);
-                    }
-                }
-            }
+
+
+        //step 3: spawn players
+        // this stuff is pretty hardcoded...
+        // if you have a better solution, feel free to implement it and create a merge request on github :)
+        $players = $room->getConnectedPlayers();
+
+        // NOTICE WE DECREASE TO USE THEM AS INDEXES IN ARRAYS!!!
+        // otherwise we always would have to subtract 1 more, which makes stuff so confusing and not that inuitive
+        $height--;
+        $width--;
+
+
+        // first 4 are always the same (in the corners)
+        $cells[0][0] = new FieldCell();
+        $cells[0][1] = new FieldCell();
+        $cells[1][0] = new FieldCell();
+        $cells[0][0]->add(new Player(0, 0, $players[0]));
+
+        if($playercount >= 2){
+            $cells[$height][$width] = new FieldCell();
+            $cells[$height-1][$width] = new FieldCell();
+            $cells[$height][$width-1] = new FieldCell();
+            $cells[$height][$width]->add(new Player($height, $width, $players[1]));
+        }
+
+        if($playercount >= 3){
+            $cells[0][$width] = new FieldCell();
+            $cells[0][$width-1] = new FieldCell();
+            $cells[1][$width] = new FieldCell();
+            $cells[0][$width]->add(new Player(0, $width, $players[2]));
+        }
+
+        if($playercount >= 4){
+            $cells[$height][0] = new FieldCell();
+            $cells[$height-1][0] = new FieldCell();
+            $cells[$height][1] = new FieldCell();
+            $cells[$height][0]->add(new Player($height, 0, $players[3]));
+        }
+
+        // 5-8  => got to the middle of the sides
+        if($playercount >= 5 ) {
+            // left side middle
+            $cells[$height/2][0] = new FieldCell(); // midddle
+            $cells[$height/2][1] = new FieldCell();
+            $cells[($height/2)+1][0] = new FieldCell();
+            $cells[$height/2][0]->add(new Player($height/2, 0, $players[4]));
+        }
+
+        if($playercount>= 6 ){
+            // 6 right side middle
+            $cells[$height/2][$width] = new FieldCell();
+            $cells[$height/2][$width-1] = new FieldCell();
+            $cells[($height/2)-1][$width] = new FieldCell();
+            $cells[$height/2][$width]->add(new Player($height/2, $width, $players[5]));
+        }
+
+
+
+        if($playercount>=7 && $playercount < 10 ){
+            // 7 top middle
+            $cells[0][$width/2] = new FieldCell();
+            $cells[0][($width/2)+1] = new FieldCell();
+            $cells[1][$width/2] = new FieldCell();
+            $cells[0][$width/2]->add(new Player(0, $width/2, $players[6]));
+        }
+
+
+        if($playercount==8){
+            // 8 bottom middle
+            $cells[$height][$width/2] = new FieldCell();
+            $cells[$height][($width/2)+1] = new FieldCell();
+            $cells[$height][$width/2] = new FieldCell();
+            $cells[$height][$width/2]->add(new Player($height, $width/2, $players[7]));
+        }
+
+
+        // above 8 => field goes wide :)
+        //  9 / 10 => two in between on top and on bottom
+        if($playercount >= 9){
+            // player 8 on bottom after 1/3
+            $cells[$height][round($width/3)] = new FieldCell();
+            $cells[$height][round(($width/3))+1] = new FieldCell();
+            $cells[$height-1][round($width/3)] = new FieldCell();
+            $cells[$height][round($width/3)]->add(new Player($height, round($width/3), $players[7]));
+
+            // player 9 on bottom after 2/3
+            $cells[$height][$width-round($width/3)] = new FieldCell();
+            $cells[$height][$width-(round($width/3)+1)] = new FieldCell();
+            $cells[$height-1][$width-round($width/3)] = new FieldCell();
+            $cells[$height][$width-round($width/3)]->add(new Player($height, $width - round($width/3), $players[8]));
+        }
+
+        if($playercount == 10){
+            // player 7 on top after 1/3
+            $cells[0][round($width/3)] = new FieldCell();
+            $cells[0][round(($width/3))+1] = new FieldCell();
+            $cells[1][round($width/3)] = new FieldCell();
+            $cells[0][round($width/3)]->add(new Player(0, round($width/3), $players[6]));
+
+            // player 10 on top after 2/3
+            $cells[0][$width-round($width/3)] = new FieldCell();
+            $cells[0][$width-(round($width/3)+1)] = new FieldCell();
+            $cells[1][$width-round($width/3)] = new FieldCell();
+            $cells[0][$width-round($width/3)]->add(new Player(0, $width - round($width/3), $players[9]));
         }
 
 

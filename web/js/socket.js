@@ -234,31 +234,49 @@
                                 // TODO: priority // inCells[r].priority
 
                                 if(inCells[r].class === 'player'){
-                                    onField.css('content','url(\"./img/man.gif\")');
+                                    onField.css('background-image','url(\"./img/man.gif\")');
+                                    onField.css('background-repeat', 'no-repeat');
+                                    onField.css('background-size', '22px');
                                 }
                                 if( inCells[r].class === 'bomb'){
-                                    onField.css('content','url(\"./img/bomb.gif\")');
+                                    onField.css('background-image','url(\"./img/bomb.gif\")');
+                                    onField.css('background-repeat', 'no-repeat');
+                                    onField.css('background-size', '22px');
                                 }
                                 if(inCells[r].class === 'fixblock'){
-                                    onField.css('content','url(\"./img/fixBlock.gif\")');
+                                    onField.css('background-image','url(\"./img/fixBlock.gif\")');
+                                    onField.css('background-repeat', 'no-repeat');
+                                    onField.css('background-size', '22px');
                                 }
                                 if(inCells[r].class === 'explosion'){
-                                    onField.css('content','url(\"./img/explosion.gif\")');
+                                    onField.css('background-image','url(\"./img/explosion.gif\")');
+                                    onField.css('background-repeat', 'no-repeat');
+                                    onField.css('background-size', '22px');
                                 }
                                 if(inCells[r].class === 'bombitem'){
-                                    onField.css('content','url(\"./img/twobomb.gif\")');
+                                    onField.css('background-image','url(\"./img/twobomb.gif\")');
+                                    onField.css('background-repeat', 'no-repeat');
+                                    onField.css('background-size', '22px');
                                 }
                                 if(inCells[r].class === 'shoeitem'){
-                                    onField.css('content','url(\"./img/shoe.gif\")');
+                                    onField.css('background-image','url(\"./img/shoe.gif\")');
+                                    onField.css('background-repeat', 'no-repeat');
+                                    onField.css('background-size', '22px');
                                 }
                                 if(inCells[r].class === 'explosionradiusitem'){
-                                    onField.css('content','url(\"./img/bombsize_lvlup.gif\")');
+                                    onField.css('background-image','url(\"./img/bombsize_lvlup.gif\")');
+                                    onField.css('background-repeat', 'no-repeat');
+                                    onField.css('background-size', '22px');
                                 }
                                 if (inCells[r].class === 'player' && !inCells[r].alive) {
-                                    onField.css('content','url(\"./img/rip.gif\")');
+                                    onField.css('background-image','url(\"./img/rip.gif\")');
+                                    onField.css('background-repeat', 'no-repeat');
+                                    onField.css('background-size', '22px');
                                 }
                                 if (inCells[r].class === 'block' && !inCells[r].alive) {
-                                    onField.css('content','url(\"./img/block.gif\")');
+                                    onField.css('background-image','url(\"./img/block.gif\")');
+                                    onField.css('background-repeat', 'no-repeat');
+                                    onField.css('background-size', '22px');
                                 }
                             }
 

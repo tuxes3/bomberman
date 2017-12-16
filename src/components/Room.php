@@ -65,7 +65,6 @@ class Room implements \JsonSerializable
         $this->uniqueId = $uniqueId;
         $this->connectedPlayers = [];
         $this->createdAt = new \DateTime();
-        // TODO: calculate field size depending on player
         $this->field = new Field($maxPlayers);
         $this->name = $name;
     }
