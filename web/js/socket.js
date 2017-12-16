@@ -182,12 +182,14 @@
             game_js: {
                 started: function (data) {
                     console.log('started');
-                    $('#lobby').hide();
+                    $('#roomcontrols').hide();
+                    $('#roomList').hide();
                 },
 
                 finished: function (data) {
                     console.log('finished');
-                    $('#lobby').show();
+                    $('#roomcontrols').show();
+                    $('#roomList').show();
                     $('#field').empty();
                     var text = 'You ' + (data.won ? 'won' : 'lose') + '!';
                     alert(text);
@@ -236,50 +238,50 @@
                                 if(inCells[r].class === 'player'){
                                     onField.css('background-image','url(\"./img/man.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
+                                    onField.css('background-size', '32px');
                                 }
                                 if( inCells[r].class === 'bomb'){
                                     onField.css('background-image','url(\"./img/bomb.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
+                                    onField.css('background-size', '32px');
                                 }
                                 if(inCells[r].class === 'fixblock'){
                                     onField.css('background-image','url(\"./img/fixBlock.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
+                                    onField.css('background-size', '32px');
                                 }
                                 if(inCells[r].class === 'explosion'){
                                     onField.css('background-image','url(\"./img/explosion.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
+                                    onField.css('background-size', '32px');
                                 }
                                 if(inCells[r].class === 'bombitem'){
                                     onField.css('background-image','url(\"./img/twobomb.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
+                                    onField.css('background-size', '32px');
                                     onField.css('background-color', '#c5ffbc');
                                 }
                                 if(inCells[r].class === 'shoeitem'){
                                     onField.css('background-image','url(\"./img/shoe.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
+                                    onField.css('background-size', '32px');
                                     onField.css('background-color', '#c5ffbc');
                                 }
                                 if(inCells[r].class === 'explosionradiusitem'){
                                     onField.css('background-image','url(\"./img/bombsize_lvlup.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
+                                    onField.css('background-size', '32px');
                                     onField.css('background-color', '#c5ffbc');
                                 }
                                 if (inCells[r].class === 'player' && !inCells[r].alive) {
                                     onField.css('background-image','url(\"./img/rip.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
+                                    onField.css('background-size', '32px');
                                 }
                                 if (inCells[r].class === 'block' && !inCells[r].alive) {
                                     onField.css('background-image','url(\"./img/block.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
-                                    onField.css('background-size', '22px');
+                                    onField.css('background-size', '32px');
                                 }
                             }
 
