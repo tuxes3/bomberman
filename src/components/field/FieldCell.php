@@ -123,6 +123,7 @@ class FieldCell implements \JsonSerializable
                 $inCell->setDead();
                 $changes = true;
             } elseif ($inCell instanceof Explosion) {
+            } elseif ($inCell instanceof FixBlock) {
             } elseif ($inCell instanceof Bomb) {
                 $inCell->explodeNow();
             } else {
@@ -184,4 +185,10 @@ class FieldCell implements \JsonSerializable
         $this->inCells[] = $inCell;
     }
 
+    /**
+     * return boolean
+     */
+     public function isEmpty(){
+        return empty($this->inCells) ? true : false;
+    }
 }

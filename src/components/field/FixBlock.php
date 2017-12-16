@@ -27,57 +27,20 @@
 
 namespace bomberman\components\field;
 
-/**
- * Class Bomb
- * @package bomberman\components\field
- */
-class Bomb extends BaseInCell
+class FixBlock extends BaseInCell
 {
 
     /**
-     * @var int $explosionSpread
-     */
-    protected $explosionSpread;
-
-    /**
-     * @var int
-     */
-    protected $planted;
-
-    /**
-     * Bomb constructor.
-     * @param int $x
-     * @param int $y
-     * @param int $explosionSpread
-     */
-    public function __construct($x, $y, $explosionSpread)
-    {
-        parent::__construct($x, $y);
-        $this->explosionSpread = $explosionSpread;
-        $this->planted = milliseconds();
-    }
-
-    public function backup()
-    {
-        return array_merge(parent::backup(), [
-            'explosionSpread' => $this->explosionSpread,
-            'planted' => $this->planted,
-        ]);
-    }
-
-    /**
      * @param array $data
-     * @return Bomb
+     * @return Block
      */
     public static function restore($data)
     {
-        $bomb = new self($data['x'], $data['y'], $data['explosionSpread']);
-        $bomb->planted = $data['planted'];
-        return $bomb;
+        return new self($data['x'], $data['y']);
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function canPlayerEnter()
     {
@@ -85,11 +48,11 @@ class Bomb extends BaseInCell
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function blocksExplosion()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -97,28 +60,7 @@ class Bomb extends BaseInCell
      */
     public function getDisplayPriority()
     {
-        return BaseInCell::BASE_PRIORITY - 1;
-    }
-
-    /**
-     * @return float
-     */
-    public function getPlanted()
-    {
-        return $this->planted;
-    }
-
-    public function explodeNow()
-    {
-        $this->planted = 0;
-    }
-
-    /**
-     * @return int
-     */
-    public function getExplosionSpread()
-    {
-        return $this->explosionSpread;
+        return self::BASE_PRIORITY+5;
     }
 
 }

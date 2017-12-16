@@ -33,7 +33,7 @@ namespace bomberman\components;
  */
 class Room implements \JsonSerializable
 {
-
+    const PLAYER_LIMIT = 12;
     /**
      * @var int
      */
@@ -66,6 +66,11 @@ class Room implements \JsonSerializable
      */
     public function __construct($maxPlayers, $uniqueId)
     {
+        //max 12 players
+        if($maxPlayers >= self::PLAYER_LIMIT){
+            $maxPlayers = self::PLAYER_LIMIT;
+        }
+
         $this->maxPlayers = $maxPlayers;
         $this->uniqueId = $uniqueId;
         $this->connectedPlayers = [];

@@ -28,6 +28,7 @@
 namespace bomberman\logic;
 
 use bomberman\components\field\Block;
+use bomberman\components\field\FixBlock;
 use bomberman\components\field\FieldCell;
 use bomberman\components\field\Player;
 use bomberman\components\Room;
@@ -42,7 +43,6 @@ use Ratchet\ConnectionInterface;
  */
 class FieldLogic extends BaseLogic
 {
-
     const EVENT_START = 'start';
     const EVENT_UPDATE_CLIENTS = 'updateClients';
 
@@ -61,16 +61,41 @@ class FieldLogic extends BaseLogic
         $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);
         $cells = [];
 
-        // TODO replace with real map creation algo ...
-        for ($i = 0; $i < 10; $i++) {
+        $playercount = count($room->getConnectedPlayers());
+
+        // add two more rows per additional player
+        $fieldsize= 11 + (($playercount-2)*2);
+
+        // initialize fieldCells
+        for ($i = 0; $i < $fieldsize; $i++) {
             $cells[] = [];
-            for ($j = 0; $j < 10; $j++) {
+            for ($j = 0; $j < $fieldsize; $j++) {
                 $cells[$i][$j] = new FieldCell();
-                if (1 == rand(1, 4)) {
-                    $cells[$i][$j]->add(new Block($i, $j));
+            }
+        }
+
+        // STEP 1: Generate fix (not bombable) blocks 
+        // (every second row and every second column)
+        for ($i = 1; $i < $fieldsize-1; $i = $i+2) {
+            for ($j = 1; $j < $fieldsize-1; $j = $j+2) {
+                $cells[$i][$j]->add(new FixBlock($i, $j));
+            }
+        }
+
+        // step 2: generate random blocks
+        for ($i = 0; $i < $fieldsize; $i++) {
+            for ($j = 0; $j < $fieldsize; $j++) {
+                if($cells[$i][$j]->isEmpty()){
+                    if (1 == rand(1, 2)) {
+                        $cells[$i][$j]->add(new Block($i, $j));
+                    }
                 }
             }
         }
+        
+        
+        // Spawn players
+        // TODO! @LUKAS
         foreach ($room->getConnectedPlayers() as $playerId) {
             foreach ($cells as $i => $row) {
                 /** @var FieldCell $cell */
@@ -83,6 +108,8 @@ class FieldLogic extends BaseLogic
                 }
             }
         }
+
+
         $room->getField()->setCells($cells);
         $this->context->sendToClients(
             $room->getConnectedPlayers(),

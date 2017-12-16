@@ -185,7 +185,7 @@
                             var onField = $('<div class="block"></div>');
                             for (var r = 0; r < inCells.length; r++) {
                                 // TODO: priority
-                                onField.css('background-color', inCells[r].class === 'player' ? 'blue' : inCells[r].class === 'bomb' ? 'black' : inCells[r].class === 'explosion' ? 'yellow' : 'brown');
+                                onField.css('background-color', inCells[r].class === 'player' ? 'blue' : inCells[r].class === 'bomb' ? 'black' : inCells[r].class === 'fixblock' ? 'violet' : inCells[r].class === 'explosion' ? 'yellow' : 'grey');
                                 if (inCells[r].class === 'player' && !inCells[r].alive) {
                                     onField.text('RIP');
                                 }
