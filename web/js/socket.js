@@ -244,20 +244,15 @@
                                 }
                                 if(inCells[r].class === 'explosion'){
                                     onField.css('content','url(\"./img/explosion.gif\")');
-
                                 }
                                 if(inCells[r].class === 'bombitem'){
-                                    inCells[r].
                                     onField.css('content','url(\"./img/twobomb.gif\")');
-
                                 }
                                 if(inCells[r].class === 'shoeitem'){
                                     onField.css('content','url(\"./img/shoe.gif\")');
-
                                 }
                                 if(inCells[r].class === 'explosionradiusitem'){
                                     onField.css('content','url(\"./img/bombsize_lvlup.gif\")');
-
                                 }
                                 if (inCells[r].class === 'player' && !inCells[r].alive) {
                                     onField.css('content','url(\"./img/rip.gif\")');
