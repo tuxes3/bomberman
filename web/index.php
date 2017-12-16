@@ -38,7 +38,7 @@
     <main id="main">
         <div id ="roomcontrols">
             <h3>Create room</h3>
-            Room Name: <input type="text" id="name" value="name" /> <br />
+            Room Name: <input type="text" id="roomName" value="name" /> <br />
             Max Player: &nbsp;&nbsp;  <input type="number" id="maxPlayer" value="1" size="2" /> <br />
             <script></script>
             <a id="createRoom" href="#">Create Room</a>
