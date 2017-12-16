@@ -209,14 +209,42 @@
                             var inCells = field.cells[i][j].inCells;
                             var onField = $('<div class="block"></div>');
                             for (var r = 0; r < inCells.length; r++) {
-                                // TODO: priority
-                                // TODO LUKAS
-                                onField.css('background-color', inCells[r].class === 'player' ? 'blue' : inCells[r].class === 'bomb' ? 'black' : inCells[r].class === 'fixblock' ? 'violet' : inCells[r].class === 'explosion' ? 'yellow' : inCells[r].class === 'bombitem' ? 'pink' : inCells[r].class === 'shoeitem' ? 'lightblue' : inCells[r].class === 'explosionradiusitem' ? 'orange' : 'brown');
+                                // TODO: priority // inCells[r].priority
 
+                                if(inCells[r].class === 'player'){
+                                    onField.css('content','url(\"./img/man.gif\")');
+                                }
+                                if( inCells[r].class === 'bomb'){
+                                    onField.css('content','url(\"./img/bomb.gif\")');
+                                }
+                                if(inCells[r].class === 'fixblock'){
+                                    onField.css('content','url(\"./img/fixBlock.gif\")');
+                                }
+                                if(inCells[r].class === 'explosion'){
+                                    onField.css('content','url(\"./img/explosion.gif\")');
+
+                                }
+                                if(inCells[r].class === 'bombitem'){
+                                    inCells[r].
+                                    onField.css('content','url(\"./img/twobomb.gif\")');
+
+                                }
+                                if(inCells[r].class === 'shoeitem'){
+                                    onField.css('content','url(\"./img/shoe.gif\")');
+
+                                }
+                                if(inCells[r].class === 'explosionradiusitem'){
+                                    onField.css('content','url(\"./img/bombsize_lvlup.gif\")');
+
+                                }
                                 if (inCells[r].class === 'player' && !inCells[r].alive) {
-                                    onField.text('RIP');
+                                    onField.css('content','url(\"./img/rip.gif\")');
+                                }
+                                if (inCells[r].class === 'block' && !inCells[r].alive) {
+                                    onField.css('content','url(\"./img/block.gif\")');
                                 }
                             }
+
                             fieldDiv.append(onField);
                         }
                         fieldDiv.append($('<div class="clear">'));

@@ -13,9 +13,9 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Bomberman</title>
-    <meta name="description" content="Bomberman Web Game" />
-    <meta name="keywords" content="Bomberman Web Projekt BFH" />
+    <title>Checker-Bomberman</title>
+    <meta name="description" content="Checker-Bomberman Web Game" />
+    <meta name="keywords" content="Checker Bomberman Web Projekt BFH" />
     <meta name="author" content="Singer Nicolo & Mueller, Lukas" />
     <meta name="Robots" content="index, follow">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
@@ -32,7 +32,7 @@
     </noscript>
 
     <header id="header">
-        <h1>Bomberman - Web Project BTI7054</h1>
+        <h1>Checker-Bomberman Game - Web Project BTI7054</h1>
     </header>
 
     <main id="main">
