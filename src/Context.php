@@ -38,4 +38,11 @@ interface Context
      */
     public function sendToClients($playerIds, $message);
 
+    /**
+     * @param callable $callable
+     * @param int $miliseconds
+     * @return \React\EventLoop\Timer\TimerInterface
+     */
+    public function executeAfter($callable, $miliseconds);
+
 }

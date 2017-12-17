@@ -22,6 +22,7 @@ abstract class BaseItem extends BaseInCell
         BombItem::class,
         ShoeItem::class,
         ExplosionRadiusItem::class,
+        MoveBombItem::class,
     ];
 
     /**
@@ -85,6 +86,14 @@ abstract class BaseItem extends BaseInCell
     public function getExplosionId()
     {
         return $this->explosionId;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function canBombEnter()
+    {
+        return true;
     }
 
 }

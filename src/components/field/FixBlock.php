@@ -67,4 +67,12 @@ class FixBlock extends BaseInCell
         return self::BASE_PRIORITY+5;
     }
 
+    /**
+     * @return bool
+     */
+    public function canBombEnter()
+    {
+        return false;
+    }
+
 }

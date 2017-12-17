@@ -70,11 +70,11 @@ class RoomCollection extends ArrayCollection implements \JsonSerializable
      */
     public function findRoomByUniqueId($uniqueId)
     {
-        $criteria = Criteria::create()
-            ->where(Criteria::expr()->eq('uniqueId', $uniqueId));
-        $match = $this->matching($criteria);
-        if ($match->count() > 0) {
-            return $match->first();
+        /** @var Room $room */
+        foreach ($this as $room) {
+            if ($room->getUniqueId() == $uniqueId) {
+                return $room;
+            }
         }
         return null;
     }

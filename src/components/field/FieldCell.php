@@ -34,13 +34,45 @@ class FieldCell implements \JsonSerializable
     }
 
     /**
+     * @param Player $player
+     * @param FieldCell $nextNextField
      * @return boolean
      */
-    public function canPlayerEnter()
+    public function canPlayerEnter(Player $player, $nextNextField)
     {
         $canEnter = true;
         foreach ($this->inCells as $inCell) {
-            $canEnter = $canEnter && $inCell->canPlayerEnter();
+            if ($inCell instanceof Bomb && $player->isCanMoveBombs() && !is_null($nextNextField) && $nextNextField->canBombEnter()) {
+                $canEnter = $canEnter && true;
+            } else {
+                $canEnter = $canEnter && $inCell->canPlayerEnter();
+            }
+        }
+        return $canEnter;
+    }
+
+    /**
+     * @param $id
+     * @return boolean
+     */
+    public function contains($id)
+    {
+        foreach ($this->inCells as $inCell) {
+            if ($inCell->getId() === $id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function canBombEnter()
+    {
+        $canEnter = true;
+        foreach ($this->inCells as $inCell) {
+            $canEnter = $canEnter && $inCell->canBombEnter();
         }
         return $canEnter;
     }
@@ -78,7 +110,9 @@ class FieldCell implements \JsonSerializable
     {
         $backup = [];
         foreach ($this->inCells as $inCell) {
-            $backup[] = $inCell->backup();
+            if (!($inCell instanceof Bomb || $inCell instanceof Explosion)) {
+                $backup[] = $inCell->backup();
+            }
         }
         return $backup;
     }

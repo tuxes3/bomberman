@@ -11,6 +11,7 @@
 
 namespace bomberman\logic;
 
+use bomberman\components\Field;
 use bomberman\components\field\Block;
 use bomberman\components\field\FixBlock;
 use bomberman\components\field\FieldCell;
@@ -19,7 +20,6 @@ use bomberman\components\Room;
 use bomberman\io\Message;
 use bomberman\logic\javascript\FieldJSLogic;
 use bomberman\logic\javascript\GameJSLogic;
-use Ratchet\ConnectionInterface;
 
 /**
  * Class FieldLogic
@@ -29,11 +29,33 @@ class FieldLogic extends BaseLogic
 {
     const EVENT_START = 'start';
     const EVENT_UPDATE_CLIENTS = 'updateClients';
+    const EVENT_CHECK_FINISH = 'checkFinish';
 
     /**
      * @var string
      */
     public static $name = 'field';
+
+    /**
+     * @param Room $room
+     * @param ClientConnection $sender
+     */
+    protected function checkFinish($room, ClientConnection $sender)
+    {
+        if ($room->getField()->isFinished()) {
+            $this->context->send(Message::fromCode(RoomLogic::$name, RoomLogic::EVENT_CLOSE, $room), $sender);
+            // send finish
+            foreach ($room->getConnectedPlayers() as $uuid) {
+                $player = $room->getField()->getFieldCollection()->findPlayerBySender($uuid);
+                $data = new \stdClass();
+                $data->won = $player->isAlive();
+                $this->context->sendToClients(
+                    [$uuid],
+                    Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_FINISHED, $data)
+                );
+            }
+        }
+    }
 
     /**
      * @param \stdClass $data

@@ -26,33 +26,63 @@ class BombLogic extends BaseLogic
 
     public static $name = 'bomb';
 
-    const EVENT_CHECK = 'check';
+    const EVENT_EXPLODE = 'explode';
+    const EVENT_MOVE = 'move';
 
     /**
-     * @param $data
+     * @param Bomb $bomb
      * @param ClientConnection $sender
      */
-    public function check($data, $sender)
+    public function explode($bomb, $sender)
     {
+        // already exploded
+        if (is_null($bomb->getTimer())) {
+            return;
+        }
+        $bomb->setTimer(null);
         $current = milliseconds();
+        $room = $this->context->getData()->findRoomBySender($sender->getUuid());
+        if (!$room) {
+            return;
+        }
+        if (($current - $bomb->getPlanted()) >= Config::get(Config::BOMB_TIMEOUT)) {
+            $fieldCell = $room->getField()->getXY($bomb->getX(), $bomb->getY());
+            $fieldCell->removeById($bomb->getId());
+            $std = new \stdClass();
+            $std->bomb = $bomb;
+            $std->room = $room;
+            $this->context->send(Message::fromCode(ExplosionLogic::$name, ExplosionLogic::EVENT_CREATE, $std), $sender);
+            $this->context->sendToClients($room->getConnectedPlayers(), Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField()));
+        }
+    }
+
+    /**
+     * @param \stdClass $data
+     * @param ClientConnection $sender
+     */
+    public function move($data, $sender)
+    {
         /** @var Room $room */
-        foreach ($this->context->getData() as $room) {
-            $updateRoom = false;
-            /** @var Bomb $bomb */
-            foreach ($room->getField()->getFieldCollection()->findBombs() as $bomb) {
-                if (($current - $bomb->getPlanted()) >= Config::get(Config::BOMB_TIMEOUT)) {
-                    $fieldCell = $room->getField()->getXY($bomb->getX(), $bomb->getY());
-                    $fieldCell->removeById($bomb->getId());
-                    $std = new \stdClass();
-                    $std->bomb = $bomb;
-                    $std->room = $room;
-                    $this->context->send(Message::fromCode(ExplosionLogic::$name, ExplosionLogic::EVENT_CREATE, $std), $sender);
-                    $updateRoom = true;
-                }
-            }
-            if ($updateRoom) {
-                $this->context->sendToClients($room->getConnectedPlayers(), Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField()));
-            }
+        $room = $this->context->getData()->findRoomBySender($sender->getUuid());
+        if (is_null($room)) {
+            return;
+        }
+        /** @var Bomb $bomb */
+        $bomb = $data->bomb;
+        $x = $data->x;
+        $y = $data->y;
+        $fieldCell = $room->getField()->getXY($bomb->getX() + $x, $bomb->getY() + $y);
+        if (!$room->getField()->getXY($bomb->getX(), $bomb->getY())->contains($bomb->getId())) {
+            return;
+        }
+        if (!is_null($fieldCell) && $fieldCell->canBombEnter()) {
+            $room->getField()->moveTo($bomb, $bomb->getX() + $x, $bomb->getY() + $y);
+            $this->context->sendToClients($room->getConnectedPlayers(), Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField()));
+            $this->context->executeAfter(function () use ($data, $sender) {
+                $this->context->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_MOVE, $data), $sender);
+            }, 600);
+        } else {
+            $bomb->setMoving(false);
         }
     }
 

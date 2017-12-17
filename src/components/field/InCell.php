@@ -52,6 +52,11 @@ interface InCell
     /**
      * @return boolean
      */
+    public function canBombEnter();
+
+    /**
+     * @return boolean
+     */
     public function blocksExplosion();
 
     /**

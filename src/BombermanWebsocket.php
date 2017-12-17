@@ -23,6 +23,7 @@ use bomberman\logic\PlayerLogic;
 use bomberman\logic\RoomLogic;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
+use React\EventLoop\LoopInterface;
 
 /**
  * Class BombermanWebsocket
@@ -45,7 +46,15 @@ class BombermanWebsocket implements MessageComponentInterface, Context
      */
     protected $data;
 
+    /**
+     * @var array
+     */
     protected $clientConnectionUuidMap;
+
+    /**
+     * @var LoopInterface
+     */
+    protected $loop;
 
     /**
      * Channel constructor.
@@ -64,6 +73,14 @@ class BombermanWebsocket implements MessageComponentInterface, Context
             ExplosionLogic::$name => new ExplosionLogic($this),
             ItemLogic::$name => new ItemLogic($this),
         ];
+    }
+
+    /**
+     * @param LoopInterface $loop
+     */
+    public function setLoop(LoopInterface $loop)
+    {
+        $this->loop = $loop;
     }
 
     /**
@@ -88,6 +105,16 @@ class BombermanWebsocket implements MessageComponentInterface, Context
     public function send($message, $from)
     {
         $this->logics[$message->getLogicName()]->execute($message, $from);
+    }
+
+    /**
+     * @param callable $callable
+     * @param int $miliseconds
+     * @return \React\EventLoop\Timer\TimerInterface
+     */
+    public function executeAfter($callable, $miliseconds)
+    {
+        return $this->loop->addTimer($miliseconds / 1000, $callable);
     }
 
     /**

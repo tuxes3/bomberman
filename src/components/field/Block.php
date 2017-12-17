@@ -47,4 +47,12 @@ class Block extends BaseInCell
         return self::BASE_PRIORITY;
     }
 
+    /**
+     * @return bool
+     */
+    public function canBombEnter()
+    {
+        return false;
+    }
+
 }

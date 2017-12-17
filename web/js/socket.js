@@ -75,6 +75,9 @@
 
     var bomberman_ui = {
 
+        bombAudio: new Audio('./sound/bomb.mp3'),
+        deadAudio: new Audio('./sound/dead.mp3'),
+
         lastMoved: null,
         movementSpeed: null,
         lastWantedMovement: null,
@@ -154,6 +157,43 @@
             } else if (keycode == 32) {
                 bomberman_socket.send(bomberman_socket_request.plantBomb());
             }
+        },
+
+        moveAnimate: function (element, newParent) {
+            //Allow passing in either a jQuery object or selector
+            element = $(element);
+            newParent= $(newParent);
+            var oldXY = element.parent().data('x-y').split('|');
+            var newXY = newParent.data('x-y').split('|');
+            var animateProperty = null;
+            if (oldXY[0] - newXY[0] === 0 && oldXY[1] - newXY[1] === 1) {
+                animateProperty = 'left';
+            } else if (oldXY[0] - newXY[0] === 0 && oldXY[1] - newXY[1] === -1) {
+                animateProperty = 'right';
+            } else if (oldXY[0] - newXY[0] === 1 && oldXY[1] - newXY[1] === 0) {
+                animateProperty = 'top';
+            } else if (oldXY[0] - newXY[0] === -1 && oldXY[1] - newXY[1] === 0) {
+                animateProperty = 'bottom';
+            }
+            var width = element.width();
+            element.appendTo(newParent);
+            var temp = element.clone().appendTo(newParent);
+            temp.removeClass('delete');
+            var tempCss = {
+                'z-index': element.css('z-index'),
+                'position': 'relative'
+            };
+            tempCss[animateProperty] = width+'px';
+            temp.css(tempCss);
+            element.hide();
+            var tempAnimation = {};
+            tempAnimation[animateProperty] = '0px';
+            temp.animate(tempAnimation, element.is('.player')
+                ? bomberman_ui.movementSpeed === null ? 270 : bomberman_ui.movementSpeed - 30
+                : 570, function(){
+                element.show();
+                temp.remove();
+            });
         }
     };
 
@@ -185,15 +225,18 @@
                     console.log('started');
                     $('#roomcontrols').hide();
                     $('#roomList').hide();
+                    $('#field').empty();
+                    $('#field').show();
                 },
 
                 finished: function (data) {
                     console.log('finished');
                     $('#roomcontrols').show();
                     $('#roomList').show();
-                    $('#field').empty();
+                    $('#field').hide();
+
                     var text = 'You ' + (data.won ? 'won' : 'lose') + '!';
-                    alert(text);
+                    console.log(text);
                 }
             },
 
@@ -260,8 +303,7 @@
                                     } else
                                     if(inCell.class === 'explosion'){
                                         image = 'url("./img/explosion.gif")';
-                                        var audio = new Audio('./sound/bomb.mp3');
-                                        audio.play();
+                                        bomberman_ui.bombAudio.play();
                                     } else
                                     if(inCell.class === 'bombitem'){
                                         image = 'url("./img/twobomb.gif")';
@@ -275,15 +317,15 @@
                                         image = 'url("./img/bombsize_lvlup.gif")';
                                         color = '#c5ffbc';
                                     } else
-                                    if (inCell.class === 'player' && !inCell.alive) {
-                                        image = 'url("./img/rip.gif")';
-                                        var audio = new Audio('./sound/dead.mp3');
-                                        audio.play();
-                                    } else
                                     if (inCell.class === 'block') {
                                         image = 'url("./img/block.gif")';
+                                    } else
+                                    if (inCell.class === 'movebombitem') {
+                                        image = 'url("./img/kickitemg.gif")';
+                                        color = '#c5ffbc';
                                     }
                                     inCellDom = $('<div class="block" data-id="'+inCell.id+'"></div>');
+                                    inCellDom.addClass(inCell.class);
                                     inCellDom.css('background-image', image);
                                     inCellDom.css('z-index', inCell.displayPriority);
                                     if(color != null){
@@ -293,10 +335,15 @@
                                 }
                                 if (inCell.class === 'player' && !inCell.alive) {
                                     inCellDom.css('background-image', 'url("./img/rip.gif")');
+                                    if (!inCellDom.data('deadPlayed')) {
+                                        bomberman_ui.deadAudio.play();
+                                        inCellDom.data('deadPlayed', true);
+                                    }
                                 }
                                 if (!inCellDom.parent().is('div[data-x-y="'+i+'|'+j+'"]')) {
-                                    inCellDom.detach();
-                                    inCellDom.appendTo('div.fieldCell[data-x-y="'+i+'|'+j+'"]');
+                                    bomberman_ui.moveAnimate(inCellDom, $('div.fieldCell[data-x-y="'+i+'|'+j+'"]'));
+                                    // inCellDom.detach();
+                                    // inCellDom.appendTo('div.fieldCell[data-x-y="'+i+'|'+j+'"]');
                                 }
                                 inCellDom.removeClass('delete');
                             }

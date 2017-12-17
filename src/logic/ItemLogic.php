@@ -10,7 +10,7 @@
 */
 
 namespace bomberman\logic;
-use bomberman\components\field\FieldCell;
+use bomberman\components\field\BaseItem;
 use bomberman\components\Room;
 use bomberman\io\Message;
 use bomberman\logic\javascript\FieldJSLogic;
@@ -24,25 +24,21 @@ class ItemLogic extends BaseLogic
 
     public static $name = 'item';
 
-    const EVENT_NAME = 'check';
+    const EVENT_NAME = 'remove';
 
     /**
-     * @param \stdClass $data
+     * @param BaseItem $data
      * @param ClientConnection $sender
      */
-    public function check($data, $sender)
+    public function remove($data, $sender)
     {
         /** @var Room $room */
-        foreach ($this->context->getData() as $room) {
-            $updateRoom = false;
-            /** @var FieldCell $fieldCell */
-            foreach ($room->getField()->getFieldCollection()->filterContainsItem() as $fieldCell) {
-                $updateRoom = $updateRoom || $fieldCell->consumeItem();
-            }
-            if ($updateRoom) {
-                $this->context->sendToClients($room->getConnectedPlayers(), Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField()));
-            }
+        $room = $this->context->getData()->findRoomBySender($sender->getUuid());
+        if (is_null($room)) {
+            return;
         }
+        $room->getField()->getXY($data->getX(), $data->getY())->removeById($data->getId());
+        $this->context->sendToClients($room->getConnectedPlayers(), Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField()));
     }
 
 }

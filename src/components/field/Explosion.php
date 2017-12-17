@@ -10,6 +10,7 @@
  */
 
 namespace bomberman\components\field;
+use React\EventLoop\Timer\TimerInterface;
 
 /**
  * Class Explosion
@@ -22,6 +23,11 @@ class Explosion extends BaseInCell
      * @var int
      */
     private $exploded;
+
+    /**
+     * @var TimerInterface
+     */
+    protected $timer;
 
     public function __construct($x, $y)
     {
@@ -80,6 +86,30 @@ class Explosion extends BaseInCell
     public function getExploded()
     {
         return $this->exploded;
+    }
+
+    /**
+     * @return TimerInterface
+     */
+    public function getTimer()
+    {
+        return $this->timer;
+    }
+
+    /**
+     * @param TimerInterface $timer
+     */
+    public function setTimer($timer)
+    {
+        $this->timer = $timer;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canBombEnter()
+    {
+        return true;
     }
 
 }

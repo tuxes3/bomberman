@@ -38,18 +38,8 @@ $bombermanWebsocket = new BombermanWebsocket($roomCollection);
 $wsServer = new WsServer($bombermanWebsocket);
 $server = IoServer::factory(new HttpServer($wsServer),8009);
 $wsServer->enableKeepAlive($server->loop, 30);
+$bombermanWebsocket->setLoop($server->loop);
 
-$server->loop->addPeriodicTimer(Config::get(Config::BOMB_INTERVAL), function ($timer) use ($bombermanWebsocket) {
-    $bombermanWebsocket->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_CHECK, null), null);
-});
-
-$server->loop->addPeriodicTimer(Config::get(Config::EXPLOSION_INTERVAL), function ($timer) use ($bombermanWebsocket) {
-    $bombermanWebsocket->send(Message::fromCode(ExplosionLogic::$name, ExplosionLogic::EVENT_CHECK, null), null);
-});
-
-$server->loop->addPeriodicTimer(Config::get(Config::ITEM_INTERVAL), function ($timer) use ($bombermanWebsocket) {
-    $bombermanWebsocket->send(Message::fromCode(ItemLogic::$name, ItemLogic::EVENT_NAME, null), null);
-});
 
 $server->loop->addPeriodicTimer(Config::get(Config::BACK_UP_INTERVAL), function ($timer) use ($bombermanWebsocket, $backupManager) {
     $backupManager->backup($bombermanWebsocket->getData());

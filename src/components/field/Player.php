@@ -51,6 +51,11 @@ class Player extends BaseInCell
     protected $alive = true;
 
     /**
+     * @var boolean
+     */
+    protected $canMoveBombs = false;
+
+    /**
      * Player constructor.
      * @param $x
      * @param $y
@@ -87,6 +92,7 @@ class Player extends BaseInCell
             'bombCount' => $this->bombCount,
             'explosionSpread' => $this->explosionSpread,
             'uuid' => $this->uuid,
+            'canMoveBombs' => $this->canMoveBombs,
         ]);
     }
 
@@ -101,6 +107,7 @@ class Player extends BaseInCell
         $player->movementSpeed = $data['movementSpeed'];
         $player->bombCount = $data['bombCount'];
         $player->explosionSpread = $data['explosionSpread'];
+        $player->canMoveBombs = $data['canMoveBombs'];
         return $player;
     }
 
@@ -118,6 +125,30 @@ class Player extends BaseInCell
     public function blocksExplosion()
     {
         return false;
+    }
+
+    /**
+     *
+     */
+    public function setCanMoveBombs()
+    {
+        $this->canMoveBombs = true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCanMoveBombs()
+    {
+        return $this->canMoveBombs;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canBombEnter()
+    {
+        return true;
     }
 
     /**

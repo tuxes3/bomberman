@@ -10,6 +10,7 @@
  */
 
 namespace bomberman\components\field;
+use React\EventLoop\Timer\TimerInterface;
 
 /**
  * Class Bomb
@@ -32,6 +33,16 @@ class Bomb extends BaseInCell
      * @var string
      */
     protected $plantedByUuid;
+
+    /**
+     * @var TimerInterface
+     */
+    protected $timer;
+
+    /**
+     * @var boolean
+     */
+    protected $moving = false;
 
     /**
      * Bomb constructor.
@@ -103,9 +114,16 @@ class Bomb extends BaseInCell
         return $this->planted;
     }
 
+    /**
+     *
+     */
     public function explodeNow()
     {
+        if (is_null($this->timer)) {
+            return;
+        }
         $this->planted = 0;
+        call_user_func($this->timer->getCallback());
     }
 
     /**
@@ -122,6 +140,46 @@ class Bomb extends BaseInCell
     public function getPlantedByUuid()
     {
         return $this->plantedByUuid;
+    }
+
+    /**
+     * @param TimerInterface $timer
+     */
+    public function setTimer($timer)
+    {
+        $this->timer = $timer;
+    }
+
+    /**
+     * @return TimerInterface
+     */
+    public function getTimer()
+    {
+        return $this->timer;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canBombEnter()
+    {
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMoving()
+    {
+        return $this->moving;
+    }
+
+    /**
+     * @param bool $moving
+     */
+    public function setMoving($moving)
+    {
+        $this->moving = $moving;
     }
 
 }
