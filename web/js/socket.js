@@ -251,6 +251,9 @@
                                     onField.css('background-size', '32px');
                                 }
                                 if(inCells[r].class === 'explosion'){
+                                    var audio = new Audio('./sound/bomb.mp3');
+                                    audio.play();
+
                                     onField.css('background-image','url(\"./img/explosion.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
                                     onField.css('background-size', '32px');
