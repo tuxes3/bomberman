@@ -52,7 +52,12 @@ class RoomLogic extends BaseLogic
     protected function create($data, ClientConnection $sender)
     {
         $uniqueId = $this->context->getData()->getFreeUniqueId();
-        $room = new Room($data->maxPlayers, $uniqueId, $data->name);
+        $roomSize = $data->maxPlayers;
+        if($roomSize>10){
+            echo "someone tried to create a room with more than 10 players";
+            $roomSize = 10;
+        }
+        $room = new Room($roomSize, $uniqueId, $data->name);
         $this->context->getData()->add($room);
         $this->sendRoomsToAll();
     }

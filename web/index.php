@@ -39,7 +39,9 @@
         <div id ="roomcontrols">
             <h3>Create room</h3>
             Room Name: <input type="text" id="roomName" value="name" /> <br />
-            Max Player: &nbsp;&nbsp;  <input type="number" id="maxPlayer" value="1" size="2" /> <br />
+            Max Player: &nbsp;&nbsp;<input type="range" id="maxPlayerInput" name="maxPlayerInput" min="1" max="10" value="2" oninput="maxPlayer.value=maxPlayerInput.value">
+            <output name="maxPlayer" id="maxPlayer" for="rangeInput">2</output> <br />
+
             <script></script>
             <a id="createRoom" href="#">Create Room</a>
         </div>

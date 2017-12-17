@@ -55,17 +55,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .fieldCell {
-    width: 20px;
-    height: 20px;
+    width: 32px;
+    height: 32px;
     border: 1px solid black;
     float: left;
 }
 
 .block {
-    width: 20px;
-    height: 20px;
+    width: 32px;
+    height: 32px;
     background-repeat: no-repeat;
-    background-size: 22px;
+    background-size: 32px;
     position: absolute;
 }
 

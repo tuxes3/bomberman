@@ -183,12 +183,14 @@
             game_js: {
                 started: function (data) {
                     console.log('started');
-                    $('#lobby').hide();
+                    $('#roomcontrols').hide();
+                    $('#roomList').hide();
                 },
 
                 finished: function (data) {
                     console.log('finished');
-                    $('#lobby').show();
+                    $('#roomcontrols').show();
+                    $('#roomList').show();
                     $('#field').empty();
                     var text = 'You ' + (data.won ? 'won' : 'lose') + '!';
                     alert(text);
@@ -202,7 +204,7 @@
                     console.log(roomList);
                     for (var i = 0; i < roomList.length; i++) {
                         roomListDiv.append($(
-                           '<a href="#" data-unique-id="'+roomList[i].uniqueId+'">Room #'+i+': '+roomList[i].name+' ('+roomList[i].connectedPlayers+'/'+roomList[i].maxPlayers+')</a>'
+                            '<a href="#" data-unique-id="'+roomList[i].uniqueId+'">Room #'+i+': '+roomList[i].name+' ('+roomList[i].connectedPlayers+'/'+roomList[i].maxPlayers+')</a>'
                         ).on('click', bomberman_ui.joinRoom));
                         roomListDiv.append($('<span> - </span>'));
                         roomListDiv.append($(
@@ -240,11 +242,13 @@
                         for (j = 0; j < field.cells[i].length; j++) {
                             var inCells = field.cells[i][j].inCells;
                             for (var r = 0; r < inCells.length; r++) {
+
                                 var inCell = inCells[r];
                                 var inCellDom = $('div[data-id="'+inCell.id+'"]');
                                 // first creation of inCell
                                 if (inCellDom.length === 0) {
                                     var image = null;
+                                    var color = null;
                                     if(inCell.class === 'player' && inCell.alive){
                                         image = 'url("./img/man.gif")';
                                     } else
@@ -256,18 +260,25 @@
                                     } else
                                     if(inCell.class === 'explosion'){
                                         image = 'url("./img/explosion.gif")';
+                                        var audio = new Audio('./sound/bomb.mp3');
+                                        audio.play();
                                     } else
                                     if(inCell.class === 'bombitem'){
                                         image = 'url("./img/twobomb.gif")';
+                                        color = '#c5ffbc';
                                     } else
                                     if(inCell.class === 'shoeitem'){
                                         image = 'url("./img/shoe.gif")';
+                                        color = '#c5ffbc';
                                     } else
                                     if(inCell.class === 'explosionradiusitem'){
                                         image = 'url("./img/bombsize_lvlup.gif")';
+                                        color = '#c5ffbc';
                                     } else
                                     if (inCell.class === 'player' && !inCell.alive) {
                                         image = 'url("./img/rip.gif")';
+                                        var audio = new Audio('./sound/dead.mp3');
+                                        audio.play();
                                     } else
                                     if (inCell.class === 'block') {
                                         image = 'url("./img/block.gif")';
@@ -275,6 +286,9 @@
                                     inCellDom = $('<div class="block" data-id="'+inCell.id+'"></div>');
                                     inCellDom.css('background-image', image);
                                     inCellDom.css('z-index', inCell.displayPriority);
+                                    if(color != null){
+                                        inCellDom.css('background-color', color);
+                                    }
                                     inCellDom.appendTo('div.fieldCell[data-x-y="'+i+'|'+j+'"]');
                                 }
                                 if (inCell.class === 'player' && !inCell.alive) {
