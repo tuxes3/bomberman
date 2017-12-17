@@ -203,7 +203,7 @@
                     console.log(roomList);
                     for (var i = 0; i < roomList.length; i++) {
                         roomListDiv.append($(
-                           '<a href="#" data-unique-id="'+roomList[i].uniqueId+'">Room #'+i+': '+roomList[i].name+' ('+roomList[i].connectedPlayers+'/'+roomList[i].maxPlayers+')</a>'
+                            '<a href="#" data-unique-id="'+roomList[i].uniqueId+'">Room #'+i+': '+roomList[i].name+' ('+roomList[i].connectedPlayers+'/'+roomList[i].maxPlayers+')</a>'
                         ).on('click', bomberman_ui.joinRoom));
                         roomListDiv.append($('<span> - </span>'));
                         roomListDiv.append($(
@@ -277,6 +277,8 @@
                                     onField.css('background-color', '#c5ffbc');
                                 }
                                 if (inCells[r].class === 'player' && !inCells[r].alive) {
+                                    var audio = new Audio('./sound/dead.mp3');
+                                    audio.play();
                                     onField.css('background-image','url(\"./img/rip.gif\")');
                                     onField.css('background-repeat', 'no-repeat');
                                     onField.css('background-size', '32px');
