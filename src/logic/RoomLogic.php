@@ -88,7 +88,7 @@ class RoomLogic extends BaseLogic
         $room = $data->room;
         if ($data->inactivity) {
             $this->context->sendToClients(
-                $room->getConnectedPlayers(),
+                array_merge($room->getConnectedPlayers(), [$room->getCreatedBy()]),
                 Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'Room closed due to inactivity.')
             );
         }

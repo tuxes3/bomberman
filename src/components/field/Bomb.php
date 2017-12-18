@@ -163,7 +163,7 @@ class Bomb extends BaseInCell
      */
     public function canBombEnter()
     {
-        return true;
+        return false;
     }
 
     /**
