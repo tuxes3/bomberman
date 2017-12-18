@@ -79,9 +79,20 @@
                 crossorigin="anonymous"></script>
         <script src="js/socket.js">
         </script>
-
     </main>
 
+    <a href="#" class="speaker">
+        <span></span>
+    </a>
+    <script>
+        var isMuted = false;
+        $('.speaker').click(function(e) {
+            e.preventDefault();
+            $(this).toggleClass('mute');
+            isMuted = !isMuted;
+        });
+
+    </script>
     <footer id="footer">
         <div id="footer-main">
             &copy; Nicolo Singer & Lukas Müller <br />

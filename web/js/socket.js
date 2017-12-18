@@ -316,7 +316,9 @@
                                     } else
                                     if(inCell.class === 'explosion'){
                                         image = 'url("./img/explosion.gif")';
-                                        bomberman_ui.bombAudio.play();
+                                        if(!isMuted){
+                                            bomberman_ui.bombAudio.play();
+                                        }
                                     } else
                                     if(inCell.class === 'bombitem'){
                                         image = 'url("./img/twobomb.gif")';
@@ -349,7 +351,9 @@
                                 if (inCell.class === 'player' && !inCell.alive) {
                                     inCellDom.css('background-image', 'url("./img/rip.gif")');
                                     if (!inCellDom.data('deadPlayed')) {
-                                        bomberman_ui.deadAudio.play();
+                                        if(!isMuted) {
+                                            bomberman_ui.deadAudio.play();
+                                        }
                                         inCellDom.data('deadPlayed', true);
                                     }
                                 }
