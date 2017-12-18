@@ -18,5 +18,6 @@ class GameJSLogic
 
     const EVENT_STARTED = 'started';
     const EVENT_FINISHED = 'finished';
+    const EVENT_BOMB_MOVEMENT_SPEED = 'bombMovementSpeed';
 
 }

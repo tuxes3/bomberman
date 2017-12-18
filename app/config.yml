@@ -1,4 +1,5 @@
 movement_speed: 300
+bomb_movement_speed: 600
 max_movement_speed: 100
 item_movement_speed_decrease: 50
 bomb_count: 1

@@ -83,8 +83,11 @@
     </main>
 
     <footer id="footer">
-        &copy; Nicolo Singer & Lukas Müller <br />
-        Kindly hosted by <a href="https://whatwedo.ch">whatwedo.ch</a>
+        <div id="footer-main">
+            &copy; Nicolo Singer & Lukas Müller <br />
+            Kindly hosted by <a href="https://whatwedo.ch">whatwedo.ch</a>
+        </div>
+        <span id="github"><a target="_blank" href="https://github.com/tuxes3/bomberman"><img src="img/github.png"></a></span>
     </footer>
 
 </body>

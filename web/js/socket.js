@@ -78,8 +78,9 @@
         bombAudio: new Audio('./sound/bomb.mp3'),
         deadAudio: new Audio('./sound/dead.mp3'),
 
+        bombMovementSpeed: 600,     // some init value. both will be overwritten
+        movementSpeed: 300,         //
         lastMoved: null,
-        movementSpeed: null,
         lastWantedMovement: null,
         waitingForNextMove: null,
 
@@ -174,19 +175,20 @@
             } else if (oldXY[0] - newXY[0] === -1 && oldXY[1] - newXY[1] === 0) {
                 animateProperty = 'bottom';
             }
-            var width = element.width();
             element.appendTo(newParent);
-            var tempCss = {
-                'position': 'relative'
-            };
-            tempCss[animateProperty] = width+'px';
+            var tempCss = {};
+            tempCss[animateProperty] = '100%';
             element.css(tempCss);
             var anim = {};
             anim[animateProperty] = '0px';
+            if (element.is(':animated')) {
+                element.finish();
+            }
+            // value minus 100 to allow a lag up to 100 milliseconds.
+            var lagFixer = 100;
             element.animate(anim, element.is('.player')
-                ? bomberman_ui.movementSpeed === null ? 270 : bomberman_ui.movementSpeed - 30
-                : 570, function(){
-                element.css('position', '');
+                ? bomberman_ui.movementSpeed - lagFixer
+                : bomberman_ui.bombMovementSpeed - lagFixer, function(){
                 element.css(animateProperty, '');
             });
         }
@@ -242,6 +244,10 @@
                         var text = 'You ' + (data.won ? 'won' : 'lose') + '!';
                         console.log(text);
                     }
+                },
+
+                bombMovementSpeed: function (bombMovementSpeed) {
+                    bomberman_ui.bombMovementSpeed = bombMovementSpeed;
                 }
             },
 

@@ -80,7 +80,7 @@ class BombLogic extends BaseLogic
             $this->context->sendToClients($room->getConnectedPlayers(), Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField()));
             $this->context->executeAfter(function () use ($data, $sender) {
                 $this->context->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_MOVE, $data), $sender);
-            }, 600);
+            }, Config::get(Config::BOMB_MOVEMENT_SPEED));
         } else {
             $bomb->setMoving(false);
         }

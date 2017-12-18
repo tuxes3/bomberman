@@ -17,6 +17,7 @@ class Config
 {
 
     const MOVEMENT_SPEED = 'movement_speed';
+    const BOMB_MOVEMENT_SPEED = 'bomb_movement_speed';
     const BOMB_COUNT = 'bomb_count';
     const BOMB_INTERVAL = 'bomb_interval';
     const BOMB_TIMEOUT = 'bomb_timeout';
