@@ -77,6 +77,8 @@
 
         bombAudio: new Audio('./sound/bomb.mp3'),
         deadAudio: new Audio('./sound/dead.mp3'),
+        winAudio: new Audio('./sound/tada.mp3'),
+        loseAudio: new Audio('./sound/lose.mp3'),
 
         bombMovementSpeed: 600,     // some init value. both will be overwritten
         movementSpeed: 300,         //
@@ -236,12 +238,26 @@
 
                 finished: function (data) {
                     console.log('finished');
-                    $('#roomcontrols').show();
-                    $('#roomList').show();
-                    $('#field').hide();
+                    var endSound;
                     // null: close due to inactivity
                     if (data !== null) {
-                        var text = 'You ' + (data.won ? 'won' : 'lose') + '!';
+                        var text = 'You ';
+                        if(data.won){
+                            text = text + "win!";
+                            endSound =bomberman_ui.winAudio;
+                        }else{
+                            text = text +"lose!"
+                            endSound = bomberman_ui.loseAudio
+                        }
+                        window.setTimeout(function(){
+                            swal(text);
+                            $('#roomcontrols').show();
+                            $('#roomList').show();
+                            $('#field').hide();
+                            if(!isMuted){
+                                endSound.play();
+                            }
+                        }, 700);  // give the player some time to realize he died
                         console.log(text);
                     }
                 },

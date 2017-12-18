@@ -19,8 +19,10 @@
     <meta name="author" content="Singer Nicolo & Mueller, Lukas" />
     <meta name="Robots" content="index, follow">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/sweetalert2.min.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <script src="js/sweetalert2.all.js"></script>
 </head>
 
 <body>
