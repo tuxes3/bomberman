@@ -29,6 +29,7 @@ class Config
     const MAX_MOVEMENT_SPEED = 'max_movement_speed';
     const ITEM_MOVEMENT_SPEED_DECREASE = 'item_movement_speed_decrease';
     const ROOM_EXPIRATION_SECONDS = 'room_expiration_seconds';
+    const MAX_ROOMS_PER_PLAYER = 'max_rooms_per_player';
 
     private static $configFile = null;
 

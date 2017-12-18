@@ -13,6 +13,7 @@ namespace bomberman\logic;
 
 use bomberman\components\Room;
 use bomberman\Context;
+use bomberman\io\Config;
 use bomberman\io\Message;
 use bomberman\logic\javascript\MessageJSLogic;
 use bomberman\logic\javascript\RoomJSLogic;
@@ -65,13 +66,16 @@ class RoomLogic extends BaseLogic
     {
         $uniqueId = $this->context->getData()->getFreeUniqueId();
         $roomSize = $data->maxPlayers;
-        if($roomSize>10){
-            echo "someone tried to create a room with more than 10 players";
-            $roomSize = 10;
+        $maxRoomsPerPlayer = Config::get(Config::MAX_ROOMS_PER_PLAYER);
+        if ($roomSize > 10) {
+            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Cannot create room with more than 10 players.')));
+        } elseif ($this->context->getData()->findByCreatedBy($sender->getUuid())->count() >= $maxRoomsPerPlayer) {
+            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, sprintf('You cannot create more than %s rooms', $maxRoomsPerPlayer))));
+        } else {
+            $room = new Room($roomSize, $uniqueId, $data->name, $sender->getUuid());
+            $this->context->getData()->add($room);
+            $this->sendRoomsToAll();
         }
-        $room = new Room($roomSize, $uniqueId, $data->name);
-        $this->context->getData()->add($room);
-        $this->sendRoomsToAll();
     }
 
     /**

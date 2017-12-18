@@ -57,7 +57,7 @@ class BackupManager
      */
     private function getRoomAsObject(array $room)
     {
-        $newRoom = new Room($room['maxPlayers'], $room['uniqueId'], $room['name']);
+        $newRoom = new Room($room['maxPlayers'], $room['uniqueId'], $room['name'], $room['createdBy']);
         return $newRoom
             ->setConnectedPlayers($room['connectedPlayers'])
             ->setLastTouch((new \DateTime())->setTimestamp($room['lastTouch']))
@@ -97,6 +97,7 @@ class BackupManager
             'connectedPlayers' => $room->getConnectedPlayers(),
             'field' => $this->getFieldAsArray($room->getField()),
             'name' => $room->getName(),
+            'createdBy' => $room->getCreatedBy(),
         ];
         return $array;
     }

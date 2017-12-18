@@ -49,12 +49,18 @@ class Room implements \JsonSerializable
     private $name;
 
     /**
+     * @var $createdBy (player uuid)
+     */
+    private $createdBy;
+
+    /**
      * Room constructor.
      * @param int $maxPlayers
      * @param string $uniqueId
-     * @param $name
+     * @param string $name
+     * @param string $createdBy (uuid)
      */
-    public function __construct($maxPlayers, $uniqueId, $name)
+    public function __construct($maxPlayers, $uniqueId, $name, $createdBy)
     {
         //max 12 players
         if($maxPlayers >= self::PLAYER_LIMIT){
@@ -67,6 +73,7 @@ class Room implements \JsonSerializable
         $this->lastTouch = new \DateTime();
         $this->field = new Field($maxPlayers);
         $this->name = $name;
+        $this->createdBy = $createdBy;
     }
 
     /**
@@ -218,6 +225,14 @@ class Room implements \JsonSerializable
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCreatedBy()
+    {
+        return $this->createdBy;
     }
 
 }

@@ -107,6 +107,19 @@ class RoomCollection extends ArrayCollection implements \JsonSerializable
 
     /**
      * @param string $uuid
+     * @return ArrayCollection|\Doctrine\Common\Collections\Collection
+     */
+    public function findByCreatedBy($uuid)
+    {
+        $criteria = Criteria::create()
+            ->where(
+                Criteria::expr()->eq('createdBy', $uuid)
+            );
+        return $this->matching($criteria);
+    }
+
+    /**
+     * @param string $uuid
      * @return Room|null
      */
     public function findRoomBySender($uuid)
