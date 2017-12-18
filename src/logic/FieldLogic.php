@@ -37,6 +37,15 @@ class FieldLogic extends BaseLogic
     public static $name = 'field';
 
     /**
+     * @return array
+     */
+    public function getEventsAllowedFromClient()
+    {
+        return [];
+    }
+
+
+    /**
      * @param Room $room
      * @param ClientConnection $sender
      */

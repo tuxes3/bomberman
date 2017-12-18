@@ -13,6 +13,7 @@ namespace bomberman\logic;
 
 use bomberman\Context;
 use bomberman\io\Message;
+use bomberman\logic\javascript\MessageJSLogic;
 use Ratchet\ConnectionInterface;
 
 abstract class BaseLogic
@@ -38,15 +39,23 @@ abstract class BaseLogic
     }
 
     /**
+     * @return array
+     */
+    public abstract function getEventsAllowedFromClient();
+
+    /**
      * @param Message $message
      * @param ClientConnection $sender
      */
     public function execute($message, $sender)
     {
-        // TODO: use reflection and protect unwanted method calls !
-        //      !! message.save
         $event = $message->getEvent();
-        $this->$event($message->getData(), $sender);
+        if (($message->isFromClient() && !in_array($event, $this->getEventsAllowedFromClient()))
+            || !method_exists($this, $event)) {
+            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Method not allowed')));
+        } else {
+            $this->$event($message->getData(), $sender);
+        }
     }
 
 }

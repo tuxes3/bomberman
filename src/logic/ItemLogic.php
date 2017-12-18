@@ -27,6 +27,14 @@ class ItemLogic extends BaseLogic
     const EVENT_NAME = 'remove';
 
     /**
+     * @return array
+     */
+    public  function getEventsAllowedFromClient()
+    {
+        return [];
+    }
+
+    /**
      * @param BaseItem $data
      * @param ClientConnection $sender
      */

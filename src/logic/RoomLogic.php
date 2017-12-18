@@ -37,6 +37,18 @@ class RoomLogic extends BaseLogic
     public static $name = 'room';
 
     /**
+     * @return array
+     */
+    public  function getEventsAllowedFromClient()
+    {
+        return [
+            self::EVENT_CREATE,
+            self::EVENT_JOIN,
+            self::EVENT_LEAVE,
+        ];
+    }
+
+    /**
      * RoomLogic constructor.
      * @param Context $context
      */

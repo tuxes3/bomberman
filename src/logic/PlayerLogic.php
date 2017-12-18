@@ -32,6 +32,18 @@ class PlayerLogic extends BaseLogic
     const EVENT_INIT = 'init';
 
     /**
+     * @return array
+     */
+    public function getEventsAllowedFromClient()
+    {
+        return [
+            self::EVENT_MOVE,
+            self::EVENT_PLAN,
+            self::EVENT_INIT,
+        ];
+    }
+
+    /**
      * @param \stdClass $data
      * @param ClientConnection $sender
      */

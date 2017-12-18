@@ -30,6 +30,14 @@ class BombLogic extends BaseLogic
     const EVENT_MOVE = 'move';
 
     /**
+     * @return array
+     */
+    public  function getEventsAllowedFromClient()
+    {
+        return [];
+    }
+
+    /**
      * @param Bomb $bomb
      * @param ClientConnection $sender
      */

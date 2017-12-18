@@ -34,6 +34,14 @@ class ExplosionLogic extends BaseLogic
     public static $name = 'explosion';
 
     /**
+     * @return array
+     */
+    public function getEventsAllowedFromClient()
+    {
+        return [];
+    }
+
+    /**
      * @param Explosion $explosion
      * @param ClientConnection $sender
      */
