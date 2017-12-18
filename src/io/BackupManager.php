@@ -60,7 +60,7 @@ class BackupManager
         $newRoom = new Room($room['maxPlayers'], $room['uniqueId'], $room['name']);
         return $newRoom
             ->setConnectedPlayers($room['connectedPlayers'])
-            ->setCreatedAt((new \DateTime())->setTimestamp($room['createdAt']))
+            ->setLastTouch((new \DateTime())->setTimestamp($room['lastTouch']))
             ->setField($this->getFieldAsObject($room['field']))
         ;
     }
@@ -92,7 +92,7 @@ class BackupManager
     {
         $array = [
             'uniqueId' => $room->getUniqueId(),
-            'createdAt' => $room->getCreatedAt()->getTimestamp(),
+            'lastTouch' => $room->getLastTouch()->getTimestamp(),
             'maxPlayers' => $room->getMaxPlayers(),
             'connectedPlayers' => $room->getConnectedPlayers(),
             'field' => $this->getFieldAsArray($room->getField()),

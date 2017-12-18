@@ -93,16 +93,29 @@ class RoomCollection extends ArrayCollection implements \JsonSerializable
     }
 
     /**
+     * @return ArrayCollection|\Doctrine\Common\Collections\Collection
+     */
+    public function findExpiredRoom()
+    {
+        $fiveMinutesEarlier = new \DateTime();
+        $fiveMinutesEarlier->modify(sprintf('-%s seconds', Config::get(Config::ROOM_EXPIRATION_SECONDS)));
+        $criteria = Criteria::create()->where(
+            Criteria::expr()->lte('lastTouch', $fiveMinutesEarlier)
+        );
+        return $this->matching($criteria);
+    }
+
+    /**
      * @param string $uuid
      * @return Room|null
      */
     public function findRoomBySender($uuid)
     {
-        $room = $this->filter(function (Room $room) use ($uuid) {
+        $rooms = $this->filter(function (Room $room) use ($uuid) {
             return in_array($uuid, $room->getConnectedPlayers());
         });
         /** @var Room|bool $room */
-        $room = $room->first();
+        $room = $rooms->first();
         if ($room) {
             return $room;
         }

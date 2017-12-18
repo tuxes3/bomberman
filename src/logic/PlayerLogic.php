@@ -57,6 +57,7 @@ class PlayerLogic extends BaseLogic
         $player = $this->context->getData()->findPlayerBySender($sender->getUuid());
         if ($player instanceof Player && $player->canPlayerMove()) {
             $room = $this->context->getData()->findRoomBySender($sender->getUuid());
+            $room->touch();
             $x = -1;
             $y = -1;
             $x2 = -1;
@@ -135,6 +136,7 @@ class PlayerLogic extends BaseLogic
         /** @var Room $room */
         $room = $this->context->getData()->findRoomBySender($sender->getUuid());
         if (!is_null($room)) {
+            $room->touch();
             $player = $room->getField()->getFieldCollection()->findPlayerBySender($sender->getUuid());
             $playerBombs = $room->getField()->getFieldCollection()->findBombsByPlanter($player->getUuid());
             if (count($playerBombs) < $player->getBombCount()) {

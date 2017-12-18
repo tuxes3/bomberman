@@ -229,9 +229,11 @@
                     $('#roomcontrols').show();
                     $('#roomList').show();
                     $('#field').hide();
-
-                    var text = 'You ' + (data.won ? 'won' : 'lose') + '!';
-                    console.log(text);
+                    // null: close due to inactivity
+                    if (data !== null) {
+                        var text = 'You ' + (data.won ? 'won' : 'lose') + '!';
+                        console.log(text);
+                    }
                 }
             },
 

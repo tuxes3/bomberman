@@ -43,7 +43,10 @@ class FieldLogic extends BaseLogic
     protected function checkFinish($room, ClientConnection $sender)
     {
         if ($room->getField()->isFinished()) {
-            $this->context->send(Message::fromCode(RoomLogic::$name, RoomLogic::EVENT_CLOSE, $room), $sender);
+            $std = new \stdClass();
+            $std->room = $room;
+            $std->inactivity = false;
+            $this->context->send(Message::fromCode(RoomLogic::$name, RoomLogic::EVENT_CLOSE, $std), $sender);
             // send finish
             foreach ($room->getConnectedPlayers() as $uuid) {
                 $player = $room->getField()->getFieldCollection()->findPlayerBySender($uuid);

@@ -31,7 +31,7 @@ class Room implements \JsonSerializable
     /**
      * @var \DateTime
      */
-    private $createdAt;
+    private $lastTouch;
 
     /**
      * @var array|string[]
@@ -64,7 +64,7 @@ class Room implements \JsonSerializable
         $this->maxPlayers = $maxPlayers;
         $this->uniqueId = $uniqueId;
         $this->connectedPlayers = [];
-        $this->createdAt = new \DateTime();
+        $this->lastTouch = new \DateTime();
         $this->field = new Field($maxPlayers);
         $this->name = $name;
     }
@@ -152,9 +152,9 @@ class Room implements \JsonSerializable
     /**
      * @return \DateTime
      */
-    public function getCreatedAt()
+    public function getLastTouch()
     {
-        return $this->createdAt;
+        return $this->lastTouch;
     }
 
     /**
@@ -177,13 +177,18 @@ class Room implements \JsonSerializable
         return $this;
     }
 
+    public function touch()
+    {
+        $this->lastTouch = new \DateTime();
+    }
+
     /**
-     * @param \DateTime $createdAt
+     * @param \DateTime $touchedAt
      * @return $this
      */
-    public function setCreatedAt($createdAt)
+    public function setLastTouch($touchedAt)
     {
-        $this->createdAt = $createdAt;
+        $this->lastTouch = $touchedAt;
         return $this;
     }
 

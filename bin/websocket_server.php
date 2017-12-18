@@ -20,6 +20,9 @@ use bomberman\logic\ExplosionLogic;
 use bomberman\io\BackupManager;
 use bomberman\io\RoomCollection;
 use bomberman\logic\ItemLogic;
+use bomberman\components\Room;
+use bomberman\logic\RoomLogic;
+use bomberman\logic\javascript\GameJSLogic;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -30,7 +33,7 @@ function milliseconds() {
 }
 
 $backupManager = new BackupManager();
-$roomCollection = $roomCollection = $backupManager->restore();
+$roomCollection = $backupManager->restore();
 if (!$roomCollection instanceof RoomCollection) {
     $roomCollection = new RoomCollection();
 }
@@ -40,9 +43,25 @@ $server = IoServer::factory(new HttpServer($wsServer),8009);
 $wsServer->enableKeepAlive($server->loop, 30);
 $bombermanWebsocket->setLoop($server->loop);
 
-
+// backup data every x
 $server->loop->addPeriodicTimer(Config::get(Config::BACK_UP_INTERVAL), function ($timer) use ($bombermanWebsocket, $backupManager) {
     $backupManager->backup($bombermanWebsocket->getData());
+});
+
+// delete unused room every x
+$server->loop->addPeriodicTimer(Config::get(Config::ROOM_EXPIRATION_SECONDS), function ($timer) use ($bombermanWebsocket) {
+    $expiredRooms = $bombermanWebsocket->getData()->findExpiredRoom();
+    /** @var Room $room */
+    foreach ($expiredRooms as $room) {
+        $std = new \stdClass();
+        $std->room = $room;
+        $std->inactivity = true;
+        $bombermanWebsocket->send(Message::fromCode(RoomLogic::$name, RoomLogic::EVENT_CLOSE, $std), null);
+        $bombermanWebsocket->sendToClients(
+            $room->getConnectedPlayers(),
+            Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_FINISHED, null)
+        );
+    }
 });
 
 $server->run();

@@ -63,12 +63,20 @@ class RoomLogic extends BaseLogic
     }
 
     /**
-     * @param Room $data
+     * @param \stdClass $data
      * @param ClientConnection $sender
      */
     protected function close($data, $sender)
     {
-        $this->context->getData()->removeUniqueId($data->getUniqueId());
+        /** @var Room $room */
+        $room = $data->room;
+        if ($data->inactivity) {
+            $this->context->sendToClients(
+                $room->getConnectedPlayers(),
+                Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'Room closed due to inactivity.')
+            );
+        }
+        $this->context->getData()->removeUniqueId($data->room->getUniqueId());
         $this->sendRoomsToAll();
     }
 

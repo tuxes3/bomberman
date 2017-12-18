@@ -27,6 +27,7 @@ class Config
     const ITEM_INTERVAL = 'item_interval';
     const MAX_MOVEMENT_SPEED = 'max_movement_speed';
     const ITEM_MOVEMENT_SPEED_DECREASE = 'item_movement_speed_decrease';
+    const ROOM_EXPIRATION_SECONDS = 'room_expiration_seconds';
 
     private static $configFile = null;
 
