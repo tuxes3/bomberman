@@ -54,7 +54,10 @@
 
         </div>
 
-
+        <div id="connectionLost">
+            <img height="500px" src="img/bomb-loading.svg" alt="bouncing bomb"/>
+            <h1>Reconnection ...</h1>
+        </div>
         <script type="text/javascript">
             const BOMBERMAN_WEBSOCKET_URL = '<?php
             $webSocketPath = isset($_SERVER['WEBSOCKET_PATH']) ? $_SERVER['WEBSOCKET_PATH'] : ':8009';

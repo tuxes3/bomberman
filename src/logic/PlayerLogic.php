@@ -40,11 +40,10 @@ class PlayerLogic extends BaseLogic
         $rooms = $this->context->getData();
         /** @var Room $room */
         $room = $rooms->findRoomBySender($sender->getUuid());
+        $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $rooms->getValues())));
         if (!is_null($room) && $room->isStartable()) {
             $sender->send(json_encode(Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_STARTED, null)));
             $sender->send(json_encode(Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())));
-        } else {
-            $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $rooms->getValues())));
         }
     }
 

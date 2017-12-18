@@ -199,6 +199,7 @@
             this.connection = new WebSocket(BOMBERMAN_WEBSOCKET_URL);
             this.connection.onmessage = this.onMessage;
             this.connection.onopen = this.onOpen;
+            this.connection.onclose = this.onClose;
         },
 
         onOpen: function (e) {
@@ -208,6 +209,13 @@
         onMessage: function (e) {
             var message = JSON.parse(e.data);
             bomberman_socket.handler[message.name][message.event](message.data);
+        },
+
+        onClose: function (e) {
+            $('#connectionLost').css('display', 'block');
+            setTimeout(function () {
+                bomberman_socket.init();
+            }, 5000);
         },
 
         send: function (request) {
@@ -239,6 +247,8 @@
 
             room_js: {
                 list: function (roomList) {
+                    // connection is back
+                    $('#connectionLost').css('display', 'none');
                     var roomListDiv = $('#roomList');
                     roomListDiv.empty();
                     console.log(roomList);
