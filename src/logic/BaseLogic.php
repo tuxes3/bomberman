@@ -52,7 +52,7 @@ abstract class BaseLogic
         $event = $message->getEvent();
         if (($message->isFromClient() && !in_array($event, $this->getEventsAllowedFromClient()))
             || !method_exists($this, $event)) {
-            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Method not allowed')));
+            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Event not found.')));
         } else {
             $this->$event($message->getData(), $sender);
         }

@@ -19,6 +19,7 @@ use bomberman\logic\ClientConnection;
 use bomberman\logic\ExplosionLogic;
 use bomberman\logic\FieldLogic;
 use bomberman\logic\ItemLogic;
+use bomberman\logic\javascript\MessageJSLogic;
 use bomberman\logic\PlayerLogic;
 use bomberman\logic\RoomLogic;
 use Ratchet\ConnectionInterface;
@@ -104,7 +105,11 @@ class BombermanWebsocket implements MessageComponentInterface, Context
      */
     public function send($message, $from)
     {
-        $this->logics[$message->getLogicName()]->execute($message, $from);
+        if (in_array($message->getLogicName(), array_keys($this->logics))) {
+            $this->logics[$message->getLogicName()]->execute($message, $from);
+        } else {
+            $from->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Logic not found.')));
+        }
     }
 
     /**
