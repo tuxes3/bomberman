@@ -54,10 +54,13 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffffff;
 }
 
+#field {
+    border: 1px solid black;
+}
+
 .fieldCell {
     width: 32px;
     height: 32px;
-    border: 1px solid black;
     float: left;
 }
 

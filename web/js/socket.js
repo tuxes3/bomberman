@@ -160,7 +160,6 @@
         },
 
         moveAnimate: function (element, newParent) {
-            //Allow passing in either a jQuery object or selector
             element = $(element);
             newParent= $(newParent);
             var oldXY = element.parent().data('x-y').split('|');
@@ -177,22 +176,18 @@
             }
             var width = element.width();
             element.appendTo(newParent);
-            var temp = element.clone().appendTo(newParent);
-            temp.removeClass('delete');
             var tempCss = {
-                'z-index': element.css('z-index'),
                 'position': 'relative'
             };
             tempCss[animateProperty] = width+'px';
-            temp.css(tempCss);
-            element.hide();
-            var tempAnimation = {};
-            tempAnimation[animateProperty] = '0px';
-            temp.animate(tempAnimation, element.is('.player')
+            element.css(tempCss);
+            var anim = {};
+            anim[animateProperty] = '0px';
+            element.animate(anim, element.is('.player')
                 ? bomberman_ui.movementSpeed === null ? 270 : bomberman_ui.movementSpeed - 30
                 : 570, function(){
-                element.show();
-                temp.remove();
+                element.css('position', '');
+                element.css(animateProperty, '');
             });
         }
     };
