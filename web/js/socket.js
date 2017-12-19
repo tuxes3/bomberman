@@ -370,6 +370,12 @@
                             fieldDiv.append($('<div class="clear">'));
                         }
                     }
+
+                    var minWidth = (11 + ((field.players-2)*2))*32+180;
+                    if(field.players > 2){
+                        $('#main').css('min-width', minWidth+'px');
+                    }
+
                     $('.block_').addClass('delete');
                     var hueRotate = 0;
                     for (i = 0; i < field.cells.length; i++) {
