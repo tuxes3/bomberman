@@ -18,6 +18,7 @@
     <meta name="keywords" content="Checker Bomberman Web Projekt BFH" />
     <meta name="author" content="Singer Nicolo & Mueller, Lukas" />
     <meta name="Robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/sweetalert2.min.css">
@@ -34,7 +35,8 @@
     </noscript>
 
     <header id="header">
-        <h1>Checker-Bomberman Game - Web Project BTI7054</h1>
+        <h1>Checker-Bomberman</h1>
+        <h4>Web Project BTI7054</h4>
     </header>
 
     <main id="main">
@@ -52,13 +54,23 @@
 
         </div>
 
+        <div id="arrowControlls">
+            <button onclick="$this.trigger(jQuery.Event( 'keydown', { which: $.ui.keyCode.w } ));">&#8593;</button><br>
+            <button onclick="moveleft()">&#8592;</button>
+            <button onclick="bomb()">&#128163;</button>
+            <button onclick="moveright()">&#8594;</button><br>
+            <button onclick="movedown()">&#8595;</button>
+        </div>
+
+
+
         <div id="roomList">
 
         </div>
 
         <div id="connectionLost">
             <img height="500px" src="img/bomb-loading.svg" alt="bouncing bomb"/>
-            <h1>Reconnection ...</h1>
+            <h1>Reconnecting ...</h1>
         </div>
         <script type="text/javascript">
             const BOMBERMAN_WEBSOCKET_URL = '<?php
@@ -87,6 +99,8 @@
         <span></span>
     </a>
     <script>
+        $('#arrowControlls').hide();
+
         var isMuted = false;
         $('.speaker').click(function(e) {
             e.preventDefault();
@@ -94,7 +108,14 @@
             isMuted = !isMuted;
         });
 
+        // check if browsers supports touch
+        function is_touch_device() {
+            return 'ontouchstart' in window        // works on most browsers
+            || navigator.maxTouchPoints;       // works on IE10/11 and Surface
+        };
+
     </script>
+
     <footer id="footer">
         <div id="footer-main">
             &copy; Nicolo Singer & Lukas Müller <br />

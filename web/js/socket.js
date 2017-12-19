@@ -234,6 +234,10 @@
                     $('#roomList').hide();
                     $('#field').empty();
                     $('#field').show();
+                    
+                    if(is_touch_device()){
+                      $('#arrowControlls').show();
+                    }
                 },
 
                 finished: function (data) {

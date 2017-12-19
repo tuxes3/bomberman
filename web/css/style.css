@@ -20,7 +20,7 @@ h1, h2, h3, h4, h5, h6 {
     color: #05144f;
     font-family: "Roboto", Arial, sans-serif;
     font-weight: 400;
-    margin: 0 0 15px 0;
+    margin: 0 0 10px 0;
 }
 
 #header{
@@ -30,8 +30,6 @@ h1, h2, h3, h4, h5, h6 {
 
 #main{
     margin: 0 auto;
-    min-width: 800px;
-    max-width:1200px;
     background:#fff;
     text-align: center;
     line-height: 1.5;
@@ -67,6 +65,9 @@ h1, h2, h3, h4, h5, h6 {
 
 #field {
     border: 1px solid black;
+    margin: 5px auto;
+    display: inline-block;
+    clear: left;
 }
 
 .fieldCell {
@@ -89,6 +90,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #roomcontrols{
+    margin-bottom: 5px;
 }
 
 #createRoom{
@@ -103,11 +105,6 @@ h1, h2, h3, h4, h5, h6 {
 
 #roomList{
     padding-bottom: 10px;
-}
-
-#field{
-    margin: 10px auto;
-    display: inline-block;
 }
 
 #connectionLost {
@@ -198,4 +195,27 @@ h1, h2, h3, h4, h5, h6 {
     color:#fff;
     margin:0;
     padding:0;
+}
+
+/*============ SMARTPHONE BUTTONS============*/
+
+#arrowControlls{
+    margin-bottom: 10px;
+}
+
+#arrowControlls button{
+    margin: 4px;
+    width: 40px;
+    height: 40px;
+}
+
+/*if landscape then float the buttons to the side */
+@media (orientation: landscape) {
+    #arrowControlls{
+        float: right;
+        padding-top: 20px;
+        padding-right: 20px;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
 }
