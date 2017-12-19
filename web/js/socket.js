@@ -370,7 +370,7 @@
                             fieldDiv.append($('<div class="clear">'));
                         }
                     }
-                    $('.block').addClass('delete');
+                    $('.block_').addClass('delete');
                     var hueRotate = 0;
                     for (i = 0; i < field.cells.length; i++) {
                         for (j = 0; j < field.cells[i].length; j++) {
@@ -380,55 +380,18 @@
                                 var inCellDom = $('div[data-id="'+inCell.id+'"]');
                                 // first creation of inCell
                                 if (inCellDom.length === 0) {
-                                    inCellDom = $('<div class="block" data-id="'+inCell.id+'"></div>');
-                                    var image = null;
-                                    var color = null;
-                                    if(inCell.class === 'player' && inCell.alive){
-                                        image = 'url("./img/man.gif")';
-                                        console.log("players:");
-                                        console.log(field.players);
+                                    inCellDom = $('<div class="block_ '+inCell.class+'" data-id="'+inCell.id+'"></div>');
+                                    if(inCell.class === 'player'){
                                         hueRotate = hueRotate+(360/field.players);
                                         inCellDom.css('filter', 'hue-rotate('+hueRotate +'deg)');
-                                    } else
-                                    if( inCell.class === 'bomb'){
-                                        image = 'url("./img/bomb.gif")';
-                                    } else
-                                    if(inCell.class === 'fixblock'){
-                                        image = 'url("./img/fixBlock.gif")';
-                                    } else
+                                    }
                                     if(inCell.class === 'explosion'){
-                                        image = 'url("./img/explosion.gif")';
                                         if(!bomberman_storage.getMuted()){
                                             // so that we have mutliple explosion ;)
                                             bomberman_ui.bombAudio.cloneNode(true).play();
                                         }
-                                    } else
-                                    if(inCell.class === 'bombitem'){
-                                        image = 'url("./img/twobomb.gif")';
-                                        color = '#c5ffbc';
-                                    } else
-                                    if(inCell.class === 'shoeitem'){
-                                        image = 'url("./img/shoe.gif")';
-                                        color = '#c5ffbc';
-                                    } else
-                                    if(inCell.class === 'explosionradiusitem'){
-                                        image = 'url("./img/bombsize_lvlup.gif")';
-                                        color = '#c5ffbc';
-                                    } else
-                                    if (inCell.class === 'block') {
-                                        image = 'url("./img/block.gif")';
-                                    } else
-                                    if (inCell.class === 'movebombitem') {
-                                        image = 'url("./img/kickitemg.gif")';
-                                        color = '#c5ffbc';
                                     }
-
-                                    inCellDom.addClass(inCell.class);
-                                    inCellDom.css('background-image', image);
                                     inCellDom.css('z-index', inCell.displayPriority);
-                                    if(color != null){
-                                        inCellDom.css('background-color', color);
-                                    }
                                     inCellDom.appendTo('div.fieldCell[data-x-y="'+i+'|'+j+'"]');
                                 }
                                 if (inCell.class === 'player' && !inCell.alive) {
@@ -442,8 +405,6 @@
                                 }
                                 if (!inCellDom.parent().is('div[data-x-y="'+i+'|'+j+'"]')) {
                                     bomberman_ui.moveAnimate(inCellDom, $('div.fieldCell[data-x-y="'+i+'|'+j+'"]'));
-                                    // inCellDom.detach();
-                                    // inCellDom.appendTo('div.fieldCell[data-x-y="'+i+'|'+j+'"]');
                                 }
                                 inCellDom.removeClass('delete');
                             }

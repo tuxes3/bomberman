@@ -77,7 +77,7 @@ h1, h2, h3, h4, h5, h6 {
     position: relative;
 }
 
-.block {
+.block_ {
     width: 32px;
     height: 32px;
     background-repeat: no-repeat;
@@ -122,6 +122,52 @@ h1, h2, h3, h4, h5, h6 {
     bottom: 0;
     background-color: rgba(0,0,0,0.5);
     z-index: 9999;
+}
+
+/* blocks */
+.player {
+    background-image: url("../img/man.gif");
+    background-size: 32px 32px;
+}
+
+.bomb {
+    background-image: url("../img/bomb.gif");
+    background-size: 32px 32px;
+}
+
+.fixblock {
+    background-image: url("../img/fixBlock.gif");
+    background-size: 32px 32px;
+}
+
+.explosion {
+    background-image: url("../img/explosion.gif");
+    background-size: 32px 32px;
+}
+
+.block {
+    background-image: url("../img/block.gif");
+    background-size: 32px 32px;
+}
+
+.bombitem {
+    background: #c5ffbc url("../img/twobomb.gif");
+    background-size: 32px 32px;
+}
+
+.shoeitem {
+    background: #c5ffbc url("../img/shoe.gif");
+    background-size: 32px 32px;
+}
+
+.explosionradiusitem {
+    background: #c5ffbc url("../img/bombsize_lvlup.gif");
+    background-size: 32px 32px;
+}
+
+.movebombitem {
+    background: #c5ffbc url("../img/kickitemg.gif");
+    background-size: 32px 32px;
 }
 
 /*============ Fancy mute button with css only  ============*/

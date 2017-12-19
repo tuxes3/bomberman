@@ -23,12 +23,12 @@ class MoveBombItem extends BaseItem
      */
     public function consume(Player $player)
     {
-        $player->setCanMoveBombs();
-
         // if the player can already kick bombs, then the powerup would be useless
         // so we make him faster if he gets it again :)
         if($player->isCanMoveBombs()){
             $player->decreaseMovementSpeed();
+        } else {
+            $player->setCanMoveBombs();
         }
     }
 
