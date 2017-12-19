@@ -1,28 +1,12 @@
 <?php
 /*
- * Copyright (c) 2017, whatwedo GmbH
- * All rights reserved
+ * This file is part of the bomberman project.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * @author Nicolo Singer tuxes3@outlook.com
+ * @author Lukas Müller computer_bastler@hotmail.com
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace bomberman\io;
@@ -86,11 +70,11 @@ class RoomCollection extends ArrayCollection implements \JsonSerializable
      */
     public function findRoomByUniqueId($uniqueId)
     {
-        $criteria = Criteria::create()
-            ->where(Criteria::expr()->eq('uniqueId', $uniqueId));
-        $match = $this->matching($criteria);
-        if ($match->count() > 0) {
-            return $match->first();
+        /** @var Room $room */
+        foreach ($this as $room) {
+            if ($room->getUniqueId() == $uniqueId) {
+                return $room;
+            }
         }
         return null;
     }
@@ -109,16 +93,42 @@ class RoomCollection extends ArrayCollection implements \JsonSerializable
     }
 
     /**
+     * @return ArrayCollection|\Doctrine\Common\Collections\Collection
+     */
+    public function findExpiredRoom()
+    {
+        $fiveMinutesEarlier = new \DateTime();
+        $fiveMinutesEarlier->modify(sprintf('-%s seconds', Config::get(Config::ROOM_EXPIRATION_SECONDS)));
+        $criteria = Criteria::create()->where(
+            Criteria::expr()->lte('lastTouch', $fiveMinutesEarlier)
+        );
+        return $this->matching($criteria);
+    }
+
+    /**
+     * @param string $uuid
+     * @return ArrayCollection|\Doctrine\Common\Collections\Collection
+     */
+    public function findByCreatedBy($uuid)
+    {
+        $criteria = Criteria::create()
+            ->where(
+                Criteria::expr()->eq('createdBy', $uuid)
+            );
+        return $this->matching($criteria);
+    }
+
+    /**
      * @param string $uuid
      * @return Room|null
      */
     public function findRoomBySender($uuid)
     {
-        $room = $this->filter(function (Room $room) use ($uuid) {
+        $rooms = $this->filter(function (Room $room) use ($uuid) {
             return in_array($uuid, $room->getConnectedPlayers());
         });
         /** @var Room|bool $room */
-        $room = $room->first();
+        $room = $rooms->first();
         if ($room) {
             return $room;
         }

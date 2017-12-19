@@ -1,38 +1,27 @@
 <?php
 /*
- * Copyright (c) 2017, whatwedo GmbH
- * All rights reserved
+ * This file is part of the bomberman project.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * @author Nicolo Singer tuxes3@outlook.com
+ * @author Lukas Müller computer_bastler@hotmail.com
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace bomberman\io;
 
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Class Config
+ * @package bomberman\io
+ */
 class Config
 {
 
     const MOVEMENT_SPEED = 'movement_speed';
+    const BOMB_MOVEMENT_SPEED = 'bomb_movement_speed';
     const BOMB_COUNT = 'bomb_count';
     const BOMB_INTERVAL = 'bomb_interval';
     const BOMB_TIMEOUT = 'bomb_timeout';
@@ -40,6 +29,11 @@ class Config
     const EXPLOSION_SPREAD = 'explosion_spread';
     const EXPLOSION_INTERVAL = 'explosion_interval';
     const BACK_UP_INTERVAL = 'back_up_interval';
+    const ITEM_INTERVAL = 'item_interval';
+    const MAX_MOVEMENT_SPEED = 'max_movement_speed';
+    const ITEM_MOVEMENT_SPEED_DECREASE = 'item_movement_speed_decrease';
+    const ROOM_EXPIRATION_SECONDS = 'room_expiration_seconds';
+    const MAX_ROOMS_PER_PLAYER = 'max_rooms_per_player';
 
     private static $configFile = null;
 

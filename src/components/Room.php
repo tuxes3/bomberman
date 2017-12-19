@@ -1,28 +1,12 @@
 <?php
 /*
- * Copyright (c) 2017, whatwedo GmbH
- * All rights reserved
+ * This file is part of the bomberman project.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * @author Nicolo Singer tuxes3@outlook.com
+ * @author Lukas Müller computer_bastler@hotmail.com
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace bomberman\components;
@@ -33,7 +17,7 @@ namespace bomberman\components;
  */
 class Room implements \JsonSerializable
 {
-
+    const PLAYER_LIMIT = 10;
     /**
      * @var int
      */
@@ -47,7 +31,7 @@ class Room implements \JsonSerializable
     /**
      * @var \DateTime
      */
-    private $createdAt;
+    private $lastTouch;
 
     /**
      * @var array|string[]
@@ -60,18 +44,36 @@ class Room implements \JsonSerializable
     private $field;
 
     /**
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @var $createdBy (player uuid)
+     */
+    private $createdBy;
+
+    /**
      * Room constructor.
      * @param int $maxPlayers
      * @param string $uniqueId
+     * @param string $name
+     * @param string $createdBy (uuid)
      */
-    public function __construct($maxPlayers, $uniqueId)
+    public function __construct($maxPlayers, $uniqueId, $name, $createdBy)
     {
+        //max 10 players
+        if($maxPlayers >= self::PLAYER_LIMIT){
+            $maxPlayers = self::PLAYER_LIMIT;
+        }
+
         $this->maxPlayers = $maxPlayers;
         $this->uniqueId = $uniqueId;
         $this->connectedPlayers = [];
-        $this->createdAt = new \DateTime();
-        // TODO: calculate field size depending on player
+        $this->lastTouch = new \DateTime();
         $this->field = new Field($maxPlayers);
+        $this->name = $name;
+        $this->createdBy = $createdBy;
     }
 
     /**
@@ -83,6 +85,8 @@ class Room implements \JsonSerializable
             'maxPlayers' => $this->maxPlayers,
             'connectedPlayers' => count($this->connectedPlayers),
             'uniqueId' => $this->uniqueId,
+            'name' => $this->name,
+            'players' => $this->connectedPlayers,
         ];
     }
 
@@ -99,7 +103,22 @@ class Room implements \JsonSerializable
             return sprintf('The room (%s) is already full.', $this->uniqueId);
         }
         $this->connectedPlayers[] = $playerId;
+        // uncomment for 9 dummy players
+        //for ($i = 0; $i < 9; $i++) {
+        //    $this->connectedPlayers[] = $i.'dummy-test-player';
+        //}
         return true;
+    }
+
+    /**
+     * @param $playerId
+     * @return bool|string
+     */
+    public function removePlayer($playerId)
+    {
+        if (($key = array_search($playerId, $this->connectedPlayers)) !== false) {
+            unset($this->connectedPlayers[$key]);
+        }
     }
 
     /**
@@ -145,9 +164,9 @@ class Room implements \JsonSerializable
     /**
      * @return \DateTime
      */
-    public function getCreatedAt()
+    public function getLastTouch()
     {
-        return $this->createdAt;
+        return $this->lastTouch;
     }
 
     /**
@@ -170,13 +189,18 @@ class Room implements \JsonSerializable
         return $this;
     }
 
+    public function touch()
+    {
+        $this->lastTouch = new \DateTime();
+    }
+
     /**
-     * @param \DateTime $createdAt
+     * @param \DateTime $touchedAt
      * @return $this
      */
-    public function setCreatedAt($createdAt)
+    public function setLastTouch($touchedAt)
     {
-        $this->createdAt = $createdAt;
+        $this->lastTouch = $touchedAt;
         return $this;
     }
 
@@ -198,6 +222,22 @@ class Room implements \JsonSerializable
     {
         $this->field = $field;
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCreatedBy()
+    {
+        return $this->createdBy;
     }
 
 }

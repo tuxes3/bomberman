@@ -1,28 +1,12 @@
 <?php
 /*
- * Copyright (c) 2017, whatwedo GmbH
- * All rights reserved
+ * This file is part of the bomberman project.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * @author Nicolo Singer tuxes3@outlook.com
+ * @author Lukas Müller computer_bastler@hotmail.com
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 use Ratchet\Server\IoServer;
@@ -34,7 +18,11 @@ use bomberman\io\Message;
 use bomberman\logic\BombLogic;
 use bomberman\logic\ExplosionLogic;
 use bomberman\io\BackupManager;
-use \bomberman\io\RoomCollection;
+use bomberman\io\RoomCollection;
+use bomberman\logic\ItemLogic;
+use bomberman\components\Room;
+use bomberman\logic\RoomLogic;
+use bomberman\logic\javascript\GameJSLogic;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -44,31 +32,37 @@ function milliseconds() {
     return ((int)$mt[1]) * 1000 + ((int)round($mt[0] * 1000));
 }
 
+// restore rooms.json incase of websocket failure
 $backupManager = new BackupManager();
-$roomCollection = $roomCollection = $backupManager->restore();
+$roomCollection = $backupManager->restore();
 if (!$roomCollection instanceof RoomCollection) {
     $roomCollection = new RoomCollection();
 }
 $bombermanWebsocket = new BombermanWebsocket($roomCollection);
-$server = IoServer::factory(
-    new HttpServer(
-        new WsServer(
-            $bombermanWebsocket
-        )
-    ),
-    8009
-);
+$wsServer = new WsServer($bombermanWebsocket);
+$server = IoServer::factory(new HttpServer($wsServer),8009);
+$wsServer->enableKeepAlive($server->loop, 30);
+$bombermanWebsocket->setLoop($server->loop);
 
-$server->loop->addPeriodicTimer(Config::get(Config::BOMB_INTERVAL), function ($timer) use ($bombermanWebsocket) {
-    $bombermanWebsocket->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_CHECK, null), null);
-});
-
-$server->loop->addPeriodicTimer(Config::get(Config::EXPLOSION_INTERVAL), function ($timer) use ($bombermanWebsocket) {
-    $bombermanWebsocket->send(Message::fromCode(ExplosionLogic::$name, ExplosionLogic::EVENT_CHECK, null), null);
-});
-
+// backup data every x
 $server->loop->addPeriodicTimer(Config::get(Config::BACK_UP_INTERVAL), function ($timer) use ($bombermanWebsocket, $backupManager) {
     $backupManager->backup($bombermanWebsocket->getData());
+});
+
+// delete unused room every x
+$server->loop->addPeriodicTimer(Config::get(Config::ROOM_EXPIRATION_SECONDS), function ($timer) use ($bombermanWebsocket) {
+    $expiredRooms = $bombermanWebsocket->getData()->findExpiredRoom();
+    /** @var Room $room */
+    foreach ($expiredRooms as $room) {
+        $std = new \stdClass();
+        $std->room = $room;
+        $std->inactivity = true;
+        $bombermanWebsocket->sendToClients(
+            $room->getConnectedPlayers(),
+            Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_FINISHED, null)
+        );
+        $bombermanWebsocket->send(Message::fromCode(RoomLogic::$name, RoomLogic::EVENT_CLOSE, $std), null);
+    }
 });
 
 $server->run();

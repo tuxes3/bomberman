@@ -1,31 +1,16 @@
 <?php
 /*
- * Copyright (c) 2017, whatwedo GmbH
- * All rights reserved
+ * This file is part of the bomberman project.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * @author Nicolo Singer tuxes3@outlook.com
+ * @author Lukas Müller computer_bastler@hotmail.com
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace bomberman\components\field;
+
 use bomberman\io\Config;
 
 /**
@@ -66,6 +51,11 @@ class Player extends BaseInCell
     protected $alive = true;
 
     /**
+     * @var boolean
+     */
+    protected $canMoveBombs = false;
+
+    /**
      * Player constructor.
      * @param $x
      * @param $y
@@ -102,6 +92,7 @@ class Player extends BaseInCell
             'bombCount' => $this->bombCount,
             'explosionSpread' => $this->explosionSpread,
             'uuid' => $this->uuid,
+            'canMoveBombs' => $this->canMoveBombs,
         ]);
     }
 
@@ -116,6 +107,7 @@ class Player extends BaseInCell
         $player->movementSpeed = $data['movementSpeed'];
         $player->bombCount = $data['bombCount'];
         $player->explosionSpread = $data['explosionSpread'];
+        $player->canMoveBombs = $data['canMoveBombs'];
         return $player;
     }
 
@@ -133,6 +125,30 @@ class Player extends BaseInCell
     public function blocksExplosion()
     {
         return false;
+    }
+
+    /**
+     *
+     */
+    public function setCanMoveBombs()
+    {
+        $this->canMoveBombs = true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCanMoveBombs()
+    {
+        return $this->canMoveBombs;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canBombEnter()
+    {
+        return true;
     }
 
     /**
@@ -171,9 +187,9 @@ class Player extends BaseInCell
     /**
      * @return int
      */
-    public function getNextMovement()
+    public function getMovementSpeed()
     {
-        return $this->lastMoved + $this->movementSpeed;
+        return $this->movementSpeed;
     }
 
     /**
@@ -198,6 +214,40 @@ class Player extends BaseInCell
     public function isAlive()
     {
         return $this->alive;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBombCount()
+    {
+        return $this->bombCount;
+    }
+
+    /**
+     *
+     */
+    public function incrementBombCount()
+    {
+        $this->bombCount++;
+    }
+
+    /**
+     *
+     */
+    public function incrementExplosionSpread()
+    {
+        $this->explosionSpread++;
+    }
+
+    /**
+     *
+     */
+    public function decreaseMovementSpeed()
+    {
+        if ($this->movementSpeed > Config::get(Config::MAX_MOVEMENT_SPEED)) {
+            $this->movementSpeed = $this->movementSpeed - Config::get(Config::ITEM_MOVEMENT_SPEED_DECREASE);
+        }
     }
 
 }

@@ -1,32 +1,20 @@
 <?php
 /*
- * Copyright (c) 2017, whatwedo GmbH
- * All rights reserved
+ * This file is part of the bomberman project.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * @author Nicolo Singer tuxes3@outlook.com
+ * @author Lukas Müller computer_bastler@hotmail.com
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace bomberman\components\field;
 
+/**
+ * Class BaseInCell
+ * @package bomberman\components\field
+ */
 abstract class BaseInCell implements InCell, \JsonSerializable
 {
 
@@ -47,6 +35,11 @@ abstract class BaseInCell implements InCell, \JsonSerializable
      */
     protected $id;
 
+    /**
+     * BaseInCell constructor.
+     * @param $x
+     * @param $y
+     */
     public function __construct($x, $y)
     {
         $this->x = $x;
@@ -54,6 +47,9 @@ abstract class BaseInCell implements InCell, \JsonSerializable
         $this->id = md5(openssl_random_pseudo_bytes(128));
     }
 
+    /**
+     * @return array
+     */
     public function jsonSerialize()
     {
         return [
@@ -61,9 +57,13 @@ abstract class BaseInCell implements InCell, \JsonSerializable
             'y' => $this->getY(),
             'class' => strtolower($this->getClass()),
             'displayPriority' => $this->getDisplayPriority(),
+            'id' => $this->id,
         ];
     }
 
+    /**
+     * @return array
+     */
     public function backup()
     {
         return array_merge($this->jsonSerialize(), [

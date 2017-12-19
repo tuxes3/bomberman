@@ -1,34 +1,19 @@
 <?php
 /*
- * Copyright (c) 2017, whatwedo GmbH
- * All rights reserved
+ * This file is part of the bomberman project.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * @author Nicolo Singer tuxes3@outlook.com
+ * @author Lukas Müller computer_bastler@hotmail.com
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace bomberman\logic;
 
 use bomberman\components\Room;
 use bomberman\Context;
+use bomberman\io\Config;
 use bomberman\io\Message;
 use bomberman\logic\javascript\MessageJSLogic;
 use bomberman\logic\javascript\RoomJSLogic;
@@ -45,11 +30,24 @@ class RoomLogic extends BaseLogic
     const EVENT_JOIN = 'join';
     const EVENT_LIST = 'getAll';
     const EVENT_CLOSE = 'close';
+    const EVENT_LEAVE = 'leave';
 
     /**
      * @var string
      */
     public static $name = 'room';
+
+    /**
+     * @return array
+     */
+    public  function getEventsAllowedFromClient()
+    {
+        return [
+            self::EVENT_CREATE,
+            self::EVENT_JOIN,
+            self::EVENT_LEAVE,
+        ];
+    }
 
     /**
      * RoomLogic constructor.
@@ -67,19 +65,34 @@ class RoomLogic extends BaseLogic
     protected function create($data, ClientConnection $sender)
     {
         $uniqueId = $this->context->getData()->getFreeUniqueId();
-        $room = new Room($data->maxPlayers, $uniqueId);
-        $this->context->getData()->add($room);
-        $this->sendRoomsToAll();
+        $roomSize = $data->maxPlayers;
+        $maxRoomsPerPlayer = Config::get(Config::MAX_ROOMS_PER_PLAYER);
+        if ($roomSize > 10) {
+            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Cannot create room with more than 10 players.')));
+        } elseif ($this->context->getData()->findByCreatedBy($sender->getUuid())->count() >= $maxRoomsPerPlayer) {
+            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, sprintf('You cannot create more than %s rooms', $maxRoomsPerPlayer))));
+        } else {
+            $room = new Room($roomSize, $uniqueId, $data->name, $sender->getUuid());
+            $this->context->getData()->add($room);
+            $this->sendRoomsToAll();
+        }
     }
 
     /**
-     * @param Room $data
+     * @param \stdClass $data
      * @param ClientConnection $sender
      */
     protected function close($data, $sender)
     {
-        $this->context->getData()->removeUniqueId($data->getUniqueId());
-        echo ('count: '.$this->context->getData()->count());
+        /** @var Room $room */
+        $room = $data->room;
+        if ($data->inactivity) {
+            $this->context->sendToClients(
+                array_merge($room->getConnectedPlayers(), [$room->getCreatedBy()]),
+                Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'Room closed due to inactivity.')
+            );
+        }
+        $this->context->getData()->removeUniqueId($data->room->getUniqueId());
         $this->sendRoomsToAll();
     }
 
@@ -97,24 +110,47 @@ class RoomLogic extends BaseLogic
      */
     protected function join($data, ClientConnection $sender)
     {
-        $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);
-        $return = null;
-        if (is_null($room)) {
-            $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, sprintf('Room (%s) not existing.', $data->uniqueId));
-        } else {
-            $result = $room->addPlayer($sender->getUuid());
-            if (is_string($result)) {
-                $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, $result);
-            } elseif ($room->isStartable()) {
-                $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_START, $data), $sender);
-                $this->sendRoomsToAll();
+        $room = ($this->context->getData()->findRoomBySender($sender->getUuid()));
+        if (!is_null($room)) {
+            if ($room->getUniqueId() == $data->uniqueId) {
+                $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'You already are in this room');
             } else {
-                $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'Waiting for players.');
-                $this->sendRoomsToAll();
+                $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'You can only be in one room');
+            }
+        } else {
+            $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);
+            $return = null;
+            if (is_null($room)) {
+                $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, sprintf('Room (%s) not existing.', $data->uniqueId));
+            } else {
+                $result = $room->addPlayer($sender->getUuid());
+                if (is_string($result)) {
+                    $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, $result);
+                } elseif ($room->isStartable()) {
+                    $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_START, $data), $sender);
+                    $this->sendRoomsToAll();
+                } else {
+                    $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'Waiting for players.');
+                    $this->sendRoomsToAll();
+                }
             }
         }
+
         if (!is_null($return)) {
             $sender->send(json_encode($return));
+        }
+    }
+
+    /**
+     * @param \stdClass $data
+     * @param ClientConnection $sender
+     */
+    protected function leave($data, ClientConnection $sender)
+    {
+        $room = $this->context->getData()->findRoomBySender($sender->getUuid());
+        if (!is_null($room)) {
+            $room->removePlayer($sender->getUuid());
+            $this->sendRoomsToAll();
         }
     }
 

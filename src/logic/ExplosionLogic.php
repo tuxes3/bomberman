@@ -1,28 +1,12 @@
 <?php
 /*
- * Copyright (c) 2017, whatwedo GmbH
- * All rights reserved
+ * This file is part of the bomberman project.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * @author Nicolo Singer tuxes3@outlook.com
+ * @author Lukas Müller computer_bastler@hotmail.com
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace bomberman\logic;
@@ -36,7 +20,6 @@ use bomberman\io\Config;
 use bomberman\io\Message;
 use bomberman\logic\javascript\FieldJSLogic;
 use bomberman\logic\javascript\GameJSLogic;
-use Ratchet\ConnectionInterface;
 
 /**
  * Class ExplosionLogic
@@ -45,50 +28,38 @@ use Ratchet\ConnectionInterface;
 class ExplosionLogic extends BaseLogic
 {
 
-    const EVENT_CHECK = 'check';
+    const EVENT_REMOVE = 'remove';
     const EVENT_CREATE = 'create';
 
     public static $name = 'explosion';
 
     /**
-     * @param \stdClass $data
+     * @return array
+     */
+    public function getEventsAllowedFromClient()
+    {
+        return [];
+    }
+
+    /**
+     * @param Explosion $explosion
      * @param ClientConnection $sender
      */
-    public function check($data, $sender)
+    public function remove($explosion, $sender)
     {
-        $current = milliseconds();
+        $explosion->setTimer(null);
         /** @var Room $room */
-        foreach ($this->context->getData() as $room) {
-            $updateRoom = false;
-            /** @var Explosion $explosion */
-            foreach ($room->getField()->getFieldCollection()->findExplosions() as $explosion) {
-                $fieldCell = $room->getField()->getXY($explosion->getX(), $explosion->getY());
-                if (($current - $explosion->getExploded()) >= Config::get(Config::EXPLOSION_DURATION)) {
-                    $fieldCell->removeById($explosion->getId());
-                    $updateRoom = true;
-                } else {
-                    $updateRoom = $fieldCell->explode();
-                }
-            }
-            if ($updateRoom || $room->getField()->isFinished()) {
-                $this->context->sendToClients(
-                    $room->getConnectedPlayers(),
-                    Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
-                );
-                if ($room->getField()->isFinished()) {
-                    $this->context->send(Message::fromCode(RoomLogic::$name, RoomLogic::EVENT_CLOSE, $room), $sender);
-                    // send finish
-                    foreach ($room->getConnectedPlayers() as $uuid) {
-                        $player = $room->getField()->getFieldCollection()->findPlayerBySender($uuid);
-                        $data = new \stdClass();
-                        $data->won = $player->isAlive();
-                        $this->context->sendToClients(
-                            [$uuid],
-                            Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_FINISHED, $data)
-                        );
-                    }
-                }
-            }
+        $room = $this->context->getData()->findRoomBySender($sender->getUuid());
+        if (!$room) {
+            return;
+        }
+        $current = milliseconds();
+        if (($current - $explosion->getExploded()) >= Config::get(Config::EXPLOSION_DURATION)) {
+            $room->getField()->getXY($explosion->getX(), $explosion->getY())->removeById($explosion->getId());
+            $this->context->sendToClients(
+                $room->getConnectedPlayers(),
+                Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
+            );
         }
     }
 
@@ -105,14 +76,14 @@ class ExplosionLogic extends BaseLogic
         /** @var Bomb $bomb */
         $bomb = $data->bomb;
         $spread = $bomb->getExplosionSpread() - 1;
-        $this->setExplosionAt($field, $bomb->getX(), $bomb->getY());
+        $this->setExplosionAt($room, $bomb->getX(), $bomb->getY(), $sender);
         foreach ([[1, 0], [0, 1], [-1, 0], [0, -1]] as $movements) {
             $x = $bomb->getX();
             $y = $bomb->getY();
             for ($i = 0; $i < $spread; $i++) {
                 $x += $movements[0];
                 $y += $movements[1];
-                if ($this->setExplosionAt($field, $x, $y)) {
+                if ($this->setExplosionAt($room, $x, $y, $sender)) {
                     break;
                 }
             }
@@ -120,20 +91,27 @@ class ExplosionLogic extends BaseLogic
     }
 
     /**
-     * @param Field $field
+     * @param Room $room
      * @param $x
      * @param $y
+     * @param ClientConnection $sender
      * @return boolean
      */
-    private function setExplosionAt($field, $x, $y)
+    private function setExplosionAt($room, $x, $y, $sender)
     {
         /** @var FieldCell $fieldCell */
-        $fieldCell = $field->getXY($x, $y);
+        $fieldCell = $room->getField()->getXY($x, $y);
         if (is_null($fieldCell)) {
             return true;
         }
         $blockExplosion = $fieldCell->blocksExplosion();
-        $fieldCell->add(new Explosion($x, $y));
+        $explosion = new Explosion($x, $y);
+        $fieldCell->explode($explosion);
+        $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_CHECK_FINISH, $room), $sender);
+        $fieldCell->add($explosion);
+        $this->context->executeAfter(function () use ($explosion, $sender) {
+            $this->context->send(Message::fromCode(ExplosionLogic::$name, ExplosionLogic::EVENT_REMOVE, $explosion), $sender);
+        }, Config::get(Config::EXPLOSION_DURATION));
         return $blockExplosion;
     }
 

@@ -1,0 +1,14 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# CURRENT DEVELOPERS
+    Müller Lukas, computer_bastler@hotmail.com
+    Singer Nicolo, tuxes3@outlook.com
+
+# THANKS
+
+    Whatwedo GmbH
+
+# TECHNOLOGY COLOPHON
+
+    HTML5, CSS3, PHP 5, Ratchet, jQuery

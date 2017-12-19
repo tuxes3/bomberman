@@ -1,28 +1,12 @@
 <?php
 /*
- * Copyright (c) 2017, whatwedo GmbH
- * All rights reserved
+ * This file is part of the bomberman project.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * @author Nicolo Singer tuxes3@outlook.com
+ * @author Lukas Müller computer_bastler@hotmail.com
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace bomberman\logic;
@@ -30,6 +14,7 @@ namespace bomberman\logic;
 use bomberman\components\field\Bomb;
 use bomberman\components\field\Player;
 use bomberman\components\Room;
+use bomberman\io\Config;
 use bomberman\io\Message;
 use bomberman\logic\javascript\FieldJSLogic;
 use bomberman\logic\javascript\GameJSLogic;
@@ -47,6 +32,18 @@ class PlayerLogic extends BaseLogic
     const EVENT_INIT = 'init';
 
     /**
+     * @return array
+     */
+    public function getEventsAllowedFromClient()
+    {
+        return [
+            self::EVENT_MOVE,
+            self::EVENT_PLAN,
+            self::EVENT_INIT,
+        ];
+    }
+
+    /**
      * @param \stdClass $data
      * @param ClientConnection $sender
      */
@@ -55,12 +52,11 @@ class PlayerLogic extends BaseLogic
         $rooms = $this->context->getData();
         /** @var Room $room */
         $room = $rooms->findRoomBySender($sender->getUuid());
+        $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $rooms->getValues())));
+        $sender->send(json_encode(Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_BOMB_MOVEMENT_SPEED, Config::get(Config::BOMB_MOVEMENT_SPEED))));
         if (!is_null($room) && $room->isStartable()) {
-            $sender->send(json_encode(Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_STARTED, null)));
-            echo ('init');
+            $sender->send(json_encode(Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_STARTED, $room->getMaxPlayers())));
             $sender->send(json_encode(Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())));
-        } else {
-            $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $rooms->getValues())));
         }
     }
 
@@ -73,34 +69,72 @@ class PlayerLogic extends BaseLogic
         $player = $this->context->getData()->findPlayerBySender($sender->getUuid());
         if ($player instanceof Player && $player->canPlayerMove()) {
             $room = $this->context->getData()->findRoomBySender($sender->getUuid());
+            $room->touch();
             $x = -1;
             $y = -1;
+            $x2 = -1;
+            $y2 = -1;
             switch ($data->direction) {
-                case 'w':
+                case '↑':
                     $x = $player->getX() - 1;
+                    $x2 = $player->getX() - 2;
                     $y = $player->getY();
+                    $y2 = $player->getY();
                     break;
-                case 'a';
+                case '←';
                     $x = $player->getx();
+                    $x2 = $player->getx();
                     $y = $player->getY() - 1;
+                    $y2 = $player->getY() - 2;
                     break;
-                case 's':
+                case '↓':
                     $x = $player->getX() + 1;
+                    $x2 = $player->getX() + 2;
                     $y = $player->getY();
+                    $y2 = $player->getY();
                     break;
-                case 'd':
+                case '→':
                     $x = $player->getX();
+                    $x2 = $player->getX();
                     $y = $player->getY() + 1;
+                    $y2 = $player->getY() + 2;
                     break;
             }
             $nextField = $room->getField()->getXY($x, $y);
-            if (!is_null($nextField) && $nextField->canPlayerEnter()) {
-                $room->getField()->moveTo($player, $x, $y);
-                $player->setLastMoved();
-                $this->context->sendToClients($room->getConnectedPlayers(),
-                    Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
-                );
-                $sender->send(json_encode(Message::fromCode(PlayerJSLogic::NAME, PlayerJSLogic::EVENT_NEXT_MOVEMENT, $player->getNextMovement())));
+            $nextNextField = $room->getField()->getXY($x2, $y2);
+            if (!is_null($nextField) && $nextField->canPlayerEnter($player, $nextNextField)) {
+                $movingBombAhead = false;
+                foreach ($nextField->getAllBombs() as $bomb) {
+                    if ($bomb->isMoving()) {
+                        $movingBombAhead = true;
+                        continue;
+                    }
+                    $std = new \stdClass();
+                    $std->bomb = $bomb;
+                    $std->x = $x - $player->getX();
+                    $std->y = $y - $player->getY();
+                    $bomb->setMoving(true);
+                    $this->context->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_MOVE, $std), $sender);
+                }
+                if (!$movingBombAhead) {
+                    $room->getField()->moveTo($player, $x, $y);
+                    $explosions = $nextField->getAllExplosions();
+                    foreach ($explosions as $explosion) {
+                        $nextField->explode($explosion);
+                    }
+                    if (count($explosions) > 0) {
+                        $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_CHECK_FINISH, $room), $sender);
+                    }
+                    foreach ($nextField->getAllItems() as $item) {
+                        $item->consume($player);
+                        $this->context->send(Message::fromCode(ItemLogic::$name, ItemLogic::EVENT_NAME, $item), $sender);
+                    }
+                    $player->setLastMoved();
+                    $this->context->sendToClients($room->getConnectedPlayers(),
+                        Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
+                    );
+                    $sender->send(json_encode(Message::fromCode(PlayerJSLogic::NAME, PlayerJSLogic::EVENT_MOVEMENT_SPEED, $player->getMovementSpeed())));
+                }
             }
         }
     }
@@ -114,11 +148,22 @@ class PlayerLogic extends BaseLogic
         /** @var Room $room */
         $room = $this->context->getData()->findRoomBySender($sender->getUuid());
         if (!is_null($room)) {
+            $room->touch();
             $player = $room->getField()->getFieldCollection()->findPlayerBySender($sender->getUuid());
-            $room->getField()->addTo(new Bomb($player->getX(), $player->getY(), $player->getExplosionSpread()));
-            $this->context->sendToClients($room->getConnectedPlayers(),
-                Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
-            );
+            if ($player->isAlive()) {
+                $playerBombs = $room->getField()->getFieldCollection()->findBombsByPlanter($player->getUuid());
+                if (count($playerBombs) < $player->getBombCount()) {
+                    $bomb = new Bomb($player->getX(), $player->getY(), $player->getExplosionSpread(), $player->getUuid());
+                    $room->getField()->addTo($bomb);
+                    $this->context->sendToClients($room->getConnectedPlayers(),
+                        Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
+                    );
+                    $timer = $this->context->executeAfter(function () use ($bomb, $sender) {
+                        $this->context->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_EXPLODE, $bomb), $sender);
+                    }, Config::get(Config::BOMB_TIMEOUT));
+                    $bomb->setTimer($timer);
+                }
+            }
         }
     }
 
