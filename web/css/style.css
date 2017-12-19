@@ -108,7 +108,39 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #roomList ul {
-    list-style: none;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#roomList li {
+    font-weight: 200;
+    font-size: 18px;
+}
+
+#roomList li:last-child {
+    border: none;
+}
+
+#roomList li a {
+    text-decoration: none;
+    color: #000;
+    -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
+    -moz-transition: font-size 0.3s ease, background-color 0.3s ease;
+    -o-transition: font-size 0.3s ease, background-color 0.3s ease;
+    -ms-transition: font-size 0.3s ease, background-color 0.3s ease;
+    transition: font-size 0.3s ease, background-color 0.3s ease;
+
+}
+
+#roomList li a:hover {
+    font-size: 22px;
+    background: #f6f6f6;
+}
+
+#roomList .leave{
+    color: #8e0000;
+    font-weight: 300;
 }
 
 #connectionLost {

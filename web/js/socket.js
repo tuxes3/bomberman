@@ -340,7 +340,7 @@
                         if (showLeave) {
                             li.append($('<span> - </span>'));
                             li.append($(
-                                '<a href="#" data-unique-id="'+roomList[i].uniqueId+'">Leave</a>'
+                                '<a href="#" class="leave" data-unique-id="'+roomList[i].uniqueId+'">Leave</a>'
                             ).on('click', bomberman_ui.leaveRoom));
                         }
                         ul.append(li);
