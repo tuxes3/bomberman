@@ -55,17 +55,16 @@
         </div>
 
         <div id="arrowControlls">
-            <button onclick="$this.trigger(jQuery.Event( 'keydown', { which: $.ui.keyCode.w } ));">&#8593;</button><br>
-            <button onclick="moveleft()">&#8592;</button>
-            <button onclick="bomb()">&#128163;</button>
-            <button onclick="moveright()">&#8594;</button><br>
-            <button onclick="movedown()">&#8595;</button>
+            <button id="buttonUp" >&#8593;</button><br> <!-- up -->
+            <button id="buttonLeft">&#8592;</button> <!-- left -->
+            <button id="buttonBomb">&#128163;</button> <!-- bomb -->
+            <button id="buttonRight" >&#8594;</button><br> <!-- right -->
+            <button id="buttonDown">&#8595;</button> <!-- down -->
         </div>
 
 
 
         <div id="roomList">
-
         </div>
 
         <div id="connectionLost">
@@ -93,6 +92,7 @@
                 crossorigin="anonymous"></script>
         <script src="js/socket.js">
         </script>
+
     </main>
 
     <a href="#" class="speaker">

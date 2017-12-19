@@ -89,6 +89,11 @@
         init: function () {
             $('#createRoom').on('click', bomberman_ui.createRoom);
             $(document).keydown(bomberman_ui.onKeyDown);
+            $('#buttonLeft').on('click touch', 37, bomberman_ui.onKeyDown);
+            $('#buttonRight').on('click touch',39, bomberman_ui.onKeyDown);
+            $('#buttonDown').on('click touch',40, bomberman_ui.onKeyDown);
+            $('#buttonUp').on('click touch', 38, bomberman_ui.onKeyDown);
+            $('#buttonBomb').on('click touch', 32, bomberman_ui.onKeyDown);
         },
 
         createRoom: function (e) {
@@ -116,18 +121,21 @@
             var dir = '\u2191';
             var keycode = e.which || e.keyCode;
             var _ = bomberman_ui;
-            //console.log("keycode:" + keycode);
+            
+            if(keycode == 1){
+                keycode = e.data;
+            }
 
             // See
             // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/which
             // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_event_key_keycode
             // https://www.key-shortcut.com/schriftsysteme/35-symbole/pfeile/
             if ([87,65,83,68,40,38,37,39].indexOf(keycode) >= 0) {
-                if(keycode == 87 || keycode ==38){
+                if(keycode ==87|| keycode ==38){
                     // UP
                     dir = '\u2191';
                 }
-                if(keycode == 65 || keycode ==37){
+                if(keycode ==65|| keycode ==37){
                     // LEFT
                     dir = '\u2190';
                 }
@@ -258,6 +266,7 @@
                             $('#roomcontrols').show();
                             $('#roomList').show();
                             $('#field').hide();
+                            $('#arrowControlls').hide();
                             if(!isMuted){
                                 endSound.play();
                             }
