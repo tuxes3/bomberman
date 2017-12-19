@@ -371,19 +371,24 @@
                         }
                     }
                     $('.block').addClass('delete');
+                    var hueRotate = 0;
                     for (i = 0; i < field.cells.length; i++) {
                         for (j = 0; j < field.cells[i].length; j++) {
                             var inCells = field.cells[i][j].inCells;
                             for (var r = 0; r < inCells.length; r++) {
-
                                 var inCell = inCells[r];
                                 var inCellDom = $('div[data-id="'+inCell.id+'"]');
                                 // first creation of inCell
                                 if (inCellDom.length === 0) {
+                                    inCellDom = $('<div class="block" data-id="'+inCell.id+'"></div>');
                                     var image = null;
                                     var color = null;
                                     if(inCell.class === 'player' && inCell.alive){
                                         image = 'url("./img/man.gif")';
+                                        console.log("players:");
+                                        console.log(field.players);
+                                        hueRotate = hueRotate+(360/field.players);
+                                        inCellDom.css('filter', 'hue-rotate('+hueRotate +'deg)');
                                     } else
                                     if( inCell.class === 'bomb'){
                                         image = 'url("./img/bomb.gif")';
@@ -417,7 +422,7 @@
                                         image = 'url("./img/kickitemg.gif")';
                                         color = '#c5ffbc';
                                     }
-                                    inCellDom = $('<div class="block" data-id="'+inCell.id+'"></div>');
+
                                     inCellDom.addClass(inCell.class);
                                     inCellDom.css('background-image', image);
                                     inCellDom.css('z-index', inCell.displayPriority);
