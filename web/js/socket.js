@@ -105,6 +105,7 @@
             $('#buttonDown').on('click touch',40, bomberman_ui.onKeyDown);
             $('#buttonUp').on('click touch', 38, bomberman_ui.onKeyDown);
             $('#buttonBomb').on('click touch', 32, bomberman_ui.onKeyDown);
+            $('#arrowControlls').hide(); //hide the controlls at start -->  show them when the game starts
             this.bombAudio = bomberman_ui.initSound('./sound/bomb.mp3');
             this.deadAudio = bomberman_ui.initSound('./sound/dead.mp3');
             this.winAudio = bomberman_ui.initSound('./sound/tada.mp3');
