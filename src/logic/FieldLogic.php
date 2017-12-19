@@ -11,7 +11,6 @@
 
 namespace bomberman\logic;
 
-use bomberman\components\Field;
 use bomberman\components\field\Block;
 use bomberman\components\field\FixBlock;
 use bomberman\components\field\FieldCell;

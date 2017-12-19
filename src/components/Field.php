@@ -15,6 +15,10 @@ use bomberman\components\field\FieldCell;
 use bomberman\components\field\InCell;
 use bomberman\io\FieldCollection;
 
+/**
+ * Class Field
+ * @package bomberman\components
+ */
 class Field implements \JsonSerializable
 {
 

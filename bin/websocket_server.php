@@ -32,6 +32,7 @@ function milliseconds() {
     return ((int)$mt[1]) * 1000 + ((int)round($mt[0] * 1000));
 }
 
+// restore rooms.json incase of websocket failure
 $backupManager = new BackupManager();
 $roomCollection = $backupManager->restore();
 if (!$roomCollection instanceof RoomCollection) {

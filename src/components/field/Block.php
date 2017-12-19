@@ -11,6 +11,10 @@
 
 namespace bomberman\components\field;
 
+/**
+ * Class Block
+ * @package bomberman\components\field
+ */
 class Block extends BaseInCell
 {
 

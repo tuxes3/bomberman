@@ -43,6 +43,9 @@ class Message implements \JsonSerializable
      */
     private $fromClient;
 
+    /**
+     * Message constructor.
+     */
     private function __construct()
     {
     }

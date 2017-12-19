@@ -28,6 +28,7 @@ use React\EventLoop\LoopInterface;
 
 /**
  * Class BombermanWebsocket
+ * @package bomberman
  */
 class BombermanWebsocket implements MessageComponentInterface, Context
 {
@@ -155,7 +156,6 @@ class BombermanWebsocket implements MessageComponentInterface, Context
      */
     function onError(ConnectionInterface $conn, \Exception $e)
     {
-        // TODO:
         print_r($e);
     }
 

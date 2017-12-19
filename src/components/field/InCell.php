@@ -11,6 +11,10 @@
 
 namespace bomberman\components\field;
 
+/**
+ * Interface InCell
+ * @package bomberman\components\field
+ */
 interface InCell
 {
 

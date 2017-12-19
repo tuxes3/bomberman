@@ -16,6 +16,10 @@ use bomberman\io\Message;
 use bomberman\logic\ClientConnection;
 use Ratchet\ConnectionInterface;
 
+/**
+ * Interface Context
+ * @package bomberman
+ */
 interface Context
 {
 

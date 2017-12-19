@@ -13,6 +13,10 @@ namespace bomberman\io;
 
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Class Config
+ * @package bomberman\io
+ */
 class Config
 {
 

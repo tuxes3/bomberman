@@ -16,6 +16,10 @@ use bomberman\io\Message;
 use bomberman\logic\javascript\MessageJSLogic;
 use Ratchet\ConnectionInterface;
 
+/**
+ * Class BaseLogic
+ * @package bomberman\logic
+ */
 abstract class BaseLogic
 {
 

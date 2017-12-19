@@ -11,6 +11,10 @@
 
 namespace bomberman\components\field;
 
+/**
+ * Class BaseInCell
+ * @package bomberman\components\field
+ */
 abstract class BaseInCell implements InCell, \JsonSerializable
 {
 
@@ -31,6 +35,11 @@ abstract class BaseInCell implements InCell, \JsonSerializable
      */
     protected $id;
 
+    /**
+     * BaseInCell constructor.
+     * @param $x
+     * @param $y
+     */
     public function __construct($x, $y)
     {
         $this->x = $x;

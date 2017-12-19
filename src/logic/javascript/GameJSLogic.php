@@ -11,7 +11,11 @@
 
 namespace bomberman\logic\javascript;
 
-class GameJSLogic
+/**
+ * Interface GameJSLogic
+ * @package bomberman\logic\javascript
+ */
+interface GameJSLogic
 {
 
     const NAME = 'game_js';
