@@ -48,10 +48,14 @@ class Field implements \JsonSerializable
         return null;
     }
 
+    /**
+     * @return array
+     */
     public function jsonSerialize()
     {
         return [
-            'cells' => $this->cells
+            'players' => $this->maxPlayers,
+            'cells' => $this->cells,
         ];
     }
 
