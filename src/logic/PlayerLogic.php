@@ -150,17 +150,19 @@ class PlayerLogic extends BaseLogic
         if (!is_null($room)) {
             $room->touch();
             $player = $room->getField()->getFieldCollection()->findPlayerBySender($sender->getUuid());
-            $playerBombs = $room->getField()->getFieldCollection()->findBombsByPlanter($player->getUuid());
-            if (count($playerBombs) < $player->getBombCount()) {
-                $bomb = new Bomb($player->getX(), $player->getY(), $player->getExplosionSpread(), $player->getUuid());
-                $room->getField()->addTo($bomb);
-                $this->context->sendToClients($room->getConnectedPlayers(),
-                    Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
-                );
-                $timer = $this->context->executeAfter(function () use ($bomb, $sender) {
-                    $this->context->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_EXPLODE, $bomb), $sender);
-                }, Config::get(Config::BOMB_TIMEOUT));
-                $bomb->setTimer($timer);
+            if ($player->isAlive()) {
+                $playerBombs = $room->getField()->getFieldCollection()->findBombsByPlanter($player->getUuid());
+                if (count($playerBombs) < $player->getBombCount()) {
+                    $bomb = new Bomb($player->getX(), $player->getY(), $player->getExplosionSpread(), $player->getUuid());
+                    $room->getField()->addTo($bomb);
+                    $this->context->sendToClients($room->getConnectedPlayers(),
+                        Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
+                    );
+                    $timer = $this->context->executeAfter(function () use ($bomb, $sender) {
+                        $this->context->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_EXPLODE, $bomb), $sender);
+                    }, Config::get(Config::BOMB_TIMEOUT));
+                    $bomb->setTimer($timer);
+                }
             }
         }
     }

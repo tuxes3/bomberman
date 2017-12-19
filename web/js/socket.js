@@ -301,17 +301,17 @@
                             text = text + 'lose!';
                             endSound = bomberman_ui.loseAudio
                         }
-                        window.setTimeout(function(){
-                            swal(text);
-                            $('#roomcontrols').show();
-                            $('#roomList').show();
-                            $('#field').hide();
-                            $('#arrowControlls').hide();
-                            if(!bomberman_storage.getMuted()){
-                                endSound.play();
-                            }
-                        }, 700);  // give the player some time to realize he died
                     }
+                    window.setTimeout(function(){
+                        swal(text);
+                        $('#roomcontrols').show();
+                        $('#roomList').show();
+                        $('#field').hide();
+                        $('#arrowControlls').hide();
+                        if(!bomberman_storage.getMuted()){
+                            endSound.play();
+                        }
+                    }, 700);  // give the player some time to realize he died
                 },
 
                 bombMovementSpeed: function (bombMovementSpeed) {

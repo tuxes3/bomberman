@@ -56,11 +56,11 @@ $server->loop->addPeriodicTimer(Config::get(Config::ROOM_EXPIRATION_SECONDS), fu
         $std = new \stdClass();
         $std->room = $room;
         $std->inactivity = true;
-        $bombermanWebsocket->send(Message::fromCode(RoomLogic::$name, RoomLogic::EVENT_CLOSE, $std), null);
         $bombermanWebsocket->sendToClients(
             $room->getConnectedPlayers(),
             Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_FINISHED, null)
         );
+        $bombermanWebsocket->send(Message::fromCode(RoomLogic::$name, RoomLogic::EVENT_CLOSE, $std), null);
     }
 });
 
