@@ -77,6 +77,8 @@
 
         bombAudio: new Audio('./sound/bomb.mp3'),
         deadAudio: new Audio('./sound/dead.mp3'),
+        winAudio: new Audio('./sound/tada.mp3'),
+        loseAudio: new Audio('./sound/lose.mp3'),
 
         bombMovementSpeed: 600,     // some init value. both will be overwritten
         movementSpeed: 300,         //
@@ -87,6 +89,11 @@
         init: function () {
             $('#createRoom').on('click', bomberman_ui.createRoom);
             $(document).keydown(bomberman_ui.onKeyDown);
+            $('#buttonLeft').on('click touch', 37, bomberman_ui.onKeyDown);
+            $('#buttonRight').on('click touch',39, bomberman_ui.onKeyDown);
+            $('#buttonDown').on('click touch',40, bomberman_ui.onKeyDown);
+            $('#buttonUp').on('click touch', 38, bomberman_ui.onKeyDown);
+            $('#buttonBomb').on('click touch', 32, bomberman_ui.onKeyDown);
         },
 
         createRoom: function (e) {
@@ -114,18 +121,21 @@
             var dir = '\u2191';
             var keycode = e.which || e.keyCode;
             var _ = bomberman_ui;
-            //console.log("keycode:" + keycode);
+            
+            if(keycode == 1){
+                keycode = e.data;
+            }
 
             // See
             // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/which
             // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_event_key_keycode
             // https://www.key-shortcut.com/schriftsysteme/35-symbole/pfeile/
             if ([87,65,83,68,40,38,37,39].indexOf(keycode) >= 0) {
-                if(keycode == 87 || keycode ==38){
+                if(keycode ==87|| keycode ==38){
                     // UP
                     dir = '\u2191';
                 }
-                if(keycode == 65 || keycode ==37){
+                if(keycode ==65|| keycode ==37){
                     // LEFT
                     dir = '\u2190';
                 }
@@ -232,16 +242,35 @@
                     $('#roomList').hide();
                     $('#field').empty();
                     $('#field').show();
+                    
+                    if(is_touch_device()){
+                      $('#arrowControlls').show();
+                    }
                 },
 
                 finished: function (data) {
                     console.log('finished');
-                    $('#roomcontrols').show();
-                    $('#roomList').show();
-                    $('#field').hide();
+                    var endSound;
                     // null: close due to inactivity
                     if (data !== null) {
-                        var text = 'You ' + (data.won ? 'won' : 'lose') + '!';
+                        var text = 'You ';
+                        if(data.won){
+                            text = text + "win!";
+                            endSound =bomberman_ui.winAudio;
+                        }else{
+                            text = text +"lose!"
+                            endSound = bomberman_ui.loseAudio
+                        }
+                        window.setTimeout(function(){
+                            swal(text);
+                            $('#roomcontrols').show();
+                            $('#roomList').show();
+                            $('#field').hide();
+                            $('#arrowControlls').hide();
+                            if(!isMuted){
+                                endSound.play();
+                            }
+                        }, 700);  // give the player some time to realize he died
                         console.log(text);
                     }
                 },
@@ -316,7 +345,9 @@
                                     } else
                                     if(inCell.class === 'explosion'){
                                         image = 'url("./img/explosion.gif")';
-                                        bomberman_ui.bombAudio.play();
+                                        if(!isMuted){
+                                            bomberman_ui.bombAudio.play();
+                                        }
                                     } else
                                     if(inCell.class === 'bombitem'){
                                         image = 'url("./img/twobomb.gif")';
@@ -349,7 +380,9 @@
                                 if (inCell.class === 'player' && !inCell.alive) {
                                     inCellDom.css('background-image', 'url("./img/rip.gif")');
                                     if (!inCellDom.data('deadPlayed')) {
-                                        bomberman_ui.deadAudio.play();
+                                        if(!isMuted) {
+                                            bomberman_ui.deadAudio.play();
+                                        }
                                         inCellDom.data('deadPlayed', true);
                                     }
                                 }

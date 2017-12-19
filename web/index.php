@@ -18,9 +18,12 @@
     <meta name="keywords" content="Checker Bomberman Web Projekt BFH" />
     <meta name="author" content="Singer Nicolo & Mueller, Lukas" />
     <meta name="Robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/sweetalert2.min.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <script src="js/sweetalert2.all.js"></script>
 </head>
 
 <body>
@@ -32,7 +35,8 @@
     </noscript>
 
     <header id="header">
-        <h1>Checker-Bomberman Game - Web Project BTI7054</h1>
+        <h1>Checker-Bomberman</h1>
+        <h4>Web Project BTI7054</h4>
     </header>
 
     <main id="main">
@@ -50,13 +54,22 @@
 
         </div>
 
-        <div id="roomList">
+        <div id="arrowControlls">
+            <button id="buttonUp" >&#8593;</button><br> <!-- up -->
+            <button id="buttonLeft">&#8592;</button> <!-- left -->
+            <button id="buttonBomb">&#128163;</button> <!-- bomb -->
+            <button id="buttonRight" >&#8594;</button><br> <!-- right -->
+            <button id="buttonDown">&#8595;</button> <!-- down -->
+        </div>
 
+
+
+        <div id="roomList">
         </div>
 
         <div id="connectionLost">
             <img height="500px" src="img/bomb-loading.svg" alt="bouncing bomb"/>
-            <h1>Reconnection ...</h1>
+            <h1>Reconnecting ...</h1>
         </div>
         <script type="text/javascript">
             const BOMBERMAN_WEBSOCKET_URL = '<?php
@@ -81,6 +94,27 @@
         </script>
 
     </main>
+
+    <a href="#" class="speaker">
+        <span></span>
+    </a>
+    <script>
+        $('#arrowControlls').hide();
+
+        var isMuted = false;
+        $('.speaker').click(function(e) {
+            e.preventDefault();
+            $(this).toggleClass('mute');
+            isMuted = !isMuted;
+        });
+
+        // check if browsers supports touch
+        function is_touch_device() {
+            return 'ontouchstart' in window        // works on most browsers
+            || navigator.maxTouchPoints;       // works on IE10/11 and Surface
+        };
+
+    </script>
 
     <footer id="footer">
         <div id="footer-main">
