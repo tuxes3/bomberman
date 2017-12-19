@@ -70,15 +70,26 @@
                 localStorage.userId = Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36); // uuid
             }
             return localStorage.userId;
+        },
+
+        getMuted: function () {
+            if (localStorage.muted == null) {
+                localStorage.muted = false;
+            }
+            return localStorage.muted === 'true';
+        },
+
+        setMuted: function (muted) {
+            localStorage.muted = muted;
         }
     };
 
     var bomberman_ui = {
 
-        bombAudio: new Audio('./sound/bomb.mp3'),
-        deadAudio: new Audio('./sound/dead.mp3'),
-        winAudio: new Audio('./sound/tada.mp3'),
-        loseAudio: new Audio('./sound/lose.mp3'),
+        bombAudio: null,
+        deadAudio: null,
+        winAudio: null,
+        loseAudio: null,
 
         bombMovementSpeed: 600,     // some init value. both will be overwritten
         movementSpeed: 300,         //
@@ -94,6 +105,35 @@
             $('#buttonDown').on('click touch',40, bomberman_ui.onKeyDown);
             $('#buttonUp').on('click touch', 38, bomberman_ui.onKeyDown);
             $('#buttonBomb').on('click touch', 32, bomberman_ui.onKeyDown);
+            this.bombAudio = bomberman_ui.initSound('./sound/bomb.mp3');
+            this.deadAudio = bomberman_ui.initSound('./sound/dead.mp3');
+            this.winAudio = bomberman_ui.initSound('./sound/tada.mp3');
+            this.loseAudio = bomberman_ui.initSound('./sound/lose.mp3');
+            var speaker = $('#speaker');
+            speaker.on('click touch', bomberman_ui.toggleMute);
+            if (bomberman_storage.getMuted()) {
+                speaker.addClass('mute');
+            }
+        },
+
+        initSound: function (path) {
+            var sound = new Audio();
+            var source = document.createElement('source');
+            source.type = 'audio/mpeg';
+            source.src = path;
+            sound.appendChild(source);
+            return sound;
+        },
+
+        isTouchDevice: function () {
+            return 'ontouchstart' in window        // works on most browsers
+                || navigator.maxTouchPoints;       // works on IE10/11 and Surface
+        },
+
+        toggleMute: function (e) {
+            e.preventDefault();
+            bomberman_storage.setMuted(!bomberman_storage.getMuted());
+            $('#speaker').toggleClass('mute');
         },
 
         createRoom: function (e) {
@@ -121,7 +161,7 @@
             var dir = '\u2191';
             var keycode = e.which || e.keyCode;
             var _ = bomberman_ui;
-            
+
             if(keycode == 1){
                 keycode = e.data;
             }
@@ -237,28 +277,26 @@
         handler: {
             game_js: {
                 started: function (data) {
-                    console.log('started');
                     $('#roomcontrols').hide();
                     $('#roomList').hide();
                     $('#field').empty();
                     $('#field').show();
                     
-                    if(is_touch_device()){
+                    if(bomberman_ui.isTouchDevice()){
                       $('#arrowControlls').show();
                     }
                 },
 
                 finished: function (data) {
-                    console.log('finished');
                     var endSound;
                     // null: close due to inactivity
                     if (data !== null) {
                         var text = 'You ';
                         if(data.won){
-                            text = text + "win!";
-                            endSound =bomberman_ui.winAudio;
+                            text = text + 'win!';
+                            endSound = bomberman_ui.winAudio;
                         }else{
-                            text = text +"lose!"
+                            text = text + 'lose!';
                             endSound = bomberman_ui.loseAudio
                         }
                         window.setTimeout(function(){
@@ -267,11 +305,10 @@
                             $('#roomList').show();
                             $('#field').hide();
                             $('#arrowControlls').hide();
-                            if(!isMuted){
+                            if(!bomberman_storage.getMuted()){
                                 endSound.play();
                             }
                         }, 700);  // give the player some time to realize he died
-                        console.log(text);
                     }
                 },
 
@@ -286,7 +323,6 @@
                     $('#connectionLost').css('display', 'none');
                     var roomListDiv = $('#roomList');
                     roomListDiv.empty();
-                    console.log(roomList);
                     for (var i = 0; i < roomList.length; i++) {
                         roomListDiv.append($(
                             '<a href="#" data-unique-id="'+roomList[i].uniqueId+'">Room #'+i+': '+roomList[i].name+' ('+roomList[i].connectedPlayers+'/'+roomList[i].maxPlayers+')</a>'
@@ -302,16 +338,15 @@
 
             message_js: {
                 warning: function (message) {
-                    console.log(message);
+                    swal(message);
                 },
                 info: function (message) {
-                    console.log(message);
+                    swal(message);
                 }
             },
 
             field_js: {
                 update: function (field) {
-                    console.log({event: 'field_js.update', field: field});
                     var fieldDiv = $('#field');
                     if (fieldDiv.find('div').length === 0) {
                         // init map creation
@@ -345,8 +380,9 @@
                                     } else
                                     if(inCell.class === 'explosion'){
                                         image = 'url("./img/explosion.gif")';
-                                        if(!isMuted){
-                                            bomberman_ui.bombAudio.play();
+                                        if(!bomberman_storage.getMuted()){
+                                            // so that we have mutliple explosion ;)
+                                            bomberman_ui.bombAudio.cloneNode(true).play();
                                         }
                                     } else
                                     if(inCell.class === 'bombitem'){
@@ -380,7 +416,7 @@
                                 if (inCell.class === 'player' && !inCell.alive) {
                                     inCellDom.css('background-image', 'url("./img/rip.gif")');
                                     if (!inCellDom.data('deadPlayed')) {
-                                        if(!isMuted) {
+                                        if(!bomberman_storage.getMuted()) {
                                             bomberman_ui.deadAudio.play();
                                         }
                                         inCellDom.data('deadPlayed', true);

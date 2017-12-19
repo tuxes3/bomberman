@@ -71,8 +71,22 @@
             <img height="500px" src="img/bomb-loading.svg" alt="bouncing bomb"/>
             <h1>Reconnecting ...</h1>
         </div>
-        <script type="text/javascript">
-            const BOMBERMAN_WEBSOCKET_URL = '<?php
+    </main>
+
+    <a href="#" id="speaker">
+        <span></span>
+    </a>
+
+    <footer id="footer">
+        <div id="footer-main">
+            &copy; Nicolo Singer & Lukas Müller <br />
+            Kindly hosted by <a href="https://whatwedo.ch">whatwedo.ch</a>
+        </div>
+        <span id="github"><a target="_blank" href="https://github.com/tuxes3/bomberman"><img src="img/github.png"></a></span>
+    </footer>
+
+    <script type="text/javascript">
+        const BOMBERMAN_WEBSOCKET_URL = '<?php
             $webSocketPath = isset($_SERVER['WEBSOCKET_PATH']) ? $_SERVER['WEBSOCKET_PATH'] : ':8009';
             $host = $_SERVER['HTTP_HOST'];
             if (strpos($host, ':') !== false) {
@@ -84,45 +98,13 @@
                 echo 'ws://' . $host . $webSocketPath;
             }
             ?>';
-        </script>
-
-        <script
-                src="https://code.jquery.com/jquery-3.2.1.min.js"
-                integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-                crossorigin="anonymous"></script>
-        <script src="js/socket.js">
-        </script>
-
-    </main>
-
-    <a href="#" class="speaker">
-        <span></span>
-    </a>
-    <script>
-        $('#arrowControlls').hide();
-
-        var isMuted = false;
-        $('.speaker').click(function(e) {
-            e.preventDefault();
-            $(this).toggleClass('mute');
-            isMuted = !isMuted;
-        });
-
-        // check if browsers supports touch
-        function is_touch_device() {
-            return 'ontouchstart' in window        // works on most browsers
-            || navigator.maxTouchPoints;       // works on IE10/11 and Surface
-        };
-
     </script>
 
-    <footer id="footer">
-        <div id="footer-main">
-            &copy; Nicolo Singer & Lukas Müller <br />
-            Kindly hosted by <a href="https://whatwedo.ch">whatwedo.ch</a>
-        </div>
-        <span id="github"><a target="_blank" href="https://github.com/tuxes3/bomberman"><img src="img/github.png"></a></span>
-    </footer>
-
+    <script
+            src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+    <script src="js/socket.js">
+    </script>
 </body>
 </html>

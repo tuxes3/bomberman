@@ -123,7 +123,7 @@ h1, h2, h3, h4, h5, h6 {
 /*============ Fancy mute button with css only  ============*/
 /* https://codepen.io/MarvinVK/pen/FgAht */
 
-.speaker {
+#speaker {
     height: 30px;
     width: 30px;
     position: fixed;
@@ -132,14 +132,14 @@ h1, h2, h3, h4, h5, h6 {
     overflow: hidden;
     display: inline-block;
 }
-.speaker span {
+#speaker span {
     display: block;
     width: 8px;
     height: 8px;
     background: #05144f;
     margin: 11px 0 0 2px;
 }
-.speaker span:after {
+#speaker span:after {
     content: '';
     position: absolute;
     width: 0;
@@ -150,7 +150,7 @@ h1, h2, h3, h4, h5, h6 {
     left: -13px;
     top: 5px;
 }
-.speaker span:before {
+#speaker span:before {
     transform: rotate(45deg);
     border-radius: 0 50px 0 0;
     content: '';
@@ -164,15 +164,15 @@ h1, h2, h3, h4, h5, h6 {
     top: 9px;
     transition: all 0.2s ease-out;
 }
-.speaker:hover span:before {
+#speaker:hover span:before {
     transform: scale(0.8) translate(-3px, 0) rotate(42deg);
 }
-.speaker.mute span:before {
+#speaker.mute span:before {
     transform: scale(0.5) translate(-15px, 0) rotate(36deg);
     opacity: 0;
 }
 
-.speaker.mute span::before {
+#speaker.mute span::before {
         transform: scale(.5) translate(-15px, 0) rotate(36deg);
         opacity: 0;
 }
@@ -199,15 +199,6 @@ h1, h2, h3, h4, h5, h6 {
 
 /*============ SMARTPHONE BUTTONS============*/
 
-#arrowControlls{
-    margin-bottom: 10px;
-}
-
-#arrowControlls button{
-    margin: 4px;
-    width: 40px;
-    height: 40px;
-}
 
 /*if landscape then float the buttons to the side */
 @media (orientation: landscape) {
@@ -218,4 +209,15 @@ h1, h2, h3, h4, h5, h6 {
         display: inline-block;
         margin-bottom: 10px;
     }
+}
+
+#arrowControlls{
+    display: none;
+    margin-bottom: 10px;
+}
+
+#arrowControlls button{
+    margin: 4px;
+    width: 40px;
+    height: 40px;
 }

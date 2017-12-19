@@ -110,9 +110,13 @@ class RoomLogic extends BaseLogic
      */
     protected function join($data, ClientConnection $sender)
     {
-        $isInRoom = !is_null($this->context->getData()->findRoomBySender($sender->getUuid()));
-        if ($isInRoom) {
-            $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'You can only be in one room');
+        $room = ($this->context->getData()->findRoomBySender($sender->getUuid()));
+        if (!is_null($room)) {
+            if ($room->getUniqueId() == $data->uniqueId) {
+                $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'You already are in this room');
+            } else {
+                $return = Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_INFO, 'You can only be in one room');
+            }
         } else {
             $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);
             $return = null;
