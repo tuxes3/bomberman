@@ -277,6 +277,7 @@
         handler: {
             game_js: {
                 started: function (data) {
+                    swal.close();
                     $('#roomcontrols').hide();
                     $('#roomList').hide();
                     $('#field').empty();
@@ -323,16 +324,27 @@
                     $('#connectionLost').css('display', 'none');
                     var roomListDiv = $('#roomList');
                     roomListDiv.empty();
+                    var ul = $('<ul></ul>');
                     for (var i = 0; i < roomList.length; i++) {
-                        roomListDiv.append($(
+                        var li = $('<li></li>');
+                        li.append($(
                             '<a href="#" data-unique-id="'+roomList[i].uniqueId+'">Room #'+i+': '+roomList[i].name+' ('+roomList[i].connectedPlayers+'/'+roomList[i].maxPlayers+')</a>'
                         ).on('click', bomberman_ui.joinRoom));
-                        roomListDiv.append($('<span> - </span>'));
-                        roomListDiv.append($(
-                            '<a href="#" data-unique-id="'+roomList[i].uniqueId+'">Leave</a>'
-                        ).on('click', bomberman_ui.leaveRoom));
-                        roomListDiv.append('<br />');
+                        var showLeave = false;
+                        for (var key in roomList[i].players){
+                            if (roomList[i].players.hasOwnProperty(key)) {
+                                showLeave = showLeave || roomList[i].players[key] === bomberman_storage.getUuid();
+                            }
+                        }
+                        if (showLeave) {
+                            li.append($('<span> - </span>'));
+                            li.append($(
+                                '<a href="#" data-unique-id="'+roomList[i].uniqueId+'">Leave</a>'
+                            ).on('click', bomberman_ui.leaveRoom));
+                        }
+                        ul.append(li);
                     }
+                    roomListDiv.append(ul);
                 }
             },
 

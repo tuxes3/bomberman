@@ -59,6 +59,9 @@ class FieldLogic extends BaseLogic
             // send finish
             foreach ($room->getConnectedPlayers() as $uuid) {
                 $player = $room->getField()->getFieldCollection()->findPlayerBySender($uuid);
+                if (is_null($player)) {
+                    continue;
+                }
                 $data = new \stdClass();
                 $data->won = $player->isAlive();
                 $this->context->sendToClients(

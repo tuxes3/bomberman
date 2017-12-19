@@ -86,6 +86,7 @@ class Room implements \JsonSerializable
             'connectedPlayers' => count($this->connectedPlayers),
             'uniqueId' => $this->uniqueId,
             'name' => $this->name,
+            'players' => $this->connectedPlayers,
         ];
     }
 
