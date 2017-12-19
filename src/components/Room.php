@@ -103,6 +103,10 @@ class Room implements \JsonSerializable
             return sprintf('The room (%s) is already full.', $this->uniqueId);
         }
         $this->connectedPlayers[] = $playerId;
+        // uncomment for 9 dummy players
+        //for ($i = 0; $i < 9; $i++) {
+        //    $this->connectedPlayers[] = $i.'dummy-test-player';
+        //}
         return true;
     }
 

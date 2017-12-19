@@ -18,12 +18,12 @@
     <meta name="keywords" content="Checker Bomberman Web Projekt BFH" />
     <meta name="author" content="Singer Nicolo & Mueller, Lukas" />
     <meta name="Robots" content="index, follow">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/sweetalert2.min.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <script src="js/sweetalert2.all.js"></script>
+    <meta id="Viewport"name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>

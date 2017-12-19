@@ -230,7 +230,7 @@ class FieldLogic extends BaseLogic
         $room->getField()->setCells($cells);
         $this->context->sendToClients(
             $room->getConnectedPlayers(),
-            Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_STARTED, null)
+            Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_STARTED, $room->getMaxPlayers())
         );
         $this->updateClients($data, $sender);
     }

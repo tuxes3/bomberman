@@ -117,6 +117,17 @@
             }
         },
 
+        setMinViewPort: function (players) {
+            var ww = ($(window).width() < window.screen.width) ? $(window).width() : window.screen.width; //get proper width
+            var mw = 200 + (players * 100); // min width of site
+            var ratio = ww / mw; //calculate ratio
+            if (ww < mw) { //smaller than minimum size
+                $('#Viewport').attr('content', 'initial-scale=' + ratio + ', maximum-scale=' + ratio + ', minimum-scale=' + ratio + ', user-scalable=yes, width=' + ww);
+            } else { //regular size
+                $('#Viewport').attr('content', 'initial-scale=1.0, maximum-scale=2, minimum-scale=1.0, user-scalable=yes, width=' + ww);
+            }
+        },
+
         initSound: function (path) {
             var sound = new Audio();
             var source = document.createElement('source');
@@ -283,9 +294,9 @@
                     $('#roomList').hide();
                     $('#field').empty();
                     $('#field').show();
-                    
                     if(bomberman_ui.isTouchDevice()){
-                      $('#arrowControlls').show();
+                        bomberman_ui.setMinViewPort(data);
+                        $('#arrowControlls').show();
                     }
                 },
 
