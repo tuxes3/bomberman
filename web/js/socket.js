@@ -302,6 +302,18 @@
 
                 finished: function (data) {
                     var endSound;
+                    var _call = function(text){
+                        if (text != null) {
+                            swal(text);
+                        }
+                        $('#roomcontrols').show();
+                        $('#roomList').show();
+                        $('#field').hide();
+                        $('#arrowControlls').hide();
+                        if(!bomberman_storage.getMuted()){
+                            endSound.play();
+                        }
+                    };
                     // null: close due to inactivity
                     if (data !== null) {
                         var text = 'You ';
@@ -312,17 +324,11 @@
                             text = text + 'lose!';
                             endSound = bomberman_ui.loseAudio
                         }
+                        window.setTimeout(function(){_call(text);}, 700); // give the player some time to realize he died
+                    } else {
+                        _call(null);
                     }
-                    window.setTimeout(function(){
-                        swal(text);
-                        $('#roomcontrols').show();
-                        $('#roomList').show();
-                        $('#field').hide();
-                        $('#arrowControlls').hide();
-                        if(!bomberman_storage.getMuted()){
-                            endSound.play();
-                        }
-                    }, 700);  // give the player some time to realize he died
+
                 },
 
                 bombMovementSpeed: function (bombMovementSpeed) {
