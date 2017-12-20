@@ -67,9 +67,13 @@ class RoomLogic extends BaseLogic
         $uniqueId = $this->context->getData()->getFreeUniqueId();
         $roomSize = $data->maxPlayers;
         $maxRoomsPerPlayer = Config::get(Config::MAX_ROOMS_PER_PLAYER);
+        $roomSize = intval($roomSize);
         if ($roomSize > 10) {
             $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Cannot create room with more than 10 players.')));
-        } elseif ($this->context->getData()->findByCreatedBy($sender->getUuid())->count() >= $maxRoomsPerPlayer) {
+        } elseif ($roomSize < 1) {
+            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Cannot create room with less than 1 players.')));
+        }
+        elseif ($this->context->getData()->findByCreatedBy($sender->getUuid())->count() >= $maxRoomsPerPlayer) {
             $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, sprintf('You cannot create more than %s rooms', $maxRoomsPerPlayer))));
         } else {
             $room = new Room($roomSize, $uniqueId, $data->name, $sender->getUuid());
