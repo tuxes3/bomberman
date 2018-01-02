@@ -1,3 +1,12 @@
+/*
+ * This file is part of the bomberman project.
+ *
+ * @author Nicolo Singer tuxes3@outlook.com
+ * @author Lukas Müller computer_bastler@hotmail.com
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 (function($) {
 
     var bomberman_socket_request = {
@@ -84,6 +93,119 @@
         }
     };
 
+    var bomberman_stage = {
+
+        // const
+        BASE_SIZE: 64,
+
+        // Aliases
+        Application: PIXI.Application,
+        loader: PIXI.loader,
+        resources: PIXI.loader.resources,
+        Sprite: PIXI.Sprite,
+        Stage: PIXI.display.Stage,
+        Group: PIXI.display.Group,
+        Layer: PIXI.display.Layer,
+        Container: PIXI.Container,
+
+        app: null,
+        parentGroup: null,
+        sprites: {},
+        elementContainer: null,
+        animations: [],
+
+        init: function () {
+            this.loader
+                .add('block', 'img/block.gif')
+                .add('bomb', 'img/bomb.gif')
+                .add('explosionradiusitem', 'img/bombsize_lvlup.gif')
+                .add('explosion', 'img/explosion.gif')
+                .add('fixblock', 'img/fixBlock.gif')
+                .add('movebombitem', 'img/kickitemg.gif')
+                .add('player', 'img/man.gif')
+                .add('rip', 'img/rip.gif')
+                .add('shoeitem', 'img/shoe.gif')
+                .add('bombitem', 'img/twobomb.gif')
+                .on('progress', bomberman_ui.loadProgressHandler)
+                .load(bomberman_stage.setup);
+        },
+
+        initView: function (fieldDimension) {
+            var screenDimension = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, []);
+            var squareLength = screenDimension.width > screenDimension.height ? screenDimension.height : screenDimension.width;
+            squareLength = squareLength - 150; // footer & header
+            var scale = squareLength / (fieldDimension.width * this.BASE_SIZE);
+            if (scale > 1.1) {
+                scale = 1.1;
+            }
+            this.app = new bomberman_stage.Application({
+                width: fieldDimension.width * this.BASE_SIZE * scale,
+                height: fieldDimension.height * this.BASE_SIZE * scale,
+                transparent: true
+            });
+            var field = $('#field');
+            field.empty();
+            field.append(this.app.view);
+            this.app.stage = new bomberman_stage.Stage();
+            this.app.stage.scale.x = scale;
+            this.app.stage.scale.y = scale;
+            this.app.stage.group.enableSort = true;
+            this.parentGroup = new bomberman_stage.Group(0, true);
+            this.elementContainer = new bomberman_stage.Container();
+            this.app.stage.addChild(new bomberman_stage.Layer(this.parentGroup));
+            this.app.stage.addChild(bomberman_stage.elementContainer);
+            this.app.ticker.add(bomberman_stage.update);
+        },
+
+        setup: function () {
+            $('#loading').hide();
+            bomberman_socket.init();
+            bomberman_ui.init();
+        },
+
+        update: function (delta) {
+            for (var id in bomberman_stage.animations) {
+                if (bomberman_stage.animations.hasOwnProperty(id)) {
+                    var anim = bomberman_stage.animations[id];
+                    var diff = null;
+                    if (anim.sprite.x === anim.newX) {
+                        diff = Math.abs(anim.sprite.y - anim.newY);
+                    } else {
+                        diff = Math.abs(anim.sprite.x - anim.newX);
+                    }
+                    if (anim.lastDiff < diff || diff < 5) {
+                        anim.sprite.x = anim.newX;
+                        anim.sprite.y = anim.newY;
+                        bomberman_stage.animations.splice(id, 1);
+                    } else {
+                        anim.sprite.x += anim.stepX;
+                        anim.sprite.y += anim.stepY;
+                        anim.lastDiff = diff;
+                    }
+                }
+            }
+        },
+
+        moveAnimate: function (id, sprite, newX, newY, duration) {
+            var stepX = (newX - sprite.x) / (duration / (1000 / 60));
+            var stepY = (newY - sprite.y) / (duration / (1000 / 60));
+            if (id in bomberman_stage.animations) {
+                var anim = bomberman_stage.animations[id];
+                anim.sprite.x = anim.newX;
+                anim.sprite.y = anim.newY;
+                bomberman_stage.animations.splice(id, 1);
+            }
+            bomberman_stage.animations[id] = {
+                sprite: sprite,
+                newX: newX,
+                newY: newY,
+                stepX: stepX,
+                stepY: stepY,
+                lastDiff: 10000
+            };
+        }
+    };
+
     var bomberman_ui = {
 
         bombAudio: null,
@@ -117,15 +239,8 @@
             }
         },
 
-        setMinViewPort: function (players) {
-            var ww = ($(window).width() < window.screen.width) ? $(window).width() : window.screen.width; //get proper width
-            var mw = 200 + (players * 100); // min width of site
-            var ratio = ww / mw; //calculate ratio
-            if (ww < mw) { //smaller than minimum size
-                $('#Viewport').attr('content', 'initial-scale=' + ratio + ', maximum-scale=' + ratio + ', minimum-scale=' + ratio + ', user-scalable=yes, width=' + ww);
-            } else { //regular size
-                $('#Viewport').attr('content', 'initial-scale=1.0, maximum-scale=2, minimum-scale=1.0, user-scalable=yes, width=' + ww);
-            }
+        loadProgressHandler: function (loader, resource) {
+            $('#loading-percent').text(loader.progress);
         },
 
         initSound: function (path) {
@@ -174,7 +289,7 @@
             var keycode = e.which || e.keyCode;
             var _ = bomberman_ui;
 
-            if(keycode == 1){
+            if(keycode === 1){
                 keycode = e.data;
             }
 
@@ -183,19 +298,16 @@
             // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_event_key_keycode
             // https://www.key-shortcut.com/schriftsysteme/35-symbole/pfeile/
             if ([87,65,83,68,40,38,37,39].indexOf(keycode) >= 0) {
-                if(keycode ==87|| keycode ==38){
+                if (keycode === 87 || keycode === 38) {
                     // UP
                     dir = '\u2191';
-                }
-                if(keycode ==65|| keycode ==37){
+                } else if (keycode === 65 || keycode === 37) {
                     // LEFT
                     dir = '\u2190';
-                }
-                if(keycode == 83 || keycode ==40){
+                } else if (keycode === 83 || keycode === 40) {
                     // DOWN
                     dir = '\u2193';
-                }
-                if(keycode == 68 || keycode ==39){
+                } else if (keycode === 68 || keycode === 39) {
                     // RIGHT
                     dir = '\u2192';
                 }
@@ -217,43 +329,11 @@
                         }, _.lastMoved + _.movementSpeed - now)
                     }
                 }
-            } else if (keycode == 32) {
+            } else if (keycode === 32) {
                 bomberman_socket.send(bomberman_socket_request.plantBomb());
             }
-        },
-
-        moveAnimate: function (element, newParent) {
-            element = $(element);
-            newParent= $(newParent);
-            var oldXY = element.parent().data('x-y').split('|');
-            var newXY = newParent.data('x-y').split('|');
-            var animateProperty = null;
-            if (oldXY[0] - newXY[0] === 0 && oldXY[1] - newXY[1] === 1) {
-                animateProperty = 'left';
-            } else if (oldXY[0] - newXY[0] === 0 && oldXY[1] - newXY[1] === -1) {
-                animateProperty = 'right';
-            } else if (oldXY[0] - newXY[0] === 1 && oldXY[1] - newXY[1] === 0) {
-                animateProperty = 'top';
-            } else if (oldXY[0] - newXY[0] === -1 && oldXY[1] - newXY[1] === 0) {
-                animateProperty = 'bottom';
-            }
-            element.appendTo(newParent);
-            var tempCss = {};
-            tempCss[animateProperty] = '100%';
-            element.css(tempCss);
-            var anim = {};
-            anim[animateProperty] = '0px';
-            if (element.is(':animated')) {
-                element.finish();
-            }
-            // value minus 100 to allow a lag up to 100 milliseconds.
-            var lagFixer = 100;
-            element.animate(anim, element.is('.player')
-                ? bomberman_ui.movementSpeed - lagFixer
-                : bomberman_ui.bombMovementSpeed - lagFixer, function(){
-                element.css(animateProperty, '');
-            });
         }
+
     };
 
     var bomberman_socket = {
@@ -292,17 +372,16 @@
                     swal.close();
                     $('#roomcontrols').hide();
                     $('#roomList').hide();
-                    $('#field').empty();
                     $('#field').show();
+                    bomberman_stage.initView(data);
                     if(bomberman_ui.isTouchDevice()){
-                        bomberman_ui.setMinViewPort(data);
                         $('#arrowControlls').show();
                     }
                 },
 
                 finished: function (data) {
                     var endSound;
-                    var _call = function(text){
+                    var _call = function(text, sound){
                         if (text != null) {
                             swal(text);
                         }
@@ -310,7 +389,8 @@
                         $('#roomList').show();
                         $('#field').hide();
                         $('#arrowControlls').hide();
-                        if(!bomberman_storage.getMuted()){
+                        $('#you-are').hide();
+                        if(!bomberman_storage.getMuted() && sound != null){
                             endSound.play();
                         }
                     };
@@ -324,9 +404,9 @@
                             text = text + 'lose!';
                             endSound = bomberman_ui.loseAudio
                         }
-                        window.setTimeout(function(){_call(text);}, 700); // give the player some time to realize he died
+                        window.setTimeout(function(){_call(text, endSound);}, 700); // give the player some time to realize he died
                     } else {
-                        _call(null);
+                        _call(null, null);
                     }
 
                 },
@@ -377,63 +457,74 @@
 
             field_js: {
                 update: function (field) {
-                    var fieldDiv = $('#field');
-                    if (fieldDiv.find('div').length === 0) {
-                        // init map creation
-                        for (var i = 0; i < field.cells.length; i++) {
-                            for (var j = 0; j < field.cells[i].length; j++) {
-                                fieldDiv.append($('<div data-x-y="' + i + '|' + j + '" class="fieldCell"></div>'));
-                            }
-                            fieldDiv.append($('<div class="clear">'));
-                        }
-                    }
-
-                    var minWidth = (11 + ((field.players-2)*2))*32+180;
-                    if(field.players > 2){
-                        $('#main').css('min-width', minWidth+'px');
-                    }
-
-                    $('.block_').addClass('delete');
+                    var doNotDelete = [];
                     var hueRotate = 0;
-                    for (i = 0; i < field.cells.length; i++) {
-                        for (j = 0; j < field.cells[i].length; j++) {
+                    for (var i = 0; i < field.cells.length; i++) {
+                        for (var j = 0; j < field.cells[i].length; j++) {
                             var inCells = field.cells[i][j].inCells;
                             for (var r = 0; r < inCells.length; r++) {
                                 var inCell = inCells[r];
-                                var inCellDom = $('div[data-id="'+inCell.id+'"]');
-                                // first creation of inCell
-                                if (inCellDom.length === 0) {
-                                    inCellDom = $('<div class="block_ '+inCell.class+'" data-id="'+inCell.id+'"></div>');
-                                    if(inCell.class === 'player'){
-                                        hueRotate = hueRotate+(360/field.players);
-                                        inCellDom.css('filter', 'hue-rotate('+hueRotate +'deg)');
-                                    }
-                                    if(inCell.class === 'explosion'){
-                                        if(!bomberman_storage.getMuted()){
-                                            // so that we have mutliple explosion ;)
+                                var sprite = bomberman_stage.sprites[inCell.id];
+                                doNotDelete.push(inCell.id);
+                                var newX = i * bomberman_stage.BASE_SIZE;
+                                var newY = j * bomberman_stage.BASE_SIZE;
+                                // first creation of sprite
+                                if (typeof sprite === 'undefined') {
+                                    sprite = new bomberman_stage.Sprite(
+                                        bomberman_stage.resources[inCell.class].texture
+                                    );
+                                    sprite.zIndex = inCell.displayPriority;
+                                    sprite.displayOrder = inCell.displayPriority;
+                                    bomberman_stage.sprites[inCell.id] = sprite;
+                                    sprite.parentGroup = bomberman_stage.parentGroup;
+                                    bomberman_stage.elementContainer.addChild(sprite);
+                                    sprite.x = newX;
+                                    sprite.y = newY;
+                                    if (inCell.class === 'player') {
+                                        sprite.data = false;
+                                        hueRotate = hueRotate + (360 / field.players);
+                                        var colorMatrix = new PIXI.filters.ColorMatrixFilter();
+                                        colorMatrix.hue(hueRotate, false);
+                                        sprite.filters = [colorMatrix];
+                                        if (inCell.uuid === bomberman_storage.getUuid()) {
+                                            $('#you-are').show();
+                                            $('#your-color').css('filter', 'hue-rotate('+hueRotate +'deg)');
+                                        }
+                                    } else if (inCell.class === 'explosion') {
+                                        if(!bomberman_storage.getMuted()) {
                                             bomberman_ui.bombAudio.cloneNode(true).play();
                                         }
                                     }
-                                    inCellDom.css('z-index', inCell.displayPriority);
-                                    inCellDom.appendTo('div.fieldCell[data-x-y="'+i+'|'+j+'"]');
                                 }
-                                if (inCell.class === 'player' && !inCell.alive) {
-                                    inCellDom.css('background-image', 'url("./img/rip.gif")');
-                                    if (!inCellDom.data('deadPlayed')) {
-                                        if(!bomberman_storage.getMuted()) {
-                                            bomberman_ui.deadAudio.play();
-                                        }
-                                        inCellDom.data('deadPlayed', true);
+                                if (inCell.class === 'player' && !inCell.alive && !sprite.data) {
+                                    sprite.data = true;
+                                    if(!bomberman_storage.getMuted()) {
+                                        bomberman_ui.deadAudio.play();
                                     }
+                                    sprite.texture = bomberman_stage.resources['rip'].texture
                                 }
-                                if (!inCellDom.parent().is('div[data-x-y="'+i+'|'+j+'"]')) {
-                                    bomberman_ui.moveAnimate(inCellDom, $('div.fieldCell[data-x-y="'+i+'|'+j+'"]'));
+                                if (sprite.vx !== newX || sprite.vy !== newY) {
+                                    sprite.vx = newX;
+                                    sprite.vy = newY;
+                                    bomberman_stage.moveAnimate(
+                                        inCell.id,
+                                        sprite,
+                                        newX,
+                                        newY,
+                                        inCell.class === 'bomb' ? bomberman_ui.bombMovementSpeed : bomberman_ui.movementSpeed
+                                    );
                                 }
-                                inCellDom.removeClass('delete');
                             }
                         }
                     }
-                    $('.delete').remove();
+                    var currentlyOnField = Object.keys(bomberman_stage.sprites);
+                    for (var i = 0; i < currentlyOnField.length; i++) {
+                        if (doNotDelete.indexOf(currentlyOnField[i]) === -1) {
+                            bomberman_stage.elementContainer.removeChild(
+                                bomberman_stage.sprites[currentlyOnField[i]]
+                            );
+                        }
+                    }
                 }
             },
 
@@ -445,6 +536,5 @@
         }
     };
 
-    bomberman_socket.init();
-    bomberman_ui.init();
+    bomberman_stage.init();
 })(jQuery);

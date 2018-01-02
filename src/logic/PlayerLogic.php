@@ -55,7 +55,7 @@ class PlayerLogic extends BaseLogic
         $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $rooms->getValues())));
         $sender->send(json_encode(Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_BOMB_MOVEMENT_SPEED, Config::get(Config::BOMB_MOVEMENT_SPEED))));
         if (!is_null($room) && $room->isStartable()) {
-            $sender->send(json_encode(Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_STARTED, $room->getMaxPlayers())));
+            $sender->send(json_encode(Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_STARTED, $room->getField()->getDimension())));
             $sender->send(json_encode(Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())));
         }
     }
@@ -76,28 +76,28 @@ class PlayerLogic extends BaseLogic
             $y2 = -1;
             switch ($data->direction) {
                 case '↑':
-                    $x = $player->getX() - 1;
-                    $x2 = $player->getX() - 2;
-                    $y = $player->getY();
-                    $y2 = $player->getY();
-                    break;
-                case '←';
-                    $x = $player->getx();
-                    $x2 = $player->getx();
+                    $x = $player->getX();
+                    $x2 = $player->getX();
                     $y = $player->getY() - 1;
                     $y2 = $player->getY() - 2;
                     break;
-                case '↓':
-                    $x = $player->getX() + 1;
-                    $x2 = $player->getX() + 2;
+                case '←';
+                    $x = $player->getx() - 1;
+                    $x2 = $player->getx() - 2;
                     $y = $player->getY();
                     $y2 = $player->getY();
                     break;
-                case '→':
+                case '↓':
                     $x = $player->getX();
                     $x2 = $player->getX();
                     $y = $player->getY() + 1;
                     $y2 = $player->getY() + 2;
+                    break;
+                case '→':
+                    $x = $player->getX() + 1;
+                    $x2 = $player->getX() + 2;
+                    $y = $player->getY();
+                    $y2 = $player->getY();
                     break;
             }
             $nextField = $room->getField()->getXY($x, $y);
