@@ -115,19 +115,6 @@
         animations: [],
 
         init: function () {
-            this.app = new bomberman_stage.Application({
-                width: 576,
-                height: 576,
-                transparent: true
-            });
-            $('#field').append(this.app.view);
-            this.app.stage = new bomberman_stage.Stage();
-            this.app.stage.group.enableSort = true;
-            this.parentGroup = new bomberman_stage.Group(0, true);
-            this.elementContainer = new bomberman_stage.Container();
-            this.app.stage.addChild(new bomberman_stage.Layer(this.parentGroup));
-            this.app.stage.addChild(bomberman_stage.elementContainer);
-            this.app.ticker.add(bomberman_stage.update);
             this.loader
                 .add('block', 'img/block.gif')
                 .add('bomb', 'img/bomb.gif')
@@ -141,6 +128,33 @@
                 .add('bombitem', 'img/twobomb.gif')
                 .on('progress', bomberman_ui.loadProgressHandler)
                 .load(bomberman_stage.setup);
+        },
+
+        initView: function (fieldDimension) {
+            var screenDimension = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, []);
+            var squareLength = screenDimension.width > screenDimension.height ? screenDimension.height : screenDimension.width;
+            squareLength = squareLength - 150; // footer & header
+            var scale = squareLength / (fieldDimension.width * this.BASE_SIZE);
+            if (scale > 1.1) {
+                scale = 1.1;
+            }
+            this.app = new bomberman_stage.Application({
+                width: fieldDimension.width * this.BASE_SIZE * scale,
+                height: fieldDimension.height * this.BASE_SIZE * scale,
+                transparent: true
+            });
+            var field = $('#field');
+            field.empty();
+            field.append(this.app.view);
+            this.app.stage = new bomberman_stage.Stage();
+            this.app.stage.scale.x = scale;
+            this.app.stage.scale.y = scale;
+            this.app.stage.group.enableSort = true;
+            this.parentGroup = new bomberman_stage.Group(0, true);
+            this.elementContainer = new bomberman_stage.Container();
+            this.app.stage.addChild(new bomberman_stage.Layer(this.parentGroup));
+            this.app.stage.addChild(bomberman_stage.elementContainer);
+            this.app.ticker.add(bomberman_stage.update);
         },
 
         setup: function () {
@@ -227,17 +241,6 @@
 
         loadProgressHandler: function (loader, resource) {
             $('#loading-percent').text(loader.progress);
-        },
-
-        setMinViewPort: function (players) {
-            var ww = ($(window).width() < window.screen.width) ? $(window).width() : window.screen.width; //get proper width
-            var mw = 200 + (players * 100); // min width of site
-            var ratio = ww / mw; //calculate ratio
-            if (ww < mw) { //smaller than minimum size
-                $('#Viewport').attr('content', 'initial-scale=' + ratio + ', maximum-scale=' + ratio + ', minimum-scale=' + ratio + ', user-scalable=yes, width=' + ww);
-            } else { //regular size
-                $('#Viewport').attr('content', 'initial-scale=1.0, maximum-scale=2, minimum-scale=1.0, user-scalable=yes, width=' + ww);
-            }
         },
 
         initSound: function (path) {
@@ -370,8 +373,8 @@
                     $('#roomcontrols').hide();
                     $('#roomList').hide();
                     $('#field').show();
+                    bomberman_stage.initView(data);
                     if(bomberman_ui.isTouchDevice()){
-                        bomberman_ui.setMinViewPort(data);
                         $('#arrowControlls').show();
                     }
                 },
@@ -386,6 +389,7 @@
                         $('#roomList').show();
                         $('#field').hide();
                         $('#arrowControlls').hide();
+                        $('#you-are').hide();
                         if(!bomberman_storage.getMuted() && sound != null){
                             endSound.play();
                         }
@@ -454,6 +458,7 @@
             field_js: {
                 update: function (field) {
                     var doNotDelete = [];
+                    var hueRotate = 0;
                     for (var i = 0; i < field.cells.length; i++) {
                         for (var j = 0; j < field.cells[i].length; j++) {
                             var inCells = field.cells[i][j].inCells;
@@ -463,6 +468,7 @@
                                 doNotDelete.push(inCell.id);
                                 var newX = i * bomberman_stage.BASE_SIZE;
                                 var newY = j * bomberman_stage.BASE_SIZE;
+                                // first creation of sprite
                                 if (typeof sprite === 'undefined') {
                                     sprite = new bomberman_stage.Sprite(
                                         bomberman_stage.resources[inCell.class].texture
@@ -474,11 +480,39 @@
                                     bomberman_stage.elementContainer.addChild(sprite);
                                     sprite.x = newX;
                                     sprite.y = newY;
+                                    if (inCell.class === 'player') {
+                                        sprite.data = false;
+                                        hueRotate = hueRotate + (360 / field.players);
+                                        var colorMatrix = new PIXI.filters.ColorMatrixFilter();
+                                        colorMatrix.hue(hueRotate, false);
+                                        sprite.filters = [colorMatrix];
+                                        if (inCell.uuid === bomberman_storage.getUuid()) {
+                                            $('#you-are').show();
+                                            $('#your-color').css('filter', 'hue-rotate('+hueRotate +'deg)');
+                                        }
+                                    } else if (inCell.class === 'explosion') {
+                                        if(!bomberman_storage.getMuted()) {
+                                            bomberman_ui.bombAudio.cloneNode(true).play();
+                                        }
+                                    }
+                                }
+                                if (inCell.class === 'player' && !inCell.alive && !sprite.data) {
+                                    sprite.data = true;
+                                    if(!bomberman_storage.getMuted()) {
+                                        bomberman_ui.deadAudio.play();
+                                    }
+                                    sprite.texture = bomberman_stage.resources['rip'].texture
                                 }
                                 if (sprite.vx !== newX || sprite.vy !== newY) {
                                     sprite.vx = newX;
                                     sprite.vy = newY;
-                                    bomberman_stage.moveAnimate(inCell.id, sprite, newX, newY, bomberman_ui.movementSpeed);
+                                    bomberman_stage.moveAnimate(
+                                        inCell.id,
+                                        sprite,
+                                        newX,
+                                        newY,
+                                        inCell.class === 'bomb' ? bomberman_ui.bombMovementSpeed : bomberman_ui.movementSpeed
+                                    );
                                 }
                             }
                         }

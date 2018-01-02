@@ -29,7 +29,7 @@ class FieldCell implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'inCells' => $this->inCells
+            'inCells' => $this->inCells,
         ];
     }
 

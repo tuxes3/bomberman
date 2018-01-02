@@ -34,7 +34,7 @@
     </noscript>
 
     <header id="header">
-        <h1>Checker-Bomberman</h1>
+        <h1>Checker-Bomberman <small id="you-are" style="display: none">You are <span id="your-color">&nbsp;&nbsp;&nbsp;&nbsp;</span></small></h1>
         <h4>Web Project BTI7054</h4>
     </header>
 
