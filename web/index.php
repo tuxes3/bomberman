@@ -20,9 +20,8 @@
     <meta name="Robots" content="index, follow">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.3.0/sweetalert2.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-    <script src="js/sweetalert2.all.js"></script>
     <meta id="Viewport"name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
@@ -35,7 +34,7 @@
     </noscript>
 
     <header id="header">
-        <h1>Checker-Bomberman</h1>
+        <h1>Checker-Bomberman <small id="you-are" style="display: none">You are <span id="your-color">&nbsp;&nbsp;&nbsp;&nbsp;</span></small></h1>
         <h4>Web Project BTI7054</h4>
     </header>
 
@@ -50,7 +49,7 @@
             <a id="createRoom" href="#">Create Room</a>
         </div>
 
-        <div id="field">
+        <div id="field" style="display: none;">
 
         </div>
 
@@ -68,8 +67,12 @@
         </div>
 
         <div id="connectionLost">
-            <img height="500px" src="img/bomb-loading.svg" alt="bouncing bomb"/>
+            <img height="500px" src="img/bomb-loading.svg" alt="bouncing bomb" />
             <h1>Reconnecting ...</h1>
+        </div>
+        <div id="loading">
+            <img height="500px" src="img/bomb-loading.svg" alt="bouncing bomb" />
+            <h1>Loading <span id="loading-percent">0</span>% ...</h1>
         </div>
     </main>
 
@@ -99,12 +102,16 @@
             }
             ?>';
     </script>
-
-    <script
-            src="https://code.jquery.com/jquery-3.2.1.min.js"
+    <!-- pixi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
+    <script src="js/plugin/pixi-layers.js"></script>
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
             integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
             crossorigin="anonymous"></script>
-    <script src="js/socket.js">
-    </script>
+    <!-- sweetalert 2 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.3.0/sweetalert2.all.min.js"></script>
+    <!-- bomberman app -->
+    <script src="js/bomberman.js"></script>
 </body>
 </html>

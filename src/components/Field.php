@@ -139,4 +139,15 @@ class Field implements \JsonSerializable
         return $this->maxPlayers;
     }
 
+    /**
+     * @return \stdClass
+     */
+    public function getDimension()
+    {
+        $std = new \stdClass();
+        $std->width = count($this->cells);
+        $std->height = count($this->cells[0]);
+        return $std;
+    }
+
 }

@@ -78,6 +78,7 @@ class Player extends BaseInCell
     {
         return array_merge(parent::jsonSerialize(), [
             'alive' => $this->alive,
+            'uuid' => $this->uuid,
         ]);
     }
 
