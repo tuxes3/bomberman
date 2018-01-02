@@ -3,10 +3,10 @@ Checker-Bomberman Game
 
 This game was developed as an assignement for the module "BTI7054 - Web programming" at the Berner Fachhochschule (BFH).
 
-It consists of a backend (written in PHP) and a  frontend(HTML5 + CSS with help of jQuery and javascript).  
+It consists of a backend (written in PHP) and a  frontend(HTML5, CSS and javascript).  
 They communicate with each other through websockets.
 
-The game is in the style of the original NES Bomberman game. (Which we both never played, since we are too young :P ).
+The game is in the style of the original NES Bomberman game.
 
 Our version supports multiplayer up to 10 players.   
 The goal is to be the last player alive. 
@@ -34,11 +34,15 @@ A working demo can be found at https://bomberman.functions.ch
 
 Installation
 ------------
-Checkout project:  `git clone https://github.com/Tuxes3/bomberman.git`
+All you need to run this project locally is PHP and Make.
+
+Checkout project:  `git clone https://github.com/tuxes3/bomberman.git`
 
 Prepare workspace:  `make install`
 
 Start servers: `make server`, `make websocket` 
+
+You can now access the game on `localhost:8008`. We use port `8009` for the websocket, so be sure that you have access on these two ports. 
 
 License
 -------
