@@ -137,14 +137,15 @@ class BombermanWebsocket implements MessageComponentInterface, Context
      */
     public function sendToClients($playerIds, $message)
     {
+        $json = json_encode($message);
         if (is_int($playerIds) && $playerIds == Context::SEND_ALL) {
             foreach ($this->clients as $client) {
-                $client->send(json_encode($message));
+                $client->send($json);
             }
         } else {
             foreach ($this->clients as $client) {
                 if (array_key_exists($client->resourceId, $this->clientConnectionUuidMap) && in_array($this->clientConnectionUuidMap[$client->resourceId], $playerIds)) {
-                    $client->send(json_encode($message));
+                    $client->send($json);
                 }
             }
         }
