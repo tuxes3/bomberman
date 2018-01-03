@@ -85,6 +85,9 @@ class BombLogic extends BaseLogic
         }
         if (!is_null($fieldCell) && $fieldCell->canBombEnter()) {
             $room->getField()->moveTo($bomb, $bomb->getX() + $x, $bomb->getY() + $y);
+            foreach ($fieldCell->getAllExplosions() as $explosion) {
+                $fieldCell->explode($explosion);
+            }
             $this->context->sendToClients($room->getConnectedPlayers(), Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField()));
             $this->context->executeAfter(function () use ($data, $sender) {
                 $this->context->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_MOVE, $data), $sender);
