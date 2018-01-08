@@ -19,6 +19,8 @@ use bomberman\components\Room;
 use bomberman\io\Message;
 use bomberman\logic\javascript\FieldJSLogic;
 use bomberman\logic\javascript\GameJSLogic;
+use mikemccabe\JsonPatch\JsonPatch;
+use Rs\Json\Merge\Patch;
 
 /**
  * Class FieldLogic
@@ -29,11 +31,17 @@ class FieldLogic extends BaseLogic
     const EVENT_START = 'start';
     const EVENT_UPDATE_CLIENTS = 'updateClients';
     const EVENT_CHECK_FINISH = 'checkFinish';
+    const EVENT_PATCH = 'patch';
 
     /**
      * @var string
      */
     public static $name = 'field';
+
+    /**
+     * @var array
+     */
+    private $fieldsCache = [];
 
     /**
      * @return array
@@ -68,6 +76,7 @@ class FieldLogic extends BaseLogic
                     Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_FINISHED, $data)
                 );
             }
+            unset($this->fieldsCache[$room->getUniqueId()]);
         }
     }
 
@@ -241,12 +250,28 @@ class FieldLogic extends BaseLogic
      */
     public function updateClients($data, ClientConnection $sender)
     {
-        /** @var Room $room */
-        $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);
-        $this->context->sendToClients(
-            $room->getConnectedPlayers(),
-            Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
-        );
+        if ($data instanceof Room) {
+            $room = $data;
+        } else {
+            /** @var Room $room */
+            $room = $this->context->getData()->findRoomByUniqueId($data->uniqueId);
+        }
+        if (!isset($this->fieldsCache[$room->getUniqueId()])) {
+            $this->fieldsCache[$room->getUniqueId()] = json_decode(json_encode($room->getField()), true);
+            $this->context->sendToClients(
+                $room->getConnectedPlayers(),
+                Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
+            );
+        } else {
+            $new = json_decode(json_encode($room->getField()), true);
+            $patchDocument = JsonPatch::diff($this->fieldsCache[$room->getUniqueId()], $new);
+            $this->fieldsCache[$room->getUniqueId()] = $new;
+            $this->context->sendToClients(
+                $room->getConnectedPlayers(),
+                Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_PATCH, $patchDocument)
+            );
+        }
+
     }
 
 }

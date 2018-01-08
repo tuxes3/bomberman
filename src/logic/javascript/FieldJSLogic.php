@@ -21,5 +21,6 @@ interface FieldJSLogic
     const NAME = 'field_js';
 
     const EVENT_UPDATE = 'update';
+    const EVENT_PATCH = 'patch';
 
 }

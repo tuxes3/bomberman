@@ -219,6 +219,8 @@
         lastWantedMovement: null,
         waitingForNextMove: null,
 
+        field: null,
+
         init: function () {
             $('#createRoom').on('click', bomberman_ui.createRoom);
             $(document).keydown(bomberman_ui.onKeyDown);
@@ -456,7 +458,13 @@
             },
 
             field_js: {
+                patch: function (patch) {
+                    var patchedField = jsonpatch.applyPatch(bomberman_ui.field, patch).newDocument;
+                    bomberman_socket.handler['field_js']['update'](patchedField);
+                },
+
                 update: function (field) {
+                    bomberman_ui.field = field;
                     var doNotDelete = [];
                     var hueRotate = 0;
                     for (var i = 0; i < field.cells.length; i++) {
