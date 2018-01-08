@@ -111,6 +111,8 @@
             crossorigin="anonymous"></script>
     <!-- sweetalert 2 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.3.0/sweetalert2.all.min.js"></script>
+    <!-- json patch -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fast-json-patch/2.0.6/fast-json-patch.min.js"></script>
     <!-- bomberman app -->
     <script src="js/bomberman.js"></script>
 </body>

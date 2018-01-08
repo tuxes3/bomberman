@@ -46,7 +46,7 @@ class ItemLogic extends BaseLogic
             return;
         }
         $room->getField()->getXY($data->getX(), $data->getY())->removeById($data->getId());
-        $this->context->sendToClients($room->getConnectedPlayers(), Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField()));
+        $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_UPDATE_CLIENTS, $room), $sender);
     }
 
 }

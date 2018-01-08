@@ -130,9 +130,7 @@ class PlayerLogic extends BaseLogic
                         $this->context->send(Message::fromCode(ItemLogic::$name, ItemLogic::EVENT_NAME, $item), $sender);
                     }
                     $player->setLastMoved();
-                    $this->context->sendToClients($room->getConnectedPlayers(),
-                        Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
-                    );
+                    $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_UPDATE_CLIENTS, $room), $sender);
                     $sender->send(json_encode(Message::fromCode(PlayerJSLogic::NAME, PlayerJSLogic::EVENT_MOVEMENT_SPEED, $player->getMovementSpeed())));
                 }
             }
@@ -155,9 +153,7 @@ class PlayerLogic extends BaseLogic
                 if (count($playerBombs) < $player->getBombCount()) {
                     $bomb = new Bomb($player->getX(), $player->getY(), $player->getExplosionSpread(), $player->getUuid());
                     $room->getField()->addTo($bomb);
-                    $this->context->sendToClients($room->getConnectedPlayers(),
-                        Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
-                    );
+                    $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_UPDATE_CLIENTS, $room), $sender);
                     $timer = $this->context->executeAfter(function () use ($bomb, $sender) {
                         $this->context->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_EXPLODE, $bomb), $sender);
                     }, Config::get(Config::BOMB_TIMEOUT));

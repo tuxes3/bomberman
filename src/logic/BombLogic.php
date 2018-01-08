@@ -60,7 +60,7 @@ class BombLogic extends BaseLogic
             $std->bomb = $bomb;
             $std->room = $room;
             $this->context->send(Message::fromCode(ExplosionLogic::$name, ExplosionLogic::EVENT_CREATE, $std), $sender);
-            $this->context->sendToClients($room->getConnectedPlayers(), Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField()));
+            $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_UPDATE_CLIENTS, $room), $sender);
         }
     }
 
@@ -88,7 +88,7 @@ class BombLogic extends BaseLogic
             foreach ($fieldCell->getAllExplosions() as $explosion) {
                 $fieldCell->explode($explosion);
             }
-            $this->context->sendToClients($room->getConnectedPlayers(), Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField()));
+            $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_UPDATE_CLIENTS, $room), $sender);
             $this->context->executeAfter(function () use ($data, $sender) {
                 $this->context->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_MOVE, $data), $sender);
             }, Config::get(Config::BOMB_MOVEMENT_SPEED));

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3a8e4929601b3daed614c7e8bf94dd2a",
+    "content-hash": "6a9ad9bf56ef452a80a312b226b91b1c",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -238,6 +238,33 @@
                 "url"
             ],
             "time": "2017-03-20T17:10:46+00:00"
+        },
+        {
+            "name": "mikemccabe/json-patch-php",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mikemccabe/json-patch-php.git",
+                "reference": "b3af30a6aec7f6467c773cd49b2d974a70f7c0d4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mikemccabe/json-patch-php/zipball/b3af30a6aec7f6467c773cd49b2d974a70f7c0d4",
+                "reference": "b3af30a6aec7f6467c773cd49b2d974a70f7c0d4",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "mikemccabe\\JsonPatch\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "description": "Produce and apply json-patch objects",
+            "time": "2015-01-05T21:19:54+00:00"
         },
         {
             "name": "paragonie/random_compat",

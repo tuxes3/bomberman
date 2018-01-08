@@ -56,10 +56,7 @@ class ExplosionLogic extends BaseLogic
         $current = milliseconds();
         if (($current - $explosion->getExploded()) >= Config::get(Config::EXPLOSION_DURATION)) {
             $room->getField()->getXY($explosion->getX(), $explosion->getY())->removeById($explosion->getId());
-            $this->context->sendToClients(
-                $room->getConnectedPlayers(),
-                Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())
-            );
+            $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_UPDATE_CLIENTS, $room), $sender);
         }
     }
 
