@@ -133,7 +133,7 @@
         initView: function (fieldDimension) {
             var screenDimension = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, []);
             var squareLength = screenDimension.width > screenDimension.height ? screenDimension.height : screenDimension.width;
-            squareLength = squareLength - 150; // footer & header
+            squareLength = squareLength - 200; // footer & header
             var scale = squareLength / (fieldDimension.width * this.BASE_SIZE);
             if (scale > 1.1) {
                 scale = 1.1;
