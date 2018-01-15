@@ -44,7 +44,7 @@ small {
     background:#fff;
     text-align: center;
     line-height: 1.5;
-    padding-bottom: 3em; /* footer height */
+    padding-bottom: 55px; /* footer height */
 }
 
 #footer #footer-main{
@@ -52,12 +52,11 @@ small {
     bottom:0;
     color:#fff;
     background-color:#05144f;
-    height: 3em;
+    height: 50px;
     min-width: 100%;
     width: 100%;
     text-align: center;
     line-height: 1.5;
-    min-height: 40px;
 }
 
 #footer #github {
