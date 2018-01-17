@@ -98,7 +98,7 @@ class FieldLogic extends BaseLogic
 
 
         // if more than 8 players no more square field. instead a wider one :)
-        if($playercount > 8){
+        if ($playercount > 8){
             $height = 11 + ((8-2)*2);
         }
 
@@ -121,7 +121,7 @@ class FieldLogic extends BaseLogic
         // step 2: generate random blocks
         for ($i = 0; $i < $height; $i++) {
             for ($j = 0; $j < $width; $j++) {
-                if($cells[$i][$j]->isEmpty()){
+                if ($cells[$i][$j]->isEmpty()) {
                     if (1 == rand(1, 2)) {
                         $cells[$i][$j]->add(new Block($i, $j));
                     }
@@ -147,21 +147,21 @@ class FieldLogic extends BaseLogic
         $cells[1][0] = new FieldCell();
         $cells[0][0]->add(new Player(0, 0, $players[0]));
 
-        if($playercount >= 2){
+        if ($playercount >= 2) {
             $cells[$height][$width] = new FieldCell();
             $cells[$height-1][$width] = new FieldCell();
             $cells[$height][$width-1] = new FieldCell();
             $cells[$height][$width]->add(new Player($height, $width, $players[1]));
         }
 
-        if($playercount >= 3){
+        if ($playercount >= 3) {
             $cells[0][$width] = new FieldCell();
             $cells[0][$width-1] = new FieldCell();
             $cells[1][$width] = new FieldCell();
             $cells[0][$width]->add(new Player(0, $width, $players[2]));
         }
 
-        if($playercount >= 4){
+        if ($playercount >= 4) {
             $cells[$height][0] = new FieldCell();
             $cells[$height-1][0] = new FieldCell();
             $cells[$height][1] = new FieldCell();
@@ -169,7 +169,7 @@ class FieldLogic extends BaseLogic
         }
 
         // 5-8  => got to the middle of the sides
-        if($playercount >= 5 ) {
+        if ($playercount >= 5) {
             // left side middle
             $cells[$height/2][0] = new FieldCell(); // midddle
             $cells[$height/2][1] = new FieldCell();
@@ -177,7 +177,7 @@ class FieldLogic extends BaseLogic
             $cells[$height/2][0]->add(new Player($height/2, 0, $players[4]));
         }
 
-        if($playercount>= 6 ){
+        if ($playercount >= 6) {
             // 6 right side middle
             $cells[$height/2][$width] = new FieldCell();
             $cells[$height/2][$width-1] = new FieldCell();
@@ -187,7 +187,7 @@ class FieldLogic extends BaseLogic
 
 
 
-        if($playercount>=7 && $playercount < 10 ){
+        if ($playercount >= 7 && $playercount < 10) {
             // 7 top middle
             $cells[0][$width/2] = new FieldCell();
             $cells[0][($width/2)+1] = new FieldCell();
@@ -196,7 +196,7 @@ class FieldLogic extends BaseLogic
         }
 
 
-        if($playercount==8){
+        if ($playercount == 8) {
             // 8 bottom middle
             $cells[$height][$width/2] = new FieldCell();
             $cells[$height][($width/2)+1] = new FieldCell();
@@ -207,7 +207,7 @@ class FieldLogic extends BaseLogic
 
         // above 8 => field goes wide :)
         //  9 / 10 => two in between on top and on bottom
-        if($playercount >= 9){
+        if ($playercount >= 9){
             // player 8 on bottom after 1/3
             $cells[$height][round($width/3)] = new FieldCell();
             $cells[$height][round(($width/3))+1] = new FieldCell();
@@ -221,7 +221,7 @@ class FieldLogic extends BaseLogic
             $cells[$height][$width-round($width/3)]->add(new Player($height, $width - round($width/3), $players[8]));
         }
 
-        if($playercount == 10){
+        if ($playercount == 10){
             // player 7 on top after 1/3
             $cells[0][round($width/3)] = new FieldCell();
             $cells[0][round(($width/3))+1] = new FieldCell();
