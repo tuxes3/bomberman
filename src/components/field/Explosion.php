@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -10,6 +12,7 @@
  */
 
 namespace bomberman\components\field;
+use bomberman\io\Milliseconds;
 use React\EventLoop\Timer\TimerInterface;
 
 /**
@@ -18,21 +21,20 @@ use React\EventLoop\Timer\TimerInterface;
  */
 class Explosion extends BaseInCell
 {
+    /**
+     * @var TimerInterface
+     */
+    protected $timer;
 
     /**
      * @var int
      */
     private $exploded;
 
-    /**
-     * @var TimerInterface
-     */
-    protected $timer;
-
     public function __construct($x, $y)
     {
         parent::__construct($x, $y);
-        $this->exploded = milliseconds();
+        $this->exploded = (new Milliseconds())->get();
     }
 
     /**
@@ -47,7 +49,7 @@ class Explosion extends BaseInCell
 
     /**
      * @param array $data
-     * @return Explosion
+     * @return self
      */
     public static function restore($data)
     {
@@ -56,10 +58,7 @@ class Explosion extends BaseInCell
         return $explosion;
     }
 
-    /**
-     * @return bool
-     */
-    public function canPlayerEnter()
+    public function canPlayerEnter(): bool
     {
         return true;
     }
@@ -67,7 +66,7 @@ class Explosion extends BaseInCell
     /**
      * @return boolean
      */
-    public function blocksExplosion()
+    public function blocksExplosion(): bool
     {
         return false;
     }
@@ -104,12 +103,8 @@ class Explosion extends BaseInCell
         $this->timer = $timer;
     }
 
-    /**
-     * @return bool
-     */
-    public function canBombEnter()
+    public function canBombEnter(): bool
     {
         return true;
     }
-
 }

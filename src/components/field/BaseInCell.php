@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -17,40 +19,23 @@ namespace bomberman\components\field;
  */
 abstract class BaseInCell implements InCell, \JsonSerializable
 {
+    public const BASE_PRIORITY = 100;
 
-    const BASE_PRIORITY = 100;
-
-    /**
-     * @var int $x
-     */
-    protected $x;
-
-    /**
-     * @var int $y
-     */
-    protected $y;
-
-    /**
-     * @var string $id
-     */
-    protected $id;
+    protected string $id;
 
     /**
      * BaseInCell constructor.
-     * @param $x
-     * @param $y
+     * @param int $x
+     * @param int $y
      */
-    public function __construct($x, $y)
-    {
-        $this->x = $x;
-        $this->y = $y;
+    public function __construct(
+        protected $x,
+        protected $y
+    ) {
         $this->id = md5(openssl_random_pseudo_bytes(128));
     }
 
-    /**
-     * @return array
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'x' => $this->getX(),
@@ -68,7 +53,7 @@ abstract class BaseInCell implements InCell, \JsonSerializable
     {
         return array_merge($this->jsonSerialize(), [
             'id' => $this->id,
-            'class' => get_class($this),
+            'class' => static::class,
         ]);
     }
 
@@ -113,7 +98,7 @@ abstract class BaseInCell implements InCell, \JsonSerializable
      */
     public function getClass()
     {
-        $reflectionClass = new \ReflectionClass(get_class($this));
+        $reflectionClass = new \ReflectionClass(static::class);
         return $reflectionClass->getShortName();
     }
 
@@ -124,5 +109,4 @@ abstract class BaseInCell implements InCell, \JsonSerializable
     {
         return $this->id;
     }
-
 }

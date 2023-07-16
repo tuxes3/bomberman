@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -11,8 +13,8 @@
 
 namespace bomberman;
 
-use bomberman\io\RoomCollection;
 use bomberman\io\Message;
+use bomberman\io\RoomCollection;
 use bomberman\logic\BaseLogic;
 use bomberman\logic\BombLogic;
 use bomberman\logic\ClientConnection;
@@ -32,11 +34,10 @@ use React\EventLoop\LoopInterface;
  */
 class BombermanWebsocket implements MessageComponentInterface, Context
 {
-
     /**
      * @var \SplObjectStorage|ConnectionInterface[]
      */
-    protected $clients;
+    protected \SplObjectStorage $clients;
 
     /**
      * @var BaseLogic[]|array
@@ -44,14 +45,9 @@ class BombermanWebsocket implements MessageComponentInterface, Context
     protected $logics;
 
     /**
-     * @var RoomCollection $data
-     */
-    protected $data;
-
-    /**
      * @var array
      */
-    protected $clientConnectionUuidMap;
+    protected $clientConnectionUuidMap = [];
 
     /**
      * @var LoopInterface
@@ -60,13 +56,12 @@ class BombermanWebsocket implements MessageComponentInterface, Context
 
     /**
      * Channel constructor.
-     * @param RoomCollection $roomCollection
+     * @param RoomCollection $data
      */
-    public function __construct($roomCollection)
-    {
+    public function __construct(
+        protected $data
+    ) {
         $this->clients = new \SplObjectStorage();
-        $this->data = $roomCollection;
-        $this->clientConnectionUuidMap = [];
         $this->logics = [
             RoomLogic::$name => new RoomLogic($this),
             FieldLogic::$name => new FieldLogic($this),
@@ -77,9 +72,6 @@ class BombermanWebsocket implements MessageComponentInterface, Context
         ];
     }
 
-    /**
-     * @param LoopInterface $loop
-     */
     public function setLoop(LoopInterface $loop)
     {
         $this->loop = $loop;
@@ -88,12 +80,11 @@ class BombermanWebsocket implements MessageComponentInterface, Context
     /**
      * Nachrichten werden allen verbundenen Clients geschickt.
      *
-     * @param ConnectionInterface $from
      * @param string $msg
      */
-    function onMessage(ConnectionInterface $from, $msg)
+    public function onMessage(ConnectionInterface $from, $msg)
     {
-        echo ($msg . PHP_EOL);
+        echo $msg.PHP_EOL;
         $message = Message::fromJson($msg);
         $clientConnection = new ClientConnection($from, $message->getUuid());
         $this->clientConnectionUuidMap[$from->resourceId] = $message->getUuid();
@@ -109,7 +100,7 @@ class BombermanWebsocket implements MessageComponentInterface, Context
         if (in_array($message->getLogicName(), array_keys($this->logics))) {
             $this->logics[$message->getLogicName()]->execute($message, $from);
         } else {
-            $from->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Logic not found.')));
+            $from->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Logic not found.'), JSON_THROW_ON_ERROR));
         }
     }
 
@@ -137,7 +128,7 @@ class BombermanWebsocket implements MessageComponentInterface, Context
      */
     public function sendToClients($playerIds, $message)
     {
-        $json = json_encode($message);
+        $json = json_encode($message, JSON_THROW_ON_ERROR);
         if (is_int($playerIds) && $playerIds == Context::SEND_ALL) {
             foreach ($this->clients as $client) {
                 $client->send($json);
@@ -151,29 +142,18 @@ class BombermanWebsocket implements MessageComponentInterface, Context
         }
     }
 
-    /**
-     * @param ConnectionInterface $conn
-     * @param \Exception $e
-     */
-    function onError(ConnectionInterface $conn, \Exception $e)
+    public function onError(ConnectionInterface $conn, \Exception $e)
     {
         print_r($e);
     }
 
-    /**
-     * @param ConnectionInterface $conn
-     */
-    function onOpen(ConnectionInterface $conn)
+    public function onOpen(ConnectionInterface $conn)
     {
         $this->clients->attach($conn);
     }
 
-    /**
-     * @param ConnectionInterface $conn
-     */
-    function onClose(ConnectionInterface $conn)
+    public function onClose(ConnectionInterface $conn)
     {
         $this->clients->detach($conn);
     }
-
 }

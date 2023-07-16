@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -12,8 +14,6 @@
 namespace bomberman\io;
 
 use bomberman\components\Field;
-use bomberman\components\field\Block;
-use bomberman\components\field\Bomb;
 use bomberman\components\field\FieldCell;
 use bomberman\components\Room;
 
@@ -23,12 +23,8 @@ use bomberman\components\Room;
  */
 class BackupManager
 {
+    final public const BACK_UP_FILE = __DIR__.'/../../var/rooms.json';
 
-    const BACK_UP_FILE = __DIR__.'/../../var/rooms.json';
-
-    /**
-     * @param RoomCollection $roomCollection
-     */
     public function backup(RoomCollection $roomCollection)
     {
         $backup = [];
@@ -44,7 +40,7 @@ class BackupManager
     public function restore()
     {
         $restore = new RoomCollection();
-        $rooms = json_decode(file_get_contents(self::BACK_UP_FILE), true);
+        $rooms = json_decode(file_get_contents(self::BACK_UP_FILE), true, 512, JSON_THROW_ON_ERROR);
         foreach ($rooms as $room) {
             $restore->add($this->getRoomAsObject($room));
         }
@@ -52,7 +48,6 @@ class BackupManager
     }
 
     /**
-     * @param array $room
      * @return Room
      */
     private function getRoomAsObject(array $room)
@@ -66,7 +61,6 @@ class BackupManager
     }
 
     /**
-     * @param array $field
      * @return Field
      */
     private function getFieldAsObject(array $field)
@@ -90,7 +84,7 @@ class BackupManager
 
     private function getRoomAsArray(Room $room)
     {
-        $array = [
+        return [
             'uniqueId' => $room->getUniqueId(),
             'lastTouch' => $room->getLastTouch()->getTimestamp(),
             'maxPlayers' => $room->getMaxPlayers(),
@@ -99,26 +93,20 @@ class BackupManager
             'name' => $room->getName(),
             'createdBy' => $room->getCreatedBy(),
         ];
-        return $array;
     }
 
     /**
-     * @param Field $field
      * @return array
      */
     private function getFieldAsArray(Field $field)
     {
         $cells = $field->getCells();
         foreach ($cells as $key => $row) {
-            $cells[$key] = array_map(function (FieldCell $fieldCell) {
-                return $fieldCell->backup();
-            }, $row);
+            $cells[$key] = array_map(fn (FieldCell $fieldCell) => $fieldCell->backup(), $row);
         }
-        $array = [
+        return [
             'cells' => $cells,
             'maxPlayers' => $field->getMaxPlayers(),
         ];
-        return $array;
     }
-
 }

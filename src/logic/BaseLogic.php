@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -11,10 +13,8 @@
 
 namespace bomberman\logic;
 
-use bomberman\Context;
 use bomberman\io\Message;
 use bomberman\logic\javascript\MessageJSLogic;
-use Ratchet\ConnectionInterface;
 
 /**
  * Class BaseLogic
@@ -22,30 +22,20 @@ use Ratchet\ConnectionInterface;
  */
 abstract class BaseLogic
 {
-
     /**
      * @var string
      */
     public static $name = '';
 
-    /**
-     * @var Context
-     */
-    protected $context;
-
-    /**
-     * BaseLogic constructor.
-     * @param Context $context
-     */
-    public function __construct(Context $context)
-    {
-        $this->context = $context;
+    public function __construct(
+        protected \bomberman\Context $context
+    ) {
     }
 
     /**
      * @return array
      */
-    public abstract function getEventsAllowedFromClient();
+    abstract public function getEventsAllowedFromClient();
 
     /**
      * @param Message $message
@@ -56,10 +46,9 @@ abstract class BaseLogic
         $event = $message->getEvent();
         if (($message->isFromClient() && !in_array($event, $this->getEventsAllowedFromClient()))
             || !method_exists($this, $event)) {
-            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Event not found.')));
+            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Event not found.'), JSON_THROW_ON_ERROR));
         } else {
-            $this->$event($message->getData(), $sender);
+            $this->{$event}($message->getData(), $sender);
         }
     }
-
 }

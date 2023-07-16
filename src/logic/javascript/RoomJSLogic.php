@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -17,9 +19,7 @@ namespace bomberman\logic\javascript;
  */
 interface RoomJSLogic
 {
+    public const NAME = 'room_js';
 
-    const NAME = 'room_js';
-
-    const EVENT_LIST = 'list';
-
+    public const EVENT_LIST = 'list';
 }

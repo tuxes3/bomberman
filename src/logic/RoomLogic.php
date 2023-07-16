@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -17,7 +19,6 @@ use bomberman\io\Config;
 use bomberman\io\Message;
 use bomberman\logic\javascript\MessageJSLogic;
 use bomberman\logic\javascript\RoomJSLogic;
-use Ratchet\ConnectionInterface;
 
 /**
  * Class RoomLogic
@@ -25,22 +26,30 @@ use Ratchet\ConnectionInterface;
  */
 class RoomLogic extends BaseLogic
 {
+    final public const EVENT_CREATE = 'create';
 
-    const EVENT_CREATE = 'create';
-    const EVENT_JOIN = 'join';
-    const EVENT_LIST = 'getAll';
-    const EVENT_CLOSE = 'close';
-    const EVENT_LEAVE = 'leave';
+    final public const EVENT_JOIN = 'join';
+
+    final public const EVENT_LIST = 'getAll';
+
+    final public const EVENT_CLOSE = 'close';
+
+    final public const EVENT_LEAVE = 'leave';
 
     /**
      * @var string
      */
     public static $name = 'room';
 
+    public function __construct(Context $context)
+    {
+        parent::__construct($context);
+    }
+
     /**
      * @return array
      */
-    public  function getEventsAllowedFromClient()
+    public function getEventsAllowedFromClient()
     {
         return [
             self::EVENT_CREATE,
@@ -50,31 +59,20 @@ class RoomLogic extends BaseLogic
     }
 
     /**
-     * RoomLogic constructor.
-     * @param Context $context
-     */
-    public function __construct(Context $context)
-    {
-        parent::__construct($context);
-    }
-
-    /**
      * @param \stdClass $data
-     * @param ClientConnection $sender
      */
     protected function create($data, ClientConnection $sender)
     {
         $uniqueId = $this->context->getData()->getFreeUniqueId();
         $roomSize = $data->maxPlayers;
         $maxRoomsPerPlayer = Config::get(Config::MAX_ROOMS_PER_PLAYER);
-        $roomSize = intval($roomSize);
+        $roomSize = (int) $roomSize;
         if ($roomSize > 10) {
-            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Cannot create room with more than 10 players.')));
+            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Cannot create room with more than 10 players.'), JSON_THROW_ON_ERROR));
         } elseif ($roomSize < 1) {
-            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Cannot create room with less than 1 players.')));
-        }
-        elseif ($this->context->getData()->findByCreatedBy($sender->getUuid())->count() >= $maxRoomsPerPlayer) {
-            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, sprintf('You cannot create more than %s rooms', $maxRoomsPerPlayer))));
+            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, 'Cannot create room with less than 1 players.'), JSON_THROW_ON_ERROR));
+        } elseif ($this->context->getData()->findByCreatedBy($sender->getUuid())->count() >= $maxRoomsPerPlayer) {
+            $sender->send(json_encode(Message::fromCode(MessageJSLogic::NAME, MessageJSLogic::EVENT_WARNING, sprintf('You cannot create more than %s rooms', $maxRoomsPerPlayer)), JSON_THROW_ON_ERROR));
         } else {
             $room = new Room($roomSize, $uniqueId, $data->name, $sender->getUuid());
             $this->context->getData()->add($room);
@@ -110,7 +108,6 @@ class RoomLogic extends BaseLogic
 
     /**
      * @param \stdClass $data
-     * @param ClientConnection $sender
      */
     protected function join($data, ClientConnection $sender)
     {
@@ -141,13 +138,12 @@ class RoomLogic extends BaseLogic
         }
 
         if (!is_null($return)) {
-            $sender->send(json_encode($return));
+            $sender->send(json_encode($return, JSON_THROW_ON_ERROR));
         }
     }
 
     /**
      * @param \stdClass $data
-     * @param ClientConnection $sender
      */
     protected function leave($data, ClientConnection $sender)
     {
@@ -158,12 +154,8 @@ class RoomLogic extends BaseLogic
         }
     }
 
-    /**
-     * @param ClientConnection $sender
-     */
     protected function getAll($data, ClientConnection $sender)
     {
-        $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $this->context->getData()->getValues())));
+        $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $this->context->getData()->getValues()), JSON_THROW_ON_ERROR));
     }
-
 }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
 * This file is part of the bomberman project.
 *
@@ -13,7 +15,6 @@ namespace bomberman\logic;
 use bomberman\components\field\BaseItem;
 use bomberman\components\Room;
 use bomberman\io\Message;
-use bomberman\logic\javascript\FieldJSLogic;
 
 /**
  * Class ItemLogic
@@ -21,15 +22,14 @@ use bomberman\logic\javascript\FieldJSLogic;
  */
 class ItemLogic extends BaseLogic
 {
+    final public const EVENT_NAME = 'remove';
 
     public static $name = 'item';
-
-    const EVENT_NAME = 'remove';
 
     /**
      * @return array
      */
-    public  function getEventsAllowedFromClient()
+    public function getEventsAllowedFromClient()
     {
         return [];
     }
@@ -48,5 +48,4 @@ class ItemLogic extends BaseLogic
         $room->getField()->getXY($data->getX(), $data->getY())->removeById($data->getId());
         $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_UPDATE_CLIENTS, $room), $sender);
     }
-
 }

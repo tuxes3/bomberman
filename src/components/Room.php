@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -17,41 +19,21 @@ namespace bomberman\components;
  */
 class Room implements \JsonSerializable
 {
-    const PLAYER_LIMIT = 10;
+    final public const PLAYER_LIMIT = 10;
+
     /**
      * @var int
      */
     private $maxPlayers;
 
-    /**
-     * @var string
-     */
-    private $uniqueId;
-
-    /**
-     * @var \DateTime
-     */
-    private $lastTouch;
+    private \DateTime $lastTouch;
 
     /**
      * @var array|string[]
      */
-    private $connectedPlayers;
+    private array $connectedPlayers;
 
-    /**
-     * @var Field
-     */
-    private $field;
-
-    /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var $createdBy (player uuid)
-     */
-    private $createdBy;
+    private \bomberman\components\Field $field;
 
     /**
      * Room constructor.
@@ -60,26 +42,26 @@ class Room implements \JsonSerializable
      * @param string $name
      * @param string $createdBy (uuid)
      */
-    public function __construct($maxPlayers, $uniqueId, $name, $createdBy)
-    {
+    public function __construct(
+        $maxPlayers,
+        private $uniqueId,
+        private $name, /**
+     * @var (player $createdBy uuid)
+     */
+        private $createdBy
+    ) {
         //max 10 players
-        if($maxPlayers >= self::PLAYER_LIMIT){
+        if ($maxPlayers >= self::PLAYER_LIMIT) {
             $maxPlayers = self::PLAYER_LIMIT;
         }
 
         $this->maxPlayers = $maxPlayers;
-        $this->uniqueId = $uniqueId;
         $this->connectedPlayers = [];
         $this->lastTouch = new \DateTime();
         $this->field = new Field($maxPlayers);
-        $this->name = $name;
-        $this->createdBy = $createdBy;
     }
 
-    /**
-     * @return array
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'maxPlayers' => $this->maxPlayers,
@@ -92,9 +74,8 @@ class Room implements \JsonSerializable
 
     /**
      * @param int $playerId
-     * @return bool|string
      */
-    public function addPlayer($playerId)
+    public function addPlayer($playerId): string|bool
     {
         if (in_array($playerId, $this->connectedPlayers)) {
             return sprintf('Player is already in room (%s).', $this->uniqueId);
@@ -110,11 +91,7 @@ class Room implements \JsonSerializable
         return true;
     }
 
-    /**
-     * @param $playerId
-     * @return bool|string
-     */
-    public function removePlayer($playerId)
+    public function removePlayer($playerId): void
     {
         if (($key = array_search($playerId, $this->connectedPlayers)) !== false) {
             unset($this->connectedPlayers[$key]);
@@ -239,5 +216,4 @@ class Room implements \JsonSerializable
     {
         return $this->createdBy;
     }
-
 }

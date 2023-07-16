@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
 * This file is part of the bomberman project.
 *
@@ -17,13 +19,8 @@ namespace bomberman\components\field;
  */
 class ShoeItem extends BaseItem
 {
-
-    /**
-     * @param Player $player
-     */
     public function consume(Player $player)
     {
         $player->decreaseMovementSpeed();
     }
-
 }

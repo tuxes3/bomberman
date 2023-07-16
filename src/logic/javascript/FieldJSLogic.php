@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -17,10 +19,9 @@ namespace bomberman\logic\javascript;
  */
 interface FieldJSLogic
 {
+    public const NAME = 'field_js';
 
-    const NAME = 'field_js';
+    public const EVENT_UPDATE = 'update';
 
-    const EVENT_UPDATE = 'update';
-    const EVENT_PATCH = 'patch';
-
+    public const EVENT_PATCH = 'patch';
 }

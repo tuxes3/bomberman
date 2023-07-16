@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -15,7 +17,7 @@ use bomberman\components\field\Bomb;
 use bomberman\components\Room;
 use bomberman\io\Config;
 use bomberman\io\Message;
-use bomberman\logic\javascript\FieldJSLogic;
+use bomberman\io\Milliseconds;
 
 /**
  * Class BombLogic
@@ -23,16 +25,16 @@ use bomberman\logic\javascript\FieldJSLogic;
  */
 class BombLogic extends BaseLogic
 {
+    final public const EVENT_EXPLODE = 'explode';
+
+    final public const EVENT_MOVE = 'move';
 
     public static $name = 'bomb';
-
-    const EVENT_EXPLODE = 'explode';
-    const EVENT_MOVE = 'move';
 
     /**
      * @return array
      */
-    public  function getEventsAllowedFromClient()
+    public function getEventsAllowedFromClient()
     {
         return [];
     }
@@ -48,9 +50,9 @@ class BombLogic extends BaseLogic
             return;
         }
         $bomb->setTimer(null);
-        $current = milliseconds();
+        $current = (new Milliseconds())->get();
         $room = $this->context->getData()->findRoomBySender($sender->getUuid());
-        if (!$room) {
+        if (!$room instanceof \bomberman\components\Room) {
             return;
         }
         if (($current - $bomb->getPlanted()) >= Config::get(Config::BOMB_TIMEOUT)) {
@@ -90,11 +92,10 @@ class BombLogic extends BaseLogic
             }
             $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_UPDATE_CLIENTS, $room), $sender);
             $this->context->executeAfter(function () use ($data, $sender) {
-                $this->context->send(Message::fromCode(BombLogic::$name, BombLogic::EVENT_MOVE, $data), $sender);
+                $this->context->send(Message::fromCode(self::$name, self::EVENT_MOVE, $data), $sender);
             }, Config::get(Config::BOMB_MOVEMENT_SPEED));
         } else {
             $bomb->setMoving(false);
         }
     }
-
 }

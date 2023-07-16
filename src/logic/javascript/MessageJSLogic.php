@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -17,10 +19,9 @@ namespace bomberman\logic\javascript;
  */
 interface MessageJSLogic
 {
+    public const NAME = 'message_js';
 
-    const NAME = 'message_js';
+    public const EVENT_WARNING = 'warning';
 
-    const EVENT_WARNING = 'warning';
-    const EVENT_INFO = 'info';
-
+    public const EVENT_INFO = 'info';
 }

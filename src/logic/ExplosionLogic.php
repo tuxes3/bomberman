@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -18,8 +20,7 @@ use bomberman\components\field\FieldCell;
 use bomberman\components\Room;
 use bomberman\io\Config;
 use bomberman\io\Message;
-use bomberman\logic\javascript\FieldJSLogic;
-use bomberman\logic\javascript\GameJSLogic;
+use bomberman\io\Milliseconds;
 
 /**
  * Class ExplosionLogic
@@ -27,9 +28,9 @@ use bomberman\logic\javascript\GameJSLogic;
  */
 class ExplosionLogic extends BaseLogic
 {
+    final public const EVENT_REMOVE = 'remove';
 
-    const EVENT_REMOVE = 'remove';
-    const EVENT_CREATE = 'create';
+    final public const EVENT_CREATE = 'create';
 
     public static $name = 'explosion';
 
@@ -53,7 +54,7 @@ class ExplosionLogic extends BaseLogic
         if (!$room) {
             return;
         }
-        $current = milliseconds();
+        $current = (new Milliseconds())->get();
         if (($current - $explosion->getExploded()) >= Config::get(Config::EXPLOSION_DURATION)) {
             $room->getField()->getXY($explosion->getX(), $explosion->getY())->removeById($explosion->getId());
             $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_UPDATE_CLIENTS, $room), $sender);
@@ -89,8 +90,6 @@ class ExplosionLogic extends BaseLogic
 
     /**
      * @param Room $room
-     * @param $x
-     * @param $y
      * @param ClientConnection $sender
      * @return boolean
      */
@@ -107,9 +106,8 @@ class ExplosionLogic extends BaseLogic
         $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_CHECK_FINISH, $room), $sender);
         $fieldCell->add($explosion);
         $this->context->executeAfter(function () use ($explosion, $sender) {
-            $this->context->send(Message::fromCode(ExplosionLogic::$name, ExplosionLogic::EVENT_REMOVE, $explosion), $sender);
+            $this->context->send(Message::fromCode(self::$name, self::EVENT_REMOVE, $explosion), $sender);
         }, Config::get(Config::EXPLOSION_DURATION));
         return $blockExplosion;
     }
-
 }

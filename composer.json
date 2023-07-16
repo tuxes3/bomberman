@@ -5,9 +5,22 @@
     }
   },
   "require": {
+    "php": "^8.1",
     "cboden/ratchet": "^0.4",
     "doctrine/collections": "^1.4",
     "symfony/yaml": "^3.4",
-    "mikemccabe/json-patch-php": "^0.1.0"
+    "mikemccabe/json-patch-php": "dev-master as v0.1.0",
+    "ext-openssl": "*",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "rector/rector": "^0.17.6",
+    "whatwedo/php-coding-standard": "^1.2",
+    "phpstan/phpstan": "^1.10"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -17,7 +19,6 @@ namespace bomberman\io;
  */
 class Message implements \JsonSerializable
 {
-
     /**
      * @var string
      */
@@ -38,22 +39,13 @@ class Message implements \JsonSerializable
      */
     private $uuid;
 
-    /**
-     * @var boolean
-     */
-    private $fromClient;
+    private bool $fromClient = false;
 
-    /**
-     * Message constructor.
-     */
     private function __construct()
     {
     }
 
-    /**
-     * @return array
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'name' => $this->logicName,
@@ -73,12 +65,12 @@ class Message implements \JsonSerializable
      *          ...
      *      }
      * }
-     * @return Message
+     * @return self
      */
     public static function fromJson($message)
     {
         $instance = new self();
-        $data = json_decode($message);
+        $data = json_decode($message, null, 512, JSON_THROW_ON_ERROR);
         $instance->logicName = $data->name;
         $instance->event = $data->event;
         $instance->data = $data->data;
@@ -88,10 +80,7 @@ class Message implements \JsonSerializable
     }
 
     /**
-     * @param $name
-     * @param $event
-     * @param $data
-     * @return Message
+     * @return self
      */
     public static function fromCode($name, $event, $data)
     {
@@ -102,7 +91,6 @@ class Message implements \JsonSerializable
         $instance->fromClient = false;
         return $instance;
     }
-
 
     /**
      * @return string
@@ -143,5 +131,4 @@ class Message implements \JsonSerializable
     {
         return $this->fromClient;
     }
-
 }

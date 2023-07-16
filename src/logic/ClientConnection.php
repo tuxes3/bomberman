@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -19,26 +21,15 @@ use Ratchet\ConnectionInterface;
  */
 class ClientConnection implements ConnectionInterface
 {
-
-    /**
-     * @var ConnectionInterface|null $connection
-     */
-    protected $connection;
-
-    /**
-     * @var string|null $uuid
-     */
-    protected $uuid;
-
     /**
      * ClientConnection constructor.
      * @param ConnectionInterface $connection
      * @param string $uuid
      */
-    public function __construct($connection, $uuid)
-    {
-        $this->connection = $connection;
-        $this->uuid = $uuid;
+    public function __construct(
+        protected $connection,
+        protected $uuid
+    ) {
     }
 
     /**
@@ -49,24 +40,17 @@ class ClientConnection implements ConnectionInterface
         return $this->uuid;
     }
 
-    /**
-     * @inheritdoc
-     */
-    function send($data)
+    public function send($data): void
     {
         if (!is_null($this->connection)) {
             $this->connection->send($data);
         }
     }
 
-    /**
-     * @inheritdoc
-     */
-    function close()
+    public function close()
     {
         if (!is_null($this->connection)) {
             $this->connection->close();
         }
     }
-
 }

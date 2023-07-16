@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -17,28 +19,21 @@ namespace bomberman\components\field;
  */
 class Block extends BaseInCell
 {
-
     /**
      * @param array $data
-     * @return Block
+     * @return self
      */
     public static function restore($data)
     {
         return new self($data['x'], $data['y']);
     }
 
-    /**
-     * @return bool
-     */
-    public function canPlayerEnter()
+    public function canPlayerEnter(): bool
     {
         return false;
     }
 
-    /**
-     * @return bool
-     */
-    public function blocksExplosion()
+    public function blocksExplosion(): bool
     {
         return true;
     }
@@ -51,12 +46,8 @@ class Block extends BaseInCell
         return self::BASE_PRIORITY;
     }
 
-    /**
-     * @return bool
-     */
-    public function canBombEnter()
+    public function canBombEnter(): bool
     {
         return false;
     }
-
 }

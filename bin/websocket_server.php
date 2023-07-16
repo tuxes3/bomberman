@@ -26,12 +26,6 @@ use bomberman\logic\javascript\GameJSLogic;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-// needs to be run 64 bit machine
-function milliseconds() {
-    $mt = explode(' ', microtime());
-    return ((int)$mt[1]) * 1000 + ((int)round($mt[0] * 1000));
-}
-
 // restore rooms.json incase of websocket failure
 $backupManager = new BackupManager();
 $roomCollection = $backupManager->restore();

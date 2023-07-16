@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -17,16 +19,12 @@ namespace bomberman\components\field;
  */
 class FieldCell implements \JsonSerializable
 {
-
     /**
-     * @var array|InCell[] $inCells
+     * @var array|InCell[]
      */
     protected $inCells = [];
 
-    /**
-     * @return array
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'inCells' => $this->inCells,
@@ -34,8 +32,7 @@ class FieldCell implements \JsonSerializable
     }
 
     /**
-     * @param Player $player
-     * @param FieldCell $nextNextField
+     * @param self $nextNextField
      * @return boolean
      */
     public function canPlayerEnter(Player $player, $nextNextField)
@@ -52,10 +49,9 @@ class FieldCell implements \JsonSerializable
     }
 
     /**
-     * @param $id
      * @return boolean
      */
-    public function contains($id)
+    public function contains($id): bool
     {
         foreach ($this->inCells as $inCell) {
             if ($inCell->getId() === $id) {
@@ -110,21 +106,18 @@ class FieldCell implements \JsonSerializable
     {
         $backup = [];
         foreach ($this->inCells as $inCell) {
-            if (!($inCell instanceof Bomb || $inCell instanceof Explosion)) {
+            if (!$inCell instanceof Bomb && !$inCell instanceof Explosion) {
                 $backup[] = $inCell->backup();
             }
         }
         return $backup;
     }
 
-    /**
-     * @param $id
-     */
     public function removeById($id)
     {
         foreach ($this->inCells as $key => $inCell) {
             if ($inCell->getId() == $id) {
-                unset ($this->inCells[$key]);
+                unset($this->inCells[$key]);
             }
         }
         $this->inCells = array_values($this->inCells);
@@ -180,8 +173,8 @@ class FieldCell implements \JsonSerializable
                 $changes = true;
             }
         }
-        if ($createItem && rand(1, 3) == 1) {
-            $itemClass = BaseItem::ALL_IMPL[rand(0, count(BaseItem::ALL_IMPL) - 1)];
+        if ($createItem && random_int(1, 3) == 1) {
+            $itemClass = BaseItem::ALL_IMPL[random_int(0, count(BaseItem::ALL_IMPL) - 1)];
             $this->inCells[] = new $itemClass($createItem->getX(), $createItem->getY(), $explosion->getId());
         }
         $this->inCells = array_values($this->inCells);
@@ -259,9 +252,6 @@ class FieldCell implements \JsonSerializable
         return $items;
     }
 
-    /**
-     * @param InCell $inCell
-     */
     public function add(InCell $inCell)
     {
         $this->inCells[] = $inCell;
@@ -270,7 +260,8 @@ class FieldCell implements \JsonSerializable
     /**
      * return boolean
      */
-     public function isEmpty(){
-        return empty($this->inCells) ? true : false;
+    public function isEmpty()
+    {
+        return $this->inCells === [];
     }
 }

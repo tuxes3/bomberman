@@ -1,6 +1,4 @@
 <?php
-
-declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -11,15 +9,9 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace bomberman\logic\javascript;
+use Rector\Config\RectorConfig;
+use Rector\Set\ValueObject\LevelSetList;
 
-/**
- * Interface PlayerJSLogic
- * @package bomberman\logic\javascript
- */
-interface PlayerJSLogic
-{
-    public const NAME = 'player_js';
-
-    public const EVENT_MOVEMENT_SPEED = 'movementSpeed';
-}
+return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->sets([LevelSetList::UP_TO_PHP_81]);
+};

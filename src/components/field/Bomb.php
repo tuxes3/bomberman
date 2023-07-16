@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -10,6 +12,7 @@
  */
 
 namespace bomberman\components\field;
+use bomberman\io\Milliseconds;
 use React\EventLoop\Timer\TimerInterface;
 
 /**
@@ -18,21 +21,10 @@ use React\EventLoop\Timer\TimerInterface;
  */
 class Bomb extends BaseInCell
 {
-
-    /**
-     * @var int $explosionSpread
-     */
-    protected $explosionSpread;
-
     /**
      * @var int
      */
     protected $planted;
-
-    /**
-     * @var string
-     */
-    protected $plantedByUuid;
 
     /**
      * @var TimerInterface
@@ -51,12 +43,14 @@ class Bomb extends BaseInCell
      * @param int $explosionSpread
      * @param string $plantedByUuid
      */
-    public function __construct($x, $y, $explosionSpread, $plantedByUuid)
-    {
+    public function __construct(
+        $x,
+        $y,
+        protected $explosionSpread,
+        protected $plantedByUuid
+    ) {
         parent::__construct($x, $y);
-        $this->explosionSpread = $explosionSpread;
-        $this->planted = milliseconds();
-        $this->plantedByUuid = $plantedByUuid;
+        $this->planted = (new Milliseconds())->get();
     }
 
     /**
@@ -73,7 +67,7 @@ class Bomb extends BaseInCell
 
     /**
      * @param array $data
-     * @return Bomb
+     * @return self
      */
     public static function restore($data)
     {
@@ -85,7 +79,7 @@ class Bomb extends BaseInCell
     /**
      * @return boolean
      */
-    public function canPlayerEnter()
+    public function canPlayerEnter(): bool
     {
         return false;
     }
@@ -93,7 +87,7 @@ class Bomb extends BaseInCell
     /**
      * @return boolean
      */
-    public function blocksExplosion()
+    public function blocksExplosion(): bool
     {
         return false;
     }
@@ -114,9 +108,6 @@ class Bomb extends BaseInCell
         return $this->planted;
     }
 
-    /**
-     *
-     */
     public function explodeNow()
     {
         if (is_null($this->timer)) {
@@ -158,10 +149,7 @@ class Bomb extends BaseInCell
         return $this->timer;
     }
 
-    /**
-     * @return bool
-     */
-    public function canBombEnter()
+    public function canBombEnter(): bool
     {
         return false;
     }
@@ -181,5 +169,4 @@ class Bomb extends BaseInCell
     {
         $this->moving = $moving;
     }
-
 }

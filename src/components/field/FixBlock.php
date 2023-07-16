@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * Copyright (c) 2017, whatwedo GmbH
  * All rights reserved
@@ -33,28 +35,21 @@ namespace bomberman\components\field;
  */
 class FixBlock extends BaseInCell
 {
-
     /**
      * @param array $data
-     * @return FixBlock
+     * @return self
      */
     public static function restore($data)
     {
         return new self($data['x'], $data['y']);
     }
 
-    /**
-     * @return bool
-     */
-    public function canPlayerEnter()
+    public function canPlayerEnter(): bool
     {
         return false;
     }
 
-    /**
-     * @return bool
-     */
-    public function blocksExplosion()
+    public function blocksExplosion(): bool
     {
         return true;
     }
@@ -64,15 +59,11 @@ class FixBlock extends BaseInCell
      */
     public function getDisplayPriority()
     {
-        return self::BASE_PRIORITY+5;
+        return self::BASE_PRIORITY + 5;
     }
 
-    /**
-     * @return bool
-     */
-    public function canBombEnter()
+    public function canBombEnter(): bool
     {
         return false;
     }
-
 }

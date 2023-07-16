@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -12,6 +14,7 @@
 namespace bomberman\components\field;
 
 use bomberman\io\Config;
+use bomberman\io\Milliseconds;
 
 /**
  * Class Player
@@ -19,12 +22,6 @@ use bomberman\io\Config;
  */
 class Player extends BaseInCell
 {
-
-    /**
-     * @var string
-     */
-    protected $uuid;
-
     /**
      * @var int
      */
@@ -57,24 +54,21 @@ class Player extends BaseInCell
 
     /**
      * Player constructor.
-     * @param $x
-     * @param $y
-     * @param $uuid
+     * @param string $uuid
      */
-    public function __construct($x, $y, $uuid)
-    {
+    public function __construct(
+        $x,
+        $y,
+        protected $uuid
+    ) {
         parent::__construct($x, $y);
-        $this->uuid = $uuid;
-        $this->lastMoved = milliseconds();
+        $this->lastMoved = (new Milliseconds())->get();
         $this->movementSpeed = Config::get(Config::MOVEMENT_SPEED);
         $this->bombCount = Config::get(Config::BOMB_COUNT);
         $this->explosionSpread = Config::get(Config::EXPLOSION_SPREAD);
     }
 
-    /**
-     * @return array
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), [
             'alive' => $this->alive,
@@ -99,11 +93,11 @@ class Player extends BaseInCell
 
     /**
      * @param array $data
-     * @return Player
+     * @return self
      */
     public static function restore($data)
     {
-        $player = new Player($data['x'], $data['y'], $data['uuid']);
+        $player = new self($data['x'], $data['y'], $data['uuid']);
         $player->lastMoved = $data['lastMoved'];
         $player->movementSpeed = $data['movementSpeed'];
         $player->bombCount = $data['bombCount'];
@@ -115,7 +109,7 @@ class Player extends BaseInCell
     /**
      * @return boolean
      */
-    public function canPlayerEnter()
+    public function canPlayerEnter(): bool
     {
         return true;
     }
@@ -123,14 +117,11 @@ class Player extends BaseInCell
     /**
      * @return boolean
      */
-    public function blocksExplosion()
+    public function blocksExplosion(): bool
     {
         return false;
     }
 
-    /**
-     *
-     */
     public function setCanMoveBombs()
     {
         $this->canMoveBombs = true;
@@ -144,10 +135,7 @@ class Player extends BaseInCell
         return $this->canMoveBombs;
     }
 
-    /**
-     * @return bool
-     */
-    public function canBombEnter()
+    public function canBombEnter(): bool
     {
         return true;
     }
@@ -157,7 +145,7 @@ class Player extends BaseInCell
      */
     public function canPlayerMove()
     {
-        return (milliseconds() - $this->lastMoved) > $this->movementSpeed && $this->alive;
+        return ((new Milliseconds())->get() - $this->lastMoved) > $this->movementSpeed && $this->alive;
     }
 
     /**
@@ -181,7 +169,7 @@ class Player extends BaseInCell
      */
     public function setLastMoved()
     {
-        $this->lastMoved = milliseconds();
+        $this->lastMoved = (new Milliseconds())->get();
         return $this;
     }
 
@@ -193,9 +181,6 @@ class Player extends BaseInCell
         return $this->movementSpeed;
     }
 
-    /**
-     *
-     */
     public function setDead()
     {
         $this->alive = false;
@@ -225,30 +210,20 @@ class Player extends BaseInCell
         return $this->bombCount;
     }
 
-    /**
-     *
-     */
     public function incrementBombCount()
     {
         $this->bombCount++;
     }
 
-    /**
-     *
-     */
     public function incrementExplosionSpread()
     {
         $this->explosionSpread++;
     }
 
-    /**
-     *
-     */
     public function decreaseMovementSpeed()
     {
         if ($this->movementSpeed > Config::get(Config::MAX_MOVEMENT_SPEED)) {
-            $this->movementSpeed = $this->movementSpeed - Config::get(Config::ITEM_MOVEMENT_SPEED_DECREASE);
+            $this->movementSpeed -= Config::get(Config::ITEM_MOVEMENT_SPEED_DECREASE);
         }
     }
-
 }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -19,21 +21,33 @@ use Symfony\Component\Yaml\Yaml;
  */
 class Config
 {
+    final public const MOVEMENT_SPEED = 'movement_speed';
 
-    const MOVEMENT_SPEED = 'movement_speed';
-    const BOMB_MOVEMENT_SPEED = 'bomb_movement_speed';
-    const BOMB_COUNT = 'bomb_count';
-    const BOMB_INTERVAL = 'bomb_interval';
-    const BOMB_TIMEOUT = 'bomb_timeout';
-    const EXPLOSION_DURATION = 'explosion_duration';
-    const EXPLOSION_SPREAD = 'explosion_spread';
-    const EXPLOSION_INTERVAL = 'explosion_interval';
-    const BACK_UP_INTERVAL = 'back_up_interval';
-    const ITEM_INTERVAL = 'item_interval';
-    const MAX_MOVEMENT_SPEED = 'max_movement_speed';
-    const ITEM_MOVEMENT_SPEED_DECREASE = 'item_movement_speed_decrease';
-    const ROOM_EXPIRATION_SECONDS = 'room_expiration_seconds';
-    const MAX_ROOMS_PER_PLAYER = 'max_rooms_per_player';
+    final public const BOMB_MOVEMENT_SPEED = 'bomb_movement_speed';
+
+    final public const BOMB_COUNT = 'bomb_count';
+
+    final public const BOMB_INTERVAL = 'bomb_interval';
+
+    final public const BOMB_TIMEOUT = 'bomb_timeout';
+
+    final public const EXPLOSION_DURATION = 'explosion_duration';
+
+    final public const EXPLOSION_SPREAD = 'explosion_spread';
+
+    final public const EXPLOSION_INTERVAL = 'explosion_interval';
+
+    final public const BACK_UP_INTERVAL = 'back_up_interval';
+
+    final public const ITEM_INTERVAL = 'item_interval';
+
+    final public const MAX_MOVEMENT_SPEED = 'max_movement_speed';
+
+    final public const ITEM_MOVEMENT_SPEED_DECREASE = 'item_movement_speed_decrease';
+
+    final public const ROOM_EXPIRATION_SECONDS = 'room_expiration_seconds';
+
+    final public const MAX_ROOMS_PER_PLAYER = 'max_rooms_per_player';
 
     private static $configFile = null;
 
@@ -43,10 +57,9 @@ class Config
      */
     public static function get($key)
     {
-        if (is_null(Config::$configFile)) {
-            Config::$configFile = Yaml::parseFile(__DIR__.'/../../app/config.yml');
+        if (is_null(self::$configFile)) {
+            self::$configFile = Yaml::parseFile(__DIR__.'/../../app/config.yml');
         }
-        return Config::$configFile[$key];
+        return self::$configFile[$key];
     }
-
 }

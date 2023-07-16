@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -11,7 +13,6 @@
 
 namespace bomberman\io;
 
-use bomberman\components\field\FieldCell;
 use bomberman\components\field\Player;
 use bomberman\components\Room;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,11 +24,7 @@ use Doctrine\Common\Collections\Criteria;
  */
 class RoomCollection extends ArrayCollection implements \JsonSerializable
 {
-
-    /**
-     * @return array
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }
@@ -65,7 +62,6 @@ class RoomCollection extends ArrayCollection implements \JsonSerializable
     }
 
     /**
-     * @param $uniqueId
      * @return Room|null
      */
     public function findRoomByUniqueId($uniqueId)
@@ -86,7 +82,7 @@ class RoomCollection extends ArrayCollection implements \JsonSerializable
     public function findPlayerBySender($uuid)
     {
         $room = $this->findRoomBySender($uuid);
-        if ($room) {
+        if ($room instanceof \bomberman\components\Room) {
             return $room->getField()->getFieldCollection()->findPlayerBySender($uuid);
         }
         return null;
@@ -124,9 +120,7 @@ class RoomCollection extends ArrayCollection implements \JsonSerializable
      */
     public function findRoomBySender($uuid)
     {
-        $rooms = $this->filter(function (Room $room) use ($uuid) {
-            return in_array($uuid, $room->getConnectedPlayers());
-        });
+        $rooms = $this->filter(fn (Room $room): bool => in_array($uuid, $room->getConnectedPlayers()));
         /** @var Room|bool $room */
         $room = $rooms->first();
         if ($room) {
@@ -134,5 +128,4 @@ class RoomCollection extends ArrayCollection implements \JsonSerializable
         }
         return null;
     }
-
 }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -17,8 +19,7 @@ namespace bomberman\components\field;
  */
 abstract class BaseItem extends BaseInCell
 {
-
-    const ALL_IMPL = [
+    final public const ALL_IMPL = [
         BombItem::class,
         ShoeItem::class,
         ExplosionRadiusItem::class,
@@ -26,25 +27,19 @@ abstract class BaseItem extends BaseInCell
     ];
 
     /**
-     * @var string $explosionId
-     */
-    private $explosionId;
-
-    /**
      * BaseItem constructor.
      * @param int $x
      * @param int $y
      * @param string $explosionId
      */
-    public function __construct($x, $y, $explosionId)
-    {
+    final public function __construct(
+        $x,
+        $y,
+        private $explosionId
+    ) {
         parent::__construct($x, $y);
-        $this->explosionId = $explosionId;
     }
 
-    /**
-     * @param Player $player
-     */
     abstract public function consume(Player $player);
 
     /**
@@ -73,7 +68,7 @@ abstract class BaseItem extends BaseInCell
 
     /**
      * @param array $data
-     * @return BaseItem|InCell
+     * @return self|InCell
      */
     public static function restore($data)
     {
@@ -95,5 +90,4 @@ abstract class BaseItem extends BaseInCell
     {
         return true;
     }
-
 }

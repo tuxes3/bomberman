@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -11,10 +13,9 @@
 
 namespace bomberman;
 
-use bomberman\io\RoomCollection;
 use bomberman\io\Message;
+use bomberman\io\RoomCollection;
 use bomberman\logic\ClientConnection;
-use Ratchet\ConnectionInterface;
 
 /**
  * Interface Context
@@ -22,8 +23,7 @@ use Ratchet\ConnectionInterface;
  */
 interface Context
 {
-
-    const SEND_ALL = -1;
+    public const SEND_ALL = -1;
 
     /**
      * @param Message $message
@@ -48,5 +48,4 @@ interface Context
      * @return \React\EventLoop\Timer\TimerInterface
      */
     public function executeAfter($callable, $miliseconds);
-
 }

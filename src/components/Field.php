@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -21,41 +23,31 @@ use bomberman\io\FieldCollection;
  */
 class Field implements \JsonSerializable
 {
-
     /**
      * @var array|InCell[][]
      */
     protected $cells = [];
 
     /**
-     * @var int $maxPlayers
+     * @param int $maxPlayers
      */
-    protected $maxPlayers;
-
-    public function __construct($maxPlayers)
-    {
-        $this->maxPlayers = $maxPlayers;
+    public function __construct(
+        protected $maxPlayers
+    ) {
     }
 
     /**
-     * @param $x
-     * @param $y
      * @return FieldCell|null
      */
     public function getXY($x, $y)
     {
-        if (isset($this->cells[$x])) {
-            if (isset($this->cells[$x][$y])) {
-                return $this->cells[$x][$y];
-            }
+        if (isset($this->cells[$x]) && isset($this->cells[$x][$y])) {
+            return $this->cells[$x][$y];
         }
         return null;
     }
 
-    /**
-     * @return array
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'players' => $this->maxPlayers,
@@ -72,7 +64,6 @@ class Field implements \JsonSerializable
     }
 
     /**
-     * @param InCell $a
      * @param int $x
      * @param int $y
      */
@@ -115,17 +106,11 @@ class Field implements \JsonSerializable
         return count($players) == 1 ? $aliveCount == 0 : $aliveCount <= 1;
     }
 
-    /**
-     * @param InCell $inCell
-     */
     public function addTo(InCell $inCell)
     {
         $this->getXY($inCell->getX(), $inCell->getY())->add($inCell);
     }
 
-    /**
-     * @param $cells
-     */
     public function setCells($cells)
     {
         $this->cells = $cells;
@@ -149,5 +134,4 @@ class Field implements \JsonSerializable
         $std->height = count($this->cells[0]);
         return $std;
     }
-
 }

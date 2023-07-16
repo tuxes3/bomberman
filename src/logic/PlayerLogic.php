@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -20,16 +22,16 @@ use bomberman\logic\javascript\FieldJSLogic;
 use bomberman\logic\javascript\GameJSLogic;
 use bomberman\logic\javascript\PlayerJSLogic;
 use bomberman\logic\javascript\RoomJSLogic;
-use Ratchet\ConnectionInterface;
 
 class PlayerLogic extends BaseLogic
 {
+    final public const EVENT_MOVE = 'move';
+
+    final public const EVENT_PLAN = 'plant';
+
+    final public const EVENT_INIT = 'init';
 
     public static $name = 'player';
-
-    const EVENT_MOVE = 'move';
-    const EVENT_PLAN = 'plant';
-    const EVENT_INIT = 'init';
 
     /**
      * @return array
@@ -45,24 +47,22 @@ class PlayerLogic extends BaseLogic
 
     /**
      * @param \stdClass $data
-     * @param ClientConnection $sender
      */
     protected function init($data, ClientConnection $sender)
     {
         $rooms = $this->context->getData();
         /** @var Room $room */
         $room = $rooms->findRoomBySender($sender->getUuid());
-        $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $rooms->getValues())));
-        $sender->send(json_encode(Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_BOMB_MOVEMENT_SPEED, Config::get(Config::BOMB_MOVEMENT_SPEED))));
+        $sender->send(json_encode(Message::fromCode(RoomJSLogic::NAME, RoomJSLogic::EVENT_LIST, $rooms->getValues()), JSON_THROW_ON_ERROR));
+        $sender->send(json_encode(Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_BOMB_MOVEMENT_SPEED, Config::get(Config::BOMB_MOVEMENT_SPEED)), JSON_THROW_ON_ERROR));
         if (!is_null($room) && $room->isStartable()) {
-            $sender->send(json_encode(Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_STARTED, $room->getField()->getDimension())));
-            $sender->send(json_encode(Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField())));
+            $sender->send(json_encode(Message::fromCode(GameJSLogic::NAME, GameJSLogic::EVENT_STARTED, $room->getField()->getDimension()), JSON_THROW_ON_ERROR));
+            $sender->send(json_encode(Message::fromCode(FieldJSLogic::NAME, FieldJSLogic::EVENT_UPDATE, $room->getField()), JSON_THROW_ON_ERROR));
         }
     }
 
     /**
      * @param \stdClass $data
-     * @param ClientConnection $sender
      */
     protected function move($data, ClientConnection $sender)
     {
@@ -81,7 +81,7 @@ class PlayerLogic extends BaseLogic
                     $y = $player->getY() - 1;
                     $y2 = $player->getY() - 2;
                     break;
-                case '←';
+                case '←':
                     $x = $player->getx() - 1;
                     $x2 = $player->getx() - 2;
                     $y = $player->getY();
@@ -122,7 +122,7 @@ class PlayerLogic extends BaseLogic
                     foreach ($explosions as $explosion) {
                         $nextField->explode($explosion);
                     }
-                    if (count($explosions) > 0) {
+                    if ($explosions !== []) {
                         $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_CHECK_FINISH, $room), $sender);
                     }
                     foreach ($nextField->getAllItems() as $item) {
@@ -131,7 +131,7 @@ class PlayerLogic extends BaseLogic
                     }
                     $player->setLastMoved();
                     $this->context->send(Message::fromCode(FieldLogic::$name, FieldLogic::EVENT_UPDATE_CLIENTS, $room), $sender);
-                    $sender->send(json_encode(Message::fromCode(PlayerJSLogic::NAME, PlayerJSLogic::EVENT_MOVEMENT_SPEED, $player->getMovementSpeed())));
+                    $sender->send(json_encode(Message::fromCode(PlayerJSLogic::NAME, PlayerJSLogic::EVENT_MOVEMENT_SPEED, $player->getMovementSpeed()), JSON_THROW_ON_ERROR));
                 }
             }
         }
@@ -139,7 +139,6 @@ class PlayerLogic extends BaseLogic
 
     /**
      * @param \stdClass $data
-     * @param ClientConnection $sender
      */
     protected function plant($data, ClientConnection $sender)
     {
@@ -162,5 +161,4 @@ class PlayerLogic extends BaseLogic
             }
         }
     }
-
 }

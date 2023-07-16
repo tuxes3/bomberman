@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -17,11 +19,11 @@ namespace bomberman\logic\javascript;
  */
 interface GameJSLogic
 {
+    public const NAME = 'game_js';
 
-    const NAME = 'game_js';
+    public const EVENT_STARTED = 'started';
 
-    const EVENT_STARTED = 'started';
-    const EVENT_FINISHED = 'finished';
-    const EVENT_BOMB_MOVEMENT_SPEED = 'bombMovementSpeed';
+    public const EVENT_FINISHED = 'finished';
 
+    public const EVENT_BOMB_MOVEMENT_SPEED = 'bombMovementSpeed';
 }

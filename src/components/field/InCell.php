@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -17,7 +19,6 @@ namespace bomberman\components\field;
  */
 interface InCell
 {
-
     /**
      * @return int
      */
@@ -78,5 +79,4 @@ interface InCell
      * @return self
      */
     public static function restore($data);
-
 }

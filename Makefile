@@ -10,6 +10,12 @@ install:
 	php -r "unlink('composer-setup.php');"
 	php composer.phar install
 
+codestyle:
+	vendor/bin/ecs check src --config vendor/whatwedo/php-coding-standard/config/whatwedo-symfony.php --fix
+
+phpstan:
+	vendor/bin/phpstan analyse
+
 docker_build:
 	docker build -t bomberman .
 

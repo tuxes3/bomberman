@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file is part of the bomberman project.
  *
@@ -23,16 +25,13 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class FieldCollection extends ArrayCollection
 {
-
     /**
      * @param string $uuid
      * @return null|Player
      */
     public function findPlayerBySender($uuid)
     {
-        $fieldCells = $this->filter(function (FieldCell $fieldCell) use ($uuid) {
-            return null !== $fieldCell->getPlayer($uuid);
-        });
+        $fieldCells = $this->filter(fn (FieldCell $fieldCell) => $fieldCell->getPlayer($uuid) instanceof \bomberman\components\field\Player);
         if ($fieldCells->count() > 0) {
             return $fieldCells->first()->getPlayer($uuid);
         }
@@ -97,9 +96,6 @@ class FieldCollection extends ArrayCollection
      */
     public function filterContainsItem()
     {
-        return $this->filter(function(FieldCell $fieldCell){
-            return count($fieldCell->getAllItems()) > 0;
-        });
+        return $this->filter(fn (FieldCell $fieldCell) => $fieldCell->getAllItems() !== []);
     }
-
 }

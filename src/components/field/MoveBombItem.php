@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
 * This file is part of the bomberman project.
 *
@@ -17,19 +19,14 @@ namespace bomberman\components\field;
  */
 class MoveBombItem extends BaseItem
 {
-
-    /**
-     * @param Player $player
-     */
     public function consume(Player $player)
     {
         // if the player can already kick bombs, then the powerup would be useless
         // so we make him faster if he gets it again :)
-        if($player->isCanMoveBombs()){
+        if ($player->isCanMoveBombs()) {
             $player->decreaseMovementSpeed();
         } else {
             $player->setCanMoveBombs();
         }
     }
-
 }
